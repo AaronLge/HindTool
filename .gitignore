@@ -1,0 +1,15 @@
+
+.idea
+.vs
+/JBOOST/*
+!/JBOOST/Accord.Math.dll
+!/JBOOST/DotNumerics.dll
+!/JBOOST/KeraLua.dll
+!/JBOOST/lua54.dll
+!/JBOOST/NLua.dll
+!/JBOOST/JBOOST.exe
+!/JBOOST/JBOOST_v2.1.exe
+!/JBOOST/wind.lua
+!/JBOOST/
+!/JBOOST/
+!/JBOOST/
