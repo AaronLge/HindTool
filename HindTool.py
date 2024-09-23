@@ -131,7 +131,7 @@ timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 
 if args.o is None:
     if INPUT['DataOut']['dir_name'] is None:
-        path_out = './out/' + 'HindCast_' + timestamp + '/'
+        path_out = INPUT['DataOut']['path_out'] + 'HindCast_' + timestamp + '/'
     else:
         path_out = INPUT['SELECT']['path_out'] + \
                    INPUT['SELECT']['dir_name'] + '/'
@@ -1073,7 +1073,18 @@ if 'swell' in INPUT["Toggle_Modules"].get("calc_Validation", {}):
     else:
         print(f"   loading from database: {db_path} in table {Input['table_name']} for current nodes and timeframe")
 
-        df = gl.export_df_from_sql(db_path, Input['table_name'], timeframe=timeframe, indizes=df_data.index)
+        df = gl.export_df_from_sql(db_path, Input['table_name'], timeframe=timeframe)
+
+        indizes_in = df.index.intersection(df_data.index)
+        indizes_in_2 = df_data.index.intersection(df.index)
+
+        if len(df.index.difference(df_data.index)) != 0:
+            print(f"   loaded data from DEL table and from Hindcast table have different indizes, "
+                  f"{len(df.index.difference(df_data.index))} points dropped from DEL data, {len(df_data.index.difference(df.index))} dropped from Hincast data")
+
+        df = df.loc[indizes_in]
+        df_data = df_data.loc[indizes_in]
+
         df = gl.filter_df_cols_by_keywords(df, Input['nodes_to_load'])
 
         Calc.basedata = {"dbname": db_path,
