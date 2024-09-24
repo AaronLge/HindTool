@@ -2,6 +2,7 @@
 .idea
 .vs
 /JBOOST/*
+Input.txt
 !/JBOOST/Accord.Math.dll
 !/JBOOST/DotNumerics.dll
 !/JBOOST/KeraLua.dll
