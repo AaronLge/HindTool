@@ -129,6 +129,14 @@ print(f"reading Inputfile ({path_in})...")
 INPUT = gl.read_input_txt(path_in)
 timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 
+# #ReportInput
+# if INPUT.get("Report", {}):
+#     try:
+#         INPUT_REPORT = gl.read_input_txt(INPUT["Report"]["ReportInput"])
+#
+#     except:
+#         print(f"Report input file {INPUT['Report']['ReportInput']} not fond")
+
 if args.o is None:
     if INPUT['DataOut']['dir_name'] is None:
         path_out = INPUT['DataOut']['path_out'] + 'HindCast_' + timestamp + '/'
@@ -242,19 +250,6 @@ elif INPUT["DataBase"]["colnames_preset"] is None:
     COLNAMES = INPUT["ColumNames"]
 else:
     print("please choose colnames_preset from 'MetOcen', 'APGMer' or None to import Colnames from Input file")
-
-# create DataCol classes and link with
-# COLNAMES = {}
-# COLNAMES_ALIAS = INPUT["Aliase"]
-#
-# for key_col, colname in COLNAMES_input.items():
-#
-#     if key_col in COLNAMES_ALIAS:
-#         name_plot = COLNAMES_ALIAS[key_col]
-#     else:
-#         name_plot = colname
-#
-#     COLNAMES[key_col] = hc_calc.DataCol(name_data=colname, name_plot=name_plot, db_name=db_path, table_raw='Hindcast_combined', symbol=key_col )
 
 
 # %% Calculation
@@ -587,7 +582,7 @@ if (('wind' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
     Calc = hc_calc.Calculation()
     Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
-    Calc.result = hc_calc.calc_VMTP(DATA_OUT["VMHS"]["wind"].result, DATA_OUT["HSTP"]["wind"].result, fill_value_interp=False)
+    Calc.result = hc_calc.calc_VMTP(DATA_OUT["VMHS"]["wind"].result, DATA_OUT["HSTP"]["wind"].result, fill_range=False)
     DATA_OUT["VMTP"]["wind"] = Calc
 
 if (('swell' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
@@ -599,9 +594,9 @@ if (('swell' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
     column_names = [COLNAMES["T_p_swell"], COLNAMES["v_m"], COLNAMES["dir_T_mean_Swell"]]
 
     Calc = hc_calc.Calculation()
-    Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
+    df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
-    Calc.result = hc_calc.calc_VMTP(DATA_OUT["VMHS"]["swell"].result, DATA_OUT["HSTP"]["swell"].result, fill_value_interp=True)
+    Calc.result = hc_calc.calc_VMTP(DATA_OUT["VMHS"]["swell"].result, DATA_OUT["HSTP"]["swell"].result, vm_points=df[COLNAMES["v_m"]], fill_range=True)
     DATA_OUT["VMTP"]["swell"] = Calc
 
 if (('total' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
@@ -615,7 +610,7 @@ if (('total' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
     Calc = hc_calc.Calculation()
     Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
-    Calc.result = hc_calc.calc_VMTP(DATA_OUT["VMHS"]["total"].result, DATA_OUT["HSTP"]["total"].result, fill_value_interp=False)
+    Calc.result = hc_calc.calc_VMTP(DATA_OUT["VMHS"]["total"].result, DATA_OUT["HSTP"]["total"].result, fill_range=False)
     DATA_OUT["VMTP"]["total"] = Calc
 
 # Table
@@ -1021,7 +1016,7 @@ if 'wind' in INPUT["Toggle_Modules"].get("calc_Validation", {}):
                          "colnames_ini": df.keys,
                          "db_timeframe": [df.index[0], df.index[1]],
                          "N_rows": len(df),
-                         "sample_rate": df.index[1] - df.index[0],
+                         "sample_rate": gl.median_sample_rate(df.index),
                          "indizes": df.index}
 
     Calc.initilize_filter(None, mode='nans')
@@ -1418,6 +1413,7 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
             tile_curr.add_scatter(scatter)
 
             if Seg.angles is not None:
+                tile_curr.legend_fontsize = 6
                 Tiles.append(tile_curr)
 
             else:
@@ -2104,9 +2100,9 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_Tables", {}):
             gl.save_figs_as_pdf(FIG, path_out + 'table_vmtp_swell', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
 if 'total' in INPUT["Toggle_Modules"].get("plot_Tables", {}):
-    print('plotting Tables swell...')
+    print('plotting Tables total...')
 
-    if not ('swell' in INPUT["Toggle_Modules"].get("calc_Tables", {})):
+    if not ('total' in INPUT["Toggle_Modules"].get("calc_Tables", {})):
         print("   please toggle calculation to plot")
     else:
         # VMHS
@@ -2506,7 +2502,7 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
                 textbox.append(f"DEL Hindcast: {Seg.result['hindcast']['added'][config].values[0]:.3e}")
                 textbox.append(f"DEL Condensed: {Seg.result['condensed']['added'][config].values[0]:.3e}")
                 textbox.append(
-                    f"Condensed/Hindcast: {round(Seg.result['hindcast']['added'][config].values[0] / Seg.result['condensed']['added'][config].values[0] * 100, 1)}" + r"\%")
+                    f"Condensed/Hindcast: {round(Seg.result['condensed']['added'][config].values[0] / Seg.result['hindcast']['added'][config].values[0] * 100, 1)}" + r"\%")
                 colors.append([cmap_lines(range_colors[i])])
                 colors.append(['black'])
                 colors.append(['black'])
@@ -2514,17 +2510,6 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
 
             Textbox_data = pd.DataFrame(data=textbox)
             colors_data = pd.DataFrame(data=colors)
-
-            Textbox_DEL = hc_plt.Textbox(Textbox_data,
-                                         fontsize=8,
-                                         corner1=[0.3, 1],
-                                         corner2=[1, 0.4],
-                                         colors=colors_data,
-                                         orientation_h='left',
-                                         orientation_v='center',
-                                         header=False)
-
-            tile_curr.add_textbox(Textbox_DEL)
 
             Bar_count = hc_plt.Bar(x=Seg.result["condensed"]['vm_vise'][configs[0]].index,
                                    y=Seg.result["condensed"]['vm_vise']["count"],
@@ -2539,8 +2524,29 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
             tile_curr.add_bar(Bar_count)
 
             if Seg.angles is not None:
+                Textbox_DEL = hc_plt.Textbox(Textbox_data,
+                             fontsize=7,
+                             corner1=[0.4, 1],
+                             corner2=[1, 0.4],
+                             colors=colors_data,
+                             orientation_h='left',
+                             orientation_v='center',
+                             header=False)
+
+                tile_curr.add_textbox(Textbox_DEL)
                 Tiles.append(tile_curr)
+
             else:
+                Textbox_DEL = hc_plt.Textbox(Textbox_data,
+                                             fontsize=8,
+                                             corner1=[0.6, 1],
+                                             corner2=[1, 0.4],
+                                             colors=colors_data,
+                                             orientation_h='left',
+                                             orientation_v='center',
+                                             header=False)
+
+                tile_curr.add_textbox(Textbox_DEL)
                 Tiles_omni.append(tile_curr)
 
         FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage)
@@ -2560,7 +2566,7 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
             Tiles_omni = []
             titels = Calc.create_segment_title()
 
-            titels = [f'Wind Sea, config: {config} ' + "\n" + title for title in titels]
+            titels = [f'Wind Sea, config: {config} ' + "\n" + title + "\n" for title in titels]
 
             titels = gl.alias(titels, COLNAMES, INPUT["Aliase"])
 
@@ -2622,8 +2628,6 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
         Tiles_omni = []
         titels = Calc.create_segment_title()
 
-        titels = [f'Swell' + "\n" + title for title in titels]
-
         titels = gl.alias(titels, COLNAMES, INPUT["Aliase"])
 
         for i, Seg in enumerate(Calc.result):
@@ -2638,12 +2642,16 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
 
             Meta = Seg.result["meta"]
 
+            Legend = [{"color": 'grey', "label": "hindcast", "linestyle": '-'},
+                      {"color": 'grey', "label": "condensed", "linestyle": '--'}]
+
             tile_curr = hc_plt.Tile(i,
                                     x_label=gl.alias(Seg.colnames["Hindcast"]["v_m"], COLNAMES, INPUT["Aliase"]),
-                                    y_label=f'Bending DEL [Nm]' + r" $\vert$ " + f'm={Meta["SN_slope"]}' + "\n " + f'N_ref={Meta["N_ref"]:.2e}' + r" $\vert$ " + f'lifetime={Meta["design_life"]}y',
+                                    y_label=f'Bending DEL [Nm]' + r" $\vert$ " + f'm={Meta["SN_slope"]}' + "\n" + f'N_ref={Meta["N_ref"]:.2e}' + r" $\vert$ " + f'lifetime={Meta["design_life"]}y',
                                     y_label_right='number of datapoints',
                                     title=titels[i],
-                                    spinecolor_right=barcolor)
+                                    spinecolor_right=barcolor,
+                                    legend=Legend)
 
             configs = list(Seg.result["condensed"]['vm_vise'].columns)
             configs = [config for config in configs if config != 'count']
@@ -2670,7 +2678,7 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
                 textbox.append(f"DEL Hindcast: {Seg.result['hindcast']['added'][config].values[0]:.3e}")
                 textbox.append(f"DEL Condensed: {Seg.result['condensed']['added'][config].values[0]:.3e}")
                 textbox.append(
-                    f"Condensed/Hindcast: {round(Seg.result['hindcast']['added'][config].values[0] / Seg.result['condensed']['added'][config].values[0] * 100, 1)}" + r"\%")
+                    f"Condensed/Hindcast: {round(Seg.result['condensed']['added'][config].values[0] / Seg.result['hindcast']['added'][config].values[0] * 100, 1)}" + r"\%")
                 colors.append([cmap_lines(range_colors[i])])
                 colors.append(['black'])
                 colors.append(['black'])
@@ -2678,17 +2686,6 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
 
             Textbox_data = pd.DataFrame(data=textbox)
             colors_data = pd.DataFrame(data=colors)
-
-            Textbox_DEL = hc_plt.Textbox(Textbox_data,
-                                         fontsize=8,
-                                         corner1=[0.5, 1],
-                                         corner2=[1, 0.4],
-                                         colors=colors_data,
-                                         orientation_h='left',
-                                         orientation_v='center',
-                                         header=False)
-
-            tile_curr.add_textbox(Textbox_DEL)
 
             Bar_count = hc_plt.Bar(x=Seg.result["condensed"]['vm_vise'][configs[0]].index,
                                    y=Seg.result["condensed"]['vm_vise']["count"],
@@ -2703,12 +2700,34 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
             tile_curr.add_bar(Bar_count)
 
             if Seg.angles is not None:
+                Textbox_DEL = hc_plt.Textbox(Textbox_data,
+                             fontsize=6,
+                             corner1=[0.4, 1],
+                             corner2=[1, 0.4],
+                             colors=colors_data,
+                             orientation_h='left',
+                             orientation_v='center',
+                             header=False)
+
+                tile_curr.add_textbox(Textbox_DEL)
                 Tiles.append(tile_curr)
+
             else:
+                Textbox_DEL = hc_plt.Textbox(Textbox_data,
+                                             fontsize=8,
+                                             corner1=[0.6, 1],
+                                             corner2=[1, 0.4],
+                                             colors=colors_data,
+                                             orientation_h='left',
+                                             orientation_v='center',
+                                             header=False)
+
+                tile_curr.add_textbox(Textbox_DEL)
                 Tiles_omni.append(tile_curr)
 
         FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage)
         FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
+
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'Valid_line_swell', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2724,7 +2743,7 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
             Tiles_omni = []
             titels = Calc.create_segment_title()
 
-            titels = [f'Swell, config: {config} ' + "\n" + title for title in titels]
+            titels = [f'Wind Sea, config: {config} ' + "\n" + title + "\n" for title in titels]
 
             titels = gl.alias(titels, COLNAMES, INPUT["Aliase"])
 
@@ -2892,6 +2911,20 @@ if INPUT["Toggle_Modules"].get("plot_Weibull", {}):
         if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f'Weibull_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
+
+# %% plot report tables
+
+# if INPUT["Report"]["create_report"]:
+#     print("1")
+#
+#     #Condensation Tables
+#     if ['wind', 'swell', 'total'] in INPUT["Toggle_Modules"].get("calc_VMHS", {}):
+#         Input = INPUT["VMHS_wind"]
+#
+#         Parameter = []
+
+
+
 # %% Data Out
 if INPUT["DataOut"]["CSV_out"]:
     print("saving CSV Data...")
@@ -3048,6 +3081,7 @@ if INPUT["DataOut"]["CSV_out"]:
         gl.save_df_list_to_excel(path_csv + r'//Validation_wind_hindcast_added', data_hindcast_added, sheet_names=table_names)
         gl.save_df_list_to_excel(path_csv + r'//Validation_wind_condensed_added', data_condensed_added, sheet_names=table_names)
 
+
     if "swell" in DATA_OUT["Validation"]:
         print("   Validation swell")
         calc = DATA_OUT["Validation"]["swell"]
@@ -3068,6 +3102,8 @@ if INPUT["DataOut"]["CSV_out"]:
         gl.save_df_list_to_excel(path_csv + r'//Validation_swell_condensed_vm_vise', data_condensed_vm_vise, sheet_names=table_names)
         gl.save_df_list_to_excel(path_csv + r'//Validation_swell_hindcast_added', data_hindcast_added, sheet_names=table_names)
         gl.save_df_list_to_excel(path_csv + r'//Validation_swell_condensed_added', data_condensed_added, sheet_names=table_names)
+
+
 
 # %% MAIN - Save Infolog
 print("saving Log...")
