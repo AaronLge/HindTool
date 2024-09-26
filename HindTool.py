@@ -644,27 +644,6 @@ if (('wind' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
 if (('swell' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
         or ('swell' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
 
-    vmhs = DATA_OUT["VMHS"]["swell"]
-    vmtp = DATA_OUT["VMTP"]["swell"]
-
-    vm_data = vmhs.load_from_db([COLNAMES["v_m"]])
-    vm_data = vm_data[vm_data.keys()[0]]
-
-    Input = INPUT["Tables"]
-
-    vm_zone = Input["vm_zone"]
-    if Input["vm_zone"][1] is None:
-        vm_zone[1] = max(vm_data.values)
-
-    vm_grid = gl.range_stepfix(Input["vm_step"], vm_zone)
-
-    Calc = hc_calc.Calculation()
-    Calc.result = hc_calc.calc_tables(DATA_OUT["VMHS"]["swell"].result, vm_grid, vm_data)
-    DATA_OUT["table_vmhs"]["swell"] = Calc
-
-    Calc = hc_calc.Calculation()
-    Calc.result = hc_calc.calc_tables(DATA_OUT["VMTP"]["swell"].result, vm_grid, vm_data)
-    DATA_OUT["table_vmtp"]["swell"] = Calc
     print("calculating Tables Swell Sea...")
 
     vmhs = DATA_OUT["VMHS"]["swell"]
@@ -678,19 +657,43 @@ if (('swell' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
     vm_zone = Input["vm_zone"]
     if Input["vm_zone"][1] is None:
         vm_zone[1] = max(vm_data.values)
+
     vm_grid = gl.range_stepfix(Input["vm_step"], vm_zone)
 
     Calc = hc_calc.Calculation()
-
     Calc.result = hc_calc.calc_tables(DATA_OUT["VMHS"]["swell"].result, vm_grid, vm_data)
     DATA_OUT["table_vmhs"]["swell"] = Calc
 
     Calc = hc_calc.Calculation()
     Calc.result = hc_calc.calc_tables(DATA_OUT["VMTP"]["swell"].result, vm_grid, vm_data)
     DATA_OUT["table_vmtp"]["swell"] = Calc
+    # print("calculating Tables Swell Sea...")
+    #
+    # vmhs = DATA_OUT["VMHS"]["swell"]
+    # vmtp = DATA_OUT["VMTP"]["swell"]
+    #
+    # vm_data = vmhs.load_from_db([COLNAMES["v_m"]])
+    # vm_data = vm_data[vm_data.keys()[0]]
+    #
+    # Input = INPUT["Tables"]
+    #
+    # vm_zone = Input["vm_zone"]
+    # if Input["vm_zone"][1] is None:
+    #     vm_zone[1] = max(vm_data.values)
+    # vm_grid = gl.range_stepfix(Input["vm_step"], vm_zone)
+    #
+    # Calc = hc_calc.Calculation()
+    #
+    # Calc.result = hc_calc.calc_tables(DATA_OUT["VMHS"]["swell"].result, vm_grid, vm_data)
+    # DATA_OUT["table_vmhs"]["swell"] = Calc
+    #
+    # Calc = hc_calc.Calculation()
+    # Calc.result = hc_calc.calc_tables(DATA_OUT["VMTP"]["swell"].result, vm_grid, vm_data)
+    # DATA_OUT["table_vmtp"]["swell"] = Calc
 
 if (('total' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
         or ('total' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
+    print("calculating Tables Total Sea...")
 
     vmhs = DATA_OUT["VMHS"]["total"]
     vmtp = DATA_OUT["VMTP"]["total"]
@@ -713,29 +716,29 @@ if (('total' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
     Calc = hc_calc.Calculation()
     Calc.result = hc_calc.calc_tables(DATA_OUT["VMTP"]["total"].result, vm_grid, vm_data)
     DATA_OUT["table_vmtp"]["total"] = Calc
-    print("calculating Tables total Sea...")
-
-    vmhs = DATA_OUT["VMHS"]["total"]
-    vmtp = DATA_OUT["VMTP"]["total"]
-
-    vm_data = vmhs.load_from_db([COLNAMES["v_m"]])
-    vm_data = vm_data[vm_data.keys()[0]]
-
-    Input = INPUT["Tables"]
-
-    vm_zone = Input["vm_zone"]
-    if Input["vm_zone"][1] is None:
-        vm_zone[1] = max(vm_data.values)
-    vm_grid = gl.range_stepfix(Input["vm_step"], vm_zone)
-
-    Calc = hc_calc.Calculation()
-
-    Calc.result = hc_calc.calc_tables(DATA_OUT["VMHS"]["total"].result, vm_grid, vm_data)
-    DATA_OUT["table_vmhs"]["total"] = Calc
-
-    Calc = hc_calc.Calculation()
-    Calc.result = hc_calc.calc_tables(DATA_OUT["VMTP"]["total"].result, vm_grid, vm_data)
-    DATA_OUT["table_vmtp"]["total"] = Calc
+    # print("calculating Tables total Sea...")
+    #
+    # vmhs = DATA_OUT["VMHS"]["total"]
+    # vmtp = DATA_OUT["VMTP"]["total"]
+    #
+    # vm_data = vmhs.load_from_db([COLNAMES["v_m"]])
+    # vm_data = vm_data[vm_data.keys()[0]]
+    #
+    # Input = INPUT["Tables"]
+    #
+    # vm_zone = Input["vm_zone"]
+    # if Input["vm_zone"][1] is None:
+    #     vm_zone[1] = max(vm_data.values)
+    # vm_grid = gl.range_stepfix(Input["vm_step"], vm_zone)
+    #
+    # Calc = hc_calc.Calculation()
+    #
+    # Calc.result = hc_calc.calc_tables(DATA_OUT["VMHS"]["total"].result, vm_grid, vm_data)
+    # DATA_OUT["table_vmhs"]["total"] = Calc
+    #
+    # Calc = hc_calc.Calculation()
+    # Calc.result = hc_calc.calc_tables(DATA_OUT["VMTP"]["total"].result, vm_grid, vm_data)
+    # DATA_OUT["table_vmtp"]["total"] = Calc
 
 # RWI
 if 'wind' in INPUT["Toggle_Modules"].get("calc_RWI", {}):
@@ -2743,7 +2746,7 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
             Tiles_omni = []
             titels = Calc.create_segment_title()
 
-            titels = [f'Wind Sea, config: {config} ' + "\n" + title + "\n" for title in titels]
+            titels = [f'Swell Sea, config: {config} ' + "\n" + title + "\n" for title in titels]
 
             titels = gl.alias(titels, COLNAMES, INPUT["Aliase"])
 
@@ -3006,6 +3009,15 @@ if INPUT["DataOut"]["CSV_out"]:
 
         gl.save_df_list_to_excel(path_csv + r'//RWI_wind', data, sheet_names=table_names)
 
+    if "swell" in DATA_OUT["RWI"]:
+        print("   RWI swell")
+        calc = DATA_OUT["RWI"]["swell"]
+        data = unpack_funcs["flat_data"](calc)
+        table_names = unpack_funcs["flat_angles"](calc)
+        table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
+
+        gl.save_df_list_to_excel(path_csv + r'//RWI_swell', data, sheet_names=table_names)
+
     if "wind" in DATA_OUT["WaveBreak_Steep"]:
         print("   WaveBreak_Steep wind")
         calc = DATA_OUT["WaveBreak_Steep"]["wind"]
@@ -3076,10 +3088,20 @@ if INPUT["DataOut"]["CSV_out"]:
 
         table_names = unpack_funcs["flat_angles"](calc)
         table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
+
+        table_hindcast_added_combined = [list(table.values[0]) for table in data_hindcast_added]
+        table_hindcast_added_combined = pd.DataFrame(table_hindcast_added_combined, columns=data_hindcast_added[0].columns)
+        table_hindcast_added_combined["angles"] = table_names
+
+        table_condensed_added_combined = [list(table.values[0]) for table in data_condensed_added]
+        table_condensed_added_combined = pd.DataFrame(table_condensed_added_combined, columns=data_condensed_added[0].columns)
+        table_condensed_added_combined["angles"] = table_names
+
+        table_wind_added = [table_hindcast_added_combined, table_condensed_added_combined]
+
         gl.save_df_list_to_excel(path_csv + r'//Validation_wind_hindcast_vm_vise', data_hindcast_vm_vise, sheet_names=table_names)
         gl.save_df_list_to_excel(path_csv + r'//Validation_wind_condensed_vm_vise', data_condensed_vm_vise, sheet_names=table_names)
-        gl.save_df_list_to_excel(path_csv + r'//Validation_wind_hindcast_added', data_hindcast_added, sheet_names=table_names)
-        gl.save_df_list_to_excel(path_csv + r'//Validation_wind_condensed_added', data_condensed_added, sheet_names=table_names)
+        gl.save_df_list_to_excel(path_csv + r'//Validation_wind_added', table_wind_added, sheet_names=["hindcast", "condensed"])
 
 
     if "swell" in DATA_OUT["Validation"]:
@@ -3098,10 +3120,20 @@ if INPUT["DataOut"]["CSV_out"]:
 
         table_names = unpack_funcs["flat_angles"](calc)
         table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
+
+        table_hindcast_added_combined = [list(table.values[0]) for table in data_hindcast_added]
+        table_hindcast_added_combined = pd.DataFrame(table_hindcast_added_combined, columns=data_hindcast_added[0].columns)
+        table_hindcast_added_combined["angles"] = table_names
+
+        table_condensed_added_combined = [list(table.values[0]) for table in data_condensed_added]
+        table_condensed_added_combined = pd.DataFrame(table_condensed_added_combined, columns=data_condensed_added[0].columns)
+        table_condensed_added_combined["angles"] = table_names
+
+        table_wind_added = [table_hindcast_added_combined, table_condensed_added_combined]
+
         gl.save_df_list_to_excel(path_csv + r'//Validation_swell_hindcast_vm_vise', data_hindcast_vm_vise, sheet_names=table_names)
         gl.save_df_list_to_excel(path_csv + r'//Validation_swell_condensed_vm_vise', data_condensed_vm_vise, sheet_names=table_names)
-        gl.save_df_list_to_excel(path_csv + r'//Validation_swell_hindcast_added', data_hindcast_added, sheet_names=table_names)
-        gl.save_df_list_to_excel(path_csv + r'//Validation_swell_condensed_added', data_condensed_added, sheet_names=table_names)
+        gl.save_df_list_to_excel(path_csv + r'//Validation_swell_added', table_wind_added, sheet_names=["hindcast", "condensed"])
 
 
 
