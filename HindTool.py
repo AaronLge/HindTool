@@ -273,11 +273,56 @@ DATA_OUT["ExtremeConture"] = {}
 if (('wind' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
         or ('wind' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
         or ('wind' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
-        or ('wind' in INPUT["Toggle_Modules"].get("calc_Validation", {}))
-        or (INPUT["Toggle_Modules"].get("plot_condensation_example", {}))):
+        or ('wind' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
     print("calculating VMHS Wind Sea...")
 
     Input = INPUT["VMHS_wind"]
+    table_name = 'Hindcast_combined'
+    column_names = [COLNAMES["dir_v_m"], COLNAMES["v_m"], COLNAMES["H_s_wind"]]
+
+    Calc = hc_calc.Calculation()
+    Calc.anglecol = COLNAMES["dir_v_m"]
+
+    df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
+
+    # filter for nans
+    indizes_in = Calc.initilize_filter(None, mode='nans')
+    df = df.loc[indizes_in]
+
+    directional = hc_calc.calc_VMHS(df[COLNAMES["v_m"]], df[COLNAMES["H_s_wind"]], df[COLNAMES["dir_v_m"]], angle_grid_mod,
+                                    N_grid=Input["N_grid"],
+                                    deg_reg=Input["deg_reg"],
+                                    model_reg=Input["model_reg"],
+                                    cut_reg=Input["cut_reg"],
+                                    weighting_reg=Input["weighting_reg"],
+                                    zone_reg=Input["zone_reg"],
+                                    zone_line=Input["zone_line"],
+                                    bin_min=Input["bin_min"],
+                                    average_correction=Input["average_correction"],
+                                    avrg_method=Input["avrg_method"],
+                                    make_monotone=Input["make_monotone"])
+
+    omni = hc_calc.calc_VMHS(df[COLNAMES["v_m"]], df[COLNAMES["H_s_wind"]], df[COLNAMES["dir_v_m"]], None,
+                             N_grid=Input["N_grid"],
+                             deg_reg=Input["deg_reg"],
+                             model_reg=Input["model_reg"],
+                             cut_reg=Input["cut_reg"],
+                             weighting_reg=Input["weighting_reg"],
+                             zone_reg=Input["zone_reg"],
+                             zone_line=Input["zone_line"],
+                             bin_min=Input["bin_min"],
+                             average_correction=Input["average_correction"],
+                             avrg_method=Input["avrg_method"],
+                             make_monotone=Input["make_monotone"])
+
+    Calc.result = omni + directional
+
+    DATA_OUT["VMHS"]["wind"] = Calc
+
+if (INPUT["Toggle_Modules"].get("plot_condensation_example", {})):
+    print("calculating VMHS Wind Sea example plot...")
+
+    Input = INPUT["VMHS_docu"]
     table_name = 'Hindcast_combined'
     column_names = [COLNAMES["dir_v_m"], COLNAMES["v_m"], COLNAMES["H_s_wind"]]
 
@@ -661,29 +706,6 @@ if (('swell' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
     Calc = hc_calc.Calculation()
     Calc.result = hc_calc.calc_tables(DATA_OUT["VMTP"]["swell"].result, vm_grid, vm_data)
     DATA_OUT["table_vmtp"]["swell"] = Calc
-    # print("calculating Tables Swell Sea...")
-    #
-    # vmhs = DATA_OUT["VMHS"]["swell"]
-    # vmtp = DATA_OUT["VMTP"]["swell"]
-    #
-    # vm_data = vmhs.load_from_db([COLNAMES["v_m"]])
-    # vm_data = vm_data[vm_data.keys()[0]]
-    #
-    # Input = INPUT["Tables"]
-    #
-    # vm_zone = Input["vm_zone"]
-    # if Input["vm_zone"][1] is None:
-    #     vm_zone[1] = max(vm_data.values)
-    # vm_grid = gl.range_stepfix(Input["vm_step"], vm_zone)
-    #
-    # Calc = hc_calc.Calculation()
-    #
-    # Calc.result = hc_calc.calc_tables(DATA_OUT["VMHS"]["swell"].result, vm_grid, vm_data)
-    # DATA_OUT["table_vmhs"]["swell"] = Calc
-    #
-    # Calc = hc_calc.Calculation()
-    # Calc.result = hc_calc.calc_tables(DATA_OUT["VMTP"]["swell"].result, vm_grid, vm_data)
-    # DATA_OUT["table_vmtp"]["swell"] = Calc
 
 if (('total' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
         or ('total' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
@@ -710,29 +732,6 @@ if (('total' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
     Calc = hc_calc.Calculation()
     Calc.result = hc_calc.calc_tables(DATA_OUT["VMTP"]["total"].result, vm_grid, vm_data)
     DATA_OUT["table_vmtp"]["total"] = Calc
-    # print("calculating Tables total Sea...")
-    #
-    # vmhs = DATA_OUT["VMHS"]["total"]
-    # vmtp = DATA_OUT["VMTP"]["total"]
-    #
-    # vm_data = vmhs.load_from_db([COLNAMES["v_m"]])
-    # vm_data = vm_data[vm_data.keys()[0]]
-    #
-    # Input = INPUT["Tables"]
-    #
-    # vm_zone = Input["vm_zone"]
-    # if Input["vm_zone"][1] is None:
-    #     vm_zone[1] = max(vm_data.values)
-    # vm_grid = gl.range_stepfix(Input["vm_step"], vm_zone)
-    #
-    # Calc = hc_calc.Calculation()
-    #
-    # Calc.result = hc_calc.calc_tables(DATA_OUT["VMHS"]["total"].result, vm_grid, vm_data)
-    # DATA_OUT["table_vmhs"]["total"] = Calc
-    #
-    # Calc = hc_calc.Calculation()
-    # Calc.result = hc_calc.calc_tables(DATA_OUT["VMTP"]["total"].result, vm_grid, vm_data)
-    # DATA_OUT["table_vmtp"]["total"] = Calc
 
 # RWI
 if 'wind' in INPUT["Toggle_Modules"].get("calc_RWI", {}):
@@ -969,7 +968,7 @@ if len(INPUT["Toggle_Modules"].get("calc_ExtremeValues", {})) > 0:
 
         DATA_OUT["ExtremeValues"][f"{cols[0]} over {cols[1]}"] = Calc
 
-# Extreme Conture Plots
+#Extreme Conture Plots
 if len(INPUT["Toggle_Modules"].get("calc_ExtremeConture", {})) > 0:
     print("calculating Extreme Conture Plots...")
     DATA_OUT["ExtremeConturePlots"] = {}
@@ -1219,10 +1218,9 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
 
             Line_mean = hc_plt.Line(x=Seg.result["x"],
                                     y=Seg.result["mean result plot"],
-                                    label='mean',
+                                    label='Selected correlation',
                                     color='black')
 
-            tile_curr.add_line(Line_mean)
 
             scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]],
                                      y=point_data[Seg.colnames["y"]],
@@ -1231,6 +1229,7 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
                                      cmap_norm='sqrt')
 
             tile_curr.add_scatter(scatter)
+            tile_curr.add_line(Line_mean)
 
             if Seg.angles is not None:
                 Tiles.append(tile_curr)
@@ -1293,7 +1292,7 @@ if INPUT["Toggle_Modules"].get("plot_condensation_example", {}):
                                           y=Seg.result["mean"],
                                           label='$y$ (representative bin values)',
                                           color='black',
-                                          size=20)
+                                          size=30)
 
             Line_regression = hc_plt.Line(x=Seg.result["x"],
                                           y=Seg.result["mean regression"],
@@ -1303,32 +1302,34 @@ if INPUT["Toggle_Modules"].get("plot_condensation_example", {}):
 
             Line_regression_inrange = hc_plt.Line(x=Seg.result["x"].iloc[use_reg_zone],
                                           y=Seg.result["mean regression"].iloc[use_reg_zone],
+                                          label='Resulting regression curve',
                                           color='blue',
-                                      linewidth=2.5)
+                                          linewidth=1.5)
 
             Line_reg_zone_left = hc_plt.Line(x=[Seg.result['x'].iloc[reg_zone[0]]],
                                              y=None,
-                                             label=r'Range of the regression base ',
-                                             color='blue',
-                                      linewidth=1)
+                                             label=r'Range of the regression base (start, end)',
+                                             color='#20D503',
+                                      linewidth=2)
 
             Line_reg_zone_right = hc_plt.Line(x=[Seg.result['x'].iloc[reg_zone[-1]]],
                                               y=None,
-                                              color='blue',
-                                      linewidth=1)
+                                              color='#20D503',
+                                      linewidth=2)
 
             Line_use_reg = hc_plt.Line(x=[Seg.result['x'].iloc[use_reg_zone[0]]],
                                        y=None,
-                                       label=r'start of datapoints evaluated with regression curve',
-                                       color='green',
-                                      linewidth=1,
+                                       label=r'Start of datapoints evaluated with regression curve',
+                                       color='#20D503',
+                                       linewidth=2,
                                        linestyle='--')
 
             scatter_regression = hc_plt.Scatter(x=Seg.result["x"].iloc[reg_zone],
                                                 y=Seg.result["mean"].iloc[reg_zone],
-                                                label=r'values used for regression (inside "Range of the regression base")',
+                                                label=r'Values used for regression (inside "Range of the regression base")',
                                                 color='blue',
-                                                size=40)
+                                                size=40,
+                                                marker='x')
 
             Line_result = hc_plt.Line(x=Seg.result["x"],
                                       y=Seg.result["mean result"],
@@ -1338,19 +1339,19 @@ if INPUT["Toggle_Modules"].get("plot_condensation_example", {}):
 
             Scatter_result = hc_plt.Scatter(x=Seg.result["x"],
                                       y=Seg.result["mean result"],
-                                      label=r'resulting values',
+                                      label=r'Selected correlation',
                                       color='red',
                                       size=5)
 
             tile_curr.add_scatter(scatter)
-            tile_curr.add_line(Line_mean)
+           # tile_curr.add_line(Line_mean)
             tile_curr.add_line(Line_regression)
 
             tile_curr.add_line(Line_regression_inrange)
-            tile_curr.add_line(Line_mean_inrange)
+          #  tile_curr.add_line(Line_mean_inrange)
 
-            tile_curr.add_scatter(scatter_regression)
             tile_curr.add_scatter(scatter_mean)
+            tile_curr.add_scatter(scatter_regression)
 
             tile_curr.add_line(Line_reg_zone_right)
             tile_curr.add_line(Line_reg_zone_left)
@@ -1364,10 +1365,10 @@ if INPUT["Toggle_Modules"].get("plot_condensation_example", {}):
     FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-        gl.save_figs_as_png(FIG_omni, path_out + 'VMHS_wind', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+        gl.save_figs_as_png(FIG_omni, path_out + 'VMHS_example', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
     if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-        gl.save_figs_as_pdf(FIG_omni, path_out + 'VMHS_wind', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+        gl.save_figs_as_pdf(FIG_omni, path_out + 'VMHS_example', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
 if 'swell' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
     print('plotting VMHS swell...')
@@ -1397,10 +1398,9 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
 
             Line_mean = hc_plt.Line(x=Seg.result["x"],
                                     y=Seg.result["mean result plot"],
-                                    label='mean',
+                                    label='Selected correlation',
                                     color='black')
 
-            tile_curr.add_line(Line_mean)
 
             scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]],
                                      y=point_data[Seg.colnames["y"]],
@@ -1409,6 +1409,7 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
                                      cmap_norm='sqrt')
 
             tile_curr.add_scatter(scatter)
+            tile_curr.add_line(Line_mean)
 
             if Seg.angles is not None:
                 Tiles.append(tile_curr)
@@ -1453,10 +1454,9 @@ if 'total' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
 
             Line_mean = hc_plt.Line(x=Seg.result["x"],
                                     y=Seg.result["mean result plot"],
-                                    label='mean',
+                                    label='Selected correlation',
                                     color='black')
 
-            tile_curr.add_line(Line_mean)
 
             scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]],
                                      y=point_data[Seg.colnames["y"]],
@@ -1465,6 +1465,7 @@ if 'total' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
                                      cmap_norm='sqrt')
 
             tile_curr.add_scatter(scatter)
+            tile_curr.add_line(Line_mean)
 
             if Seg.angles is not None:
                 Tiles.append(tile_curr)
@@ -1512,48 +1513,23 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
             key_perc = [key for key in key_plot if 'percentile' in key]
             key_quantile = [key for key in Seg.result.columns if 'quantile' in key]
 
-            Line_mean = hc_plt.Line(x=Seg.result["x"],
-                                    y=Seg.result["mean result plot"],
-                                    label='mean',
-                                    color='black',
-                                    linestyle='-')
-            tile_curr.add_line(Line_mean)
-
             Line_perc_low = hc_plt.Line(x=Seg.result["x"],
                                         y=Seg.result[key_perc[0]],
                                         label=key_perc[0].replace('result', '').replace('plot', ''),
                                         color='black',
                                         linestyle='--')
-            tile_curr.add_line(Line_perc_low)
+
+            Line_mean = hc_plt.Line(x=Seg.result["x"],
+                                    y=Seg.result["mean result plot"],
+                                    label='50 percentile',
+                                    color='black',
+                                    linestyle='-')
 
             Line_perc_up = hc_plt.Line(x=Seg.result["x"],
                                        y=Seg.result[key_perc[1]],
                                        label=key_perc[1].replace('result', '').replace('plot', ''),
                                        color='black',
                                        linestyle=':')
-            tile_curr.add_line(Line_perc_up)
-
-            if len(key_quantile) > 0:
-                Line_quant = hc_plt.Line(x=Seg.result["x"],
-                                         y=Seg.result[key_quantile[0]],
-                                         label='selected correlation',
-                                         color='red',
-                                         linestyle='-')
-                tile_curr.add_line(Line_quant)
-
-                Line_quant_up = hc_plt.Line(x=None,
-                                            y=[1 / Input["quant_up"]],
-                                            label=f'upper quantile, f={Input["quant_up"]} Hz',
-                                            color='green',
-                                            linestyle=':')
-                tile_curr.add_line(Line_quant_up)
-
-                Line_quant_low = hc_plt.Line(x=None,
-                                             y=[1 / Input["quant_low"]],
-                                             label=f'lower quantile, f={Input["quant_low"]} Hz',
-                                             color='green',
-                                             linestyle='--')
-                tile_curr.add_line(Line_quant_low)
 
             scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]],
                                      y=point_data[Seg.colnames["y"]],
@@ -1562,6 +1538,31 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
                                      cmap_norm='sqrt')
 
             tile_curr.add_scatter(scatter)
+            tile_curr.add_line(Line_perc_low)
+            tile_curr.add_line(Line_perc_up)
+            tile_curr.add_line(Line_mean)
+
+            if len(key_quantile) > 0:
+                Line_quant = hc_plt.Line(x=Seg.result["x"],
+                                         y=Seg.result[key_quantile[0]],
+                                         label='Selected correlation',
+                                         color='red',
+                                         linestyle='-')
+                tile_curr.add_line(Line_quant)
+
+                Line_quant_up = hc_plt.Line(x=None,
+                                            y=[1 / Input["quant_up"]],
+                                            label=r'$f_{up}$'+ f"$={round(Input['quant_up'], 3)}$ Hz",
+                                            color='green',
+                                            linestyle=':')
+                tile_curr.add_line(Line_quant_up)
+
+                Line_quant_low = hc_plt.Line(x=None,
+                                             y=[1 / Input["quant_low"]],
+                                             label=r'$f_{low}$' + f"$={round(Input['quant_low'],3)}$ Hz",
+                                             color='green',
+                                             linestyle='--')
+                tile_curr.add_line(Line_quant_low)
 
             if Seg.angles is not None:
                 tile_curr.legend_fontsize = 6
@@ -1607,6 +1608,12 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
                                     y_label=gl.alias(Seg.colnames['y'], COLNAMES, INPUT["Aliase"]),
                                     title=titels[i])
 
+            scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]],
+                                     y=point_data[Seg.colnames["y"]],
+                                     cmap='cool',
+                                     size=2,
+                                     cmap_norm='sqrt')
+
             key_plot = [key for key in Seg.result.columns if 'plot' in key]
             key_mean = [key for key in key_plot if 'mean' in key]
             key_perc = [key for key in key_plot if 'percentile' in key]
@@ -1614,54 +1621,12 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
 
             Line_mean = hc_plt.Line(x=Seg.result["x"],
                                     y=Seg.result["mean result plot"],
-                                    label='mean',
+                                    label='Selected correlation',
                                     color='black',
                                     linestyle='-')
-            tile_curr.add_line(Line_mean)
-
-            # Line_perc_low = hc_plt.Line(x=Seg.result["x"],
-            #                             y=Seg.result[key_perc[0]],
-            #                             label=key_perc[0].replace('result', '').replace('plot', ''),
-            #                             color='black',
-            #                             linestyle='--')
-            #tile_curr.add_line(Line_perc_low)
-
-            # Line_perc_up = hc_plt.Line(x=Seg.result["x"],
-            #                            y=Seg.result[key_perc[1]],
-            #                            label='mean',
-            #                            color='black',
-            #                            linestyle=':')
-            # tile_curr.add_line(Line_perc_up)
-
-            if len(key_quantile) > 0:
-                Line_quant = hc_plt.Line(x=Seg.result["x"],
-                                         y=Seg.result[key_quantile[0]],
-                                         label='selected correlation',
-                                         color='red',
-                                         linestyle='-')
-                tile_curr.add_line(Line_quant)
-
-                Line_quant_up = hc_plt.Line(x=None,
-                                            y=[1 / Input["quant_up"]],
-                                            label=f'upper quantile, f={Input["quant_up"]} Hz',
-                                            color='green',
-                                            linestyle=':')
-                tile_curr.add_line(Line_quant_up)
-
-                Line_quant_low = hc_plt.Line(x=None,
-                                             y=[1 / Input["quant_low"]],
-                                             label=f'lower quantile, f={Input["quant_low"]} Hz',
-                                             color='green',
-                                             linestyle='--')
-                tile_curr.add_line(Line_quant_low)
-
-            scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]],
-                                     y=point_data[Seg.colnames["y"]],
-                                     cmap='cool',
-                                     size=2,
-                                     cmap_norm='sqrt')
 
             tile_curr.add_scatter(scatter)
+            tile_curr.add_line(Line_mean)
 
             if Seg.angles is not None:
                 Tiles.append(tile_curr)
@@ -1713,46 +1678,9 @@ if 'total' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
 
             Line_mean = hc_plt.Line(x=Seg.result["x"],
                                     y=Seg.result["mean result plot"],
-                                    label='mean',
+                                    label='Selected correlation',
                                     color='black',
                                     linestyle='-')
-            tile_curr.add_line(Line_mean)
-
-            # Line_perc_low = hc_plt.Line(x=Seg.result["x"],
-            #                             y=Seg.result[key_perc[0]],
-            #                             label=key_perc[0].replace('result', '').replace('plot', ''),
-            #                             color='black',
-            #                             linestyle='--')
-            # tile_curr.add_line(Line_perc_low)
-
-            # Line_perc_up = hc_plt.Line(x=Seg.result["x"],
-            #                            y=Seg.result[key_perc[1]],
-            #                            label='mean',
-            #                            color='black',
-            #                            linestyle=':')
-            # tile_curr.add_line(Line_perc_up)
-
-            if len(key_quantile) > 0:
-                Line_quant = hc_plt.Line(x=Seg.result["x"],
-                                         y=Seg.result[key_quantile[0]],
-                                         label='selected correlation',
-                                         color='red',
-                                         linestyle='-')
-                tile_curr.add_line(Line_quant)
-
-                Line_quant_up = hc_plt.Line(x=None,
-                                            y=[1 / Input["quant_up"]],
-                                            label=f'upper quantile, f={Input["quant_up"]} Hz',
-                                            color='green',
-                                            linestyle=':')
-                tile_curr.add_line(Line_quant_up)
-
-                Line_quant_low = hc_plt.Line(x=None,
-                                             y=[1 / Input["quant_low"]],
-                                             label=f'lower quantile, f={Input["quant_low"]} Hz',
-                                             color='green',
-                                             linestyle='--')
-                tile_curr.add_line(Line_quant_low)
 
             scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]],
                                      y=point_data[Seg.colnames["y"]],
@@ -1761,6 +1689,7 @@ if 'total' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
                                      cmap_norm='sqrt')
 
             tile_curr.add_scatter(scatter)
+            tile_curr.add_line(Line_mean)
 
             if Seg.angles is not None:
                 Tiles.append(tile_curr)
@@ -1806,10 +1735,9 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_VMTP", {}):
 
             Line_mean = hc_plt.Line(x=Seg.result["x"],
                                     y=Seg.result["mean result plot"],
-                                    label='mean',
+                                    label='Extracted correlation',
                                     color='black')
 
-            tile_curr.add_line(Line_mean)
 
             scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]],
                                      y=point_data[Seg.colnames["y"]],
@@ -1818,6 +1746,7 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_VMTP", {}):
                                      cmap_norm='sqrt')
 
             tile_curr.add_scatter(scatter)
+            tile_curr.add_line(Line_mean)
 
             if Seg.angles is not None:
                 Tiles.append(tile_curr)
@@ -1864,10 +1793,9 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_VMTP", {}):
 
             Line_mean = hc_plt.Line(x=Seg.result["x"],
                                     y=Seg.result["mean result plot"],
-                                    label='mean',
+                                    label='Extracted correlation',
                                     color='black')
 
-            tile_curr.add_line(Line_mean)
 
             scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]],
                                      y=point_data[Seg.colnames["y"]],
@@ -1876,6 +1804,7 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_VMTP", {}):
                                      cmap_norm='sqrt')
 
             tile_curr.add_scatter(scatter)
+            tile_curr.add_line(Line_mean)
 
             if Seg.angles is not None:
                 Tiles.append(tile_curr)
@@ -1922,10 +1851,9 @@ if 'total' in INPUT["Toggle_Modules"].get("plot_VMTP", {}):
 
             Line_mean = hc_plt.Line(x=Seg.result["x"],
                                     y=Seg.result["mean result plot"],
-                                    label='mean',
+                                    label='Extracted correlation',
                                     color='black')
 
-            tile_curr.add_line(Line_mean)
 
             scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]],
                                      y=point_data[Seg.colnames["y"]],
@@ -1934,6 +1862,7 @@ if 'total' in INPUT["Toggle_Modules"].get("plot_VMTP", {}):
                                      cmap_norm='sqrt')
 
             tile_curr.add_scatter(scatter)
+            tile_curr.add_line(Line_mean)
 
             if Seg.angles is not None:
                 Tiles.append(tile_curr)
@@ -1988,13 +1917,14 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_RWI", {}):
                                      cbar_label="RWI = $\\sqrt{S(f_0)}$ (Resonance Wave Intesity) $[\\sqrt{m^2/Hz}]$",
                                      cbar_label_fontsize=6)
 
-            tile_curr.add_scatter(scatter)
 
             Line_f0 = hc_plt.Line(x=None,
                                   y=[1 / INPUT["Structure"]["f_0"]],
                                   label=f'f_0, f={INPUT["Structure"]["f_0"]} Hz',
                                   color='green',
                                   linestyle=':')
+
+            tile_curr.add_scatter(scatter)
             tile_curr.add_line(Line_f0)
 
             if Seg.angles is not None:
@@ -2050,13 +1980,14 @@ if 'total' in INPUT["Toggle_Modules"].get("plot_RWI", {}):
                                      cbar_label="RWI = $\\sqrt{S(f_0)}$ (Resonance Wave Intesity) $[\\sqrt{m^2/Hz}]$",
                                      cbar_label_fontsize=6)
 
-            tile_curr.add_scatter(scatter)
 
             Line_f0 = hc_plt.Line(x=None,
                                   y=[1 / INPUT["Structure"]["f_0"]],
-                                  label=f'f_0, f={INPUT["Structure"]["f_0"]} Hz',
+                                  label=f'$f_0={INPUT["Structure"]["f_0"]}$ Hz',
                                   color='green',
                                   linestyle=':')
+
+            tile_curr.add_scatter(scatter)
             tile_curr.add_line(Line_f0)
 
             if Seg.angles is not None:
@@ -2330,7 +2261,7 @@ if INPUT["Toggle_Modules"].get("plot_AngleDeviation", {}):
 
                 line = hc_plt.Line(x=Seg.result["mean"].index,
                                    y=Seg.result["mean"].values,
-                                   label=f"rolling absolute mean (global mean = {round(np.mean(Seg.result['mean'].values), 2)} deg)",
+                                   label=f"Rolling absolute mean (global mean = {round(np.mean(Seg.result['mean'].values), 2)} deg)",
                                    color='black')
 
                 tile_scatter.add_line(line)
@@ -2410,15 +2341,13 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and len(INPUT["Toggle_M
                                y=df_seg[Seg.colnames['x']].values,
                                color='black',
                                linewidth=1)
-
-            tile_curr.add_line(Line)
-
             scatter = hc_plt.Scatter(x=Seg.result["points"]["x_max"].index,
                                      y=Seg.result["points"]["x_max"].values,
                                      color='red',
                                      label='Extreme Values',
-                                     size=1)
+                                     size=10)
 
+            tile_curr.add_line(Line)
             tile_curr.add_scatter(scatter)
 
             if Seg.angles is not None:
@@ -2453,7 +2382,7 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and len(INPUT["Toggle_M
             scatter = hc_plt.Scatter(x=Seg.result["points"]["x_max"].values,
                                      y=Seg.result["points"]["x_theorie"].values,
                                      color='red',
-                                     size=2,
+                                     size=10,
                                      label='Maximal Values')
 
             tile_curr.add_scatter(scatter)
@@ -2524,7 +2453,7 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and len(INPUT["Toggle_M
             scatter = hc_plt.Scatter(x=Seg.result["points"]["T_R_x_max"].values,
                                      y=Seg.result["points"]["x_max"].values,
                                      color='red',
-                                     size=1)
+                                     size=10)
 
             tile_curr.add_scatter(scatter)
 
@@ -2642,14 +2571,14 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
                                              y=Seg.result["condensed"]['vm_vise'][config].values,
                                              color=cmap_lines(range_colors[i]),
                                              linestyle='--')
-                tile_curr.add_line(Line_condensed)
 
                 Line_hindcast = hc_plt.Line(x=Seg.result["hindcast"]['vm_vise'][config].index,
                                             y=Seg.result["hindcast"]['vm_vise'][config].values,
                                             color=cmap_lines(range_colors[i]),
                                             linestyle='-')
 
-                tile_curr.add_line(Line_hindcast)
+                tile_curr.add_line(Line_hindcast, zorder=10)
+                tile_curr.add_line(Line_condensed, zorder=10)
 
                 # textbox
                 textbox.append(str(config))
@@ -2700,7 +2629,7 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
                                              orientation_v='center',
                                              header=False)
 
-                tile_curr.add_textbox(Textbox_DEL)
+                tile_curr.add_textbox(Textbox_DEL, zorder=9)
                 Tiles_omni.append(tile_curr)
 
         FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage)
@@ -2750,7 +2679,7 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
 
                 Line_f0 = hc_plt.Line(x=None,
                                       y=[1 / INPUT["Structure"]["f_0"]],
-                                      label=f'f_0, f={INPUT["Structure"]["f_0"]} Hz',
+                                      label=f'$f_0={INPUT["Structure"]["f_0"]}$ Hz',
                                       color='green',
                                       linestyle=':')
                 tile_curr.add_line(Line_f0)
@@ -2818,14 +2747,14 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
                                              y=Seg.result["condensed"]['vm_vise'][config].values,
                                              color=cmap_lines(range_colors[i]),
                                              linestyle='--')
-                tile_curr.add_line(Line_condensed)
+                tile_curr.add_line(Line_condensed, zorder=10)
 
                 Line_hindcast = hc_plt.Line(x=Seg.result["hindcast"]['vm_vise'][config].index,
                                             y=Seg.result["hindcast"]['vm_vise'][config].values,
                                             color=cmap_lines(range_colors[i]),
                                             linestyle='-')
 
-                tile_curr.add_line(Line_hindcast)
+                tile_curr.add_line(Line_hindcast, zorder=10)
 
                 # textbox
                 textbox.append(str(config))
@@ -2851,7 +2780,7 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
                                    spinecolor=barcolor,
                                    yy_side='right')
 
-            tile_curr.add_bar(Bar_count)
+            tile_curr.add_bar(Bar_count, zorder=0)
 
             if Seg.angles is not None:
                 Textbox_DEL = hc_plt.Textbox(Textbox_data,
@@ -2876,7 +2805,7 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
                                              orientation_v='center',
                                              header=False)
 
-                tile_curr.add_textbox(Textbox_DEL)
+                tile_curr.add_textbox(Textbox_DEL, zorder=-1)
                 Tiles_omni.append(tile_curr)
 
         FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage)
@@ -2921,12 +2850,11 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
                                          size=2,
                                          cbar=True,
                                          cbar_label=f'Bending DEL [Nm]' + r" $\vert$ " + f'm={Meta["SN_slope"]}' + "\n " + f'N_ref={Meta["N_ref"]:.2e}' + r" $\vert$ " + f'lifetime={Meta["design_life"]}y')
-
                 tile_curr.add_scatter(scatter)
 
                 Line_f0 = hc_plt.Line(x=None,
                                       y=[1 / INPUT["Structure"]["f_0"]],
-                                      label=f'f_0, f={INPUT["Structure"]["f_0"]} Hz',
+                                      label=f'$f_0={INPUT["Structure"]["f_0"]}$ Hz',
                                       color='green',
                                       linestyle=':')
                 tile_curr.add_line(Line_f0)
