@@ -2915,17 +2915,6 @@ if INPUT["Toggle_Modules"].get("plot_Weibull", {}):
             gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f'Weibull_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
 
-# %% plot report tables
-
-# if INPUT["Report"]["create_report"]:
-#     print("1")
-#
-#     #Condensation Tables
-#     if ['wind', 'swell', 'total'] in INPUT["Toggle_Modules"].get("calc_VMHS", {}):
-#         Input = INPUT["VMHS_wind"]
-#
-#         Parameter = []
-
 
 
 # %% Data Out
@@ -3003,16 +2992,32 @@ if INPUT["DataOut"]["CSV_out"]:
     if "wind" in DATA_OUT["RWI"]:
         print("   RWI wind")
         calc = DATA_OUT["RWI"]["wind"]
+        df = calc.load_from_db(colnames_ini=True)
         data = unpack_funcs["flat_data"](calc)
+
+        for i, segment in enumerate(calc.result):
+            df_temp = df.loc[segment.indizes]
+
+
+            data[i] = pd.concat((data[i], df_temp), axis=1)
+
         table_names = unpack_funcs["flat_angles"](calc)
         table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
 
         gl.save_df_list_to_excel(path_csv + r'//RWI_wind', data, sheet_names=table_names)
 
-    if "swell" in DATA_OUT["RWI"]:
-        print("   RWI swell")
-        calc = DATA_OUT["RWI"]["swell"]
+    if "total" in DATA_OUT["RWI"]:
+        print("   RWI total")
+        calc = DATA_OUT["RWI"]["total"]
+        df = calc.load_from_db(colnames_ini=True)
         data = unpack_funcs["flat_data"](calc)
+
+        for i, segment in enumerate(calc.result):
+            df_temp = df.loc[segment.indizes]
+
+
+            data[i] = pd.concat((data[i], df_temp), axis=1)
+
         table_names = unpack_funcs["flat_angles"](calc)
         table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
 
@@ -3034,6 +3039,17 @@ if INPUT["DataOut"]["CSV_out"]:
         table_names = unpack_funcs["flat_angles"](calc)
         table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
 
+        #combined
+        combined = []
+        for table in data:
+            combined.append(table["value"])
+
+        combined = np.array(combined).T
+
+        df_combined = pd.DataFrame(combined, columns=table_names, index=data[0]["vm_edges"])
+
+        data.insert(0, df_combined)
+        table_names.insert(0, 'combined')
         gl.save_df_list_to_excel(path_csv + r'//table_vmhs_wind', data, sheet_names=table_names)
 
     if "swell" in DATA_OUT["table_vmhs"]:
@@ -3043,6 +3059,17 @@ if INPUT["DataOut"]["CSV_out"]:
         table_names = unpack_funcs["flat_angles"](calc)
         table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
 
+        #combined
+        combined = []
+        for table in data:
+            combined.append(table["value"])
+
+        combined = np.array(combined).T
+
+        df_combined = pd.DataFrame(combined, columns=table_names, index=data[0]["vm_edges"])
+
+        data.insert(0, df_combined)
+        table_names.insert(0, 'combined')
         gl.save_df_list_to_excel(path_csv + r'//table_vmhs_swell', data, sheet_names=table_names)
 
     if "wind" in DATA_OUT["table_vmtp"]:
@@ -3052,6 +3079,17 @@ if INPUT["DataOut"]["CSV_out"]:
         table_names = unpack_funcs["flat_angles"](calc)
         table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
 
+        #combined
+        combined = []
+        for table in data:
+            combined.append(table["value"])
+
+        combined = np.array(combined).T
+
+        df_combined = pd.DataFrame(combined, columns=table_names, index=data[0]["vm_edges"])
+
+        data.insert(0, df_combined)
+        table_names.insert(0, 'combined')
         gl.save_df_list_to_excel(path_csv + r'//table_vmtp_wind', data, sheet_names=table_names)
 
     if "swell" in DATA_OUT["table_vmtp"]:
@@ -3061,6 +3099,17 @@ if INPUT["DataOut"]["CSV_out"]:
         table_names = unpack_funcs["flat_angles"](calc)
         table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
 
+        #combined
+        combined = []
+        for table in data:
+            combined.append(table["value"])
+
+        combined = np.array(combined).T
+
+        df_combined = pd.DataFrame(combined, columns=table_names, index=data[0]["vm_edges"])
+
+        data.insert(0, df_combined)
+        table_names.insert(0, 'combined')
         gl.save_df_list_to_excel(path_csv + r'//table_vmtp_swell', data, sheet_names=table_names)
 
     if DATA_OUT["AngleDeviation"]:
@@ -3083,8 +3132,8 @@ if INPUT["DataOut"]["CSV_out"]:
 
         data_hindcast_vm_vise = unpac_func_hindcast_vm_vise(calc)
         data_condensed_vm_vise = unpac_func_condensed_vm_vise(calc)
-        data_hindcast_added = unpac_func_condensed_added(calc)
         data_condensed_added = unpac_func_condensed_added(calc)
+        data_hindcast_added = unpac_func_hindcast_added(calc)
 
         table_names = unpack_funcs["flat_angles"](calc)
         table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
@@ -3103,7 +3152,6 @@ if INPUT["DataOut"]["CSV_out"]:
         gl.save_df_list_to_excel(path_csv + r'//Validation_wind_condensed_vm_vise', data_condensed_vm_vise, sheet_names=table_names)
         gl.save_df_list_to_excel(path_csv + r'//Validation_wind_added', table_wind_added, sheet_names=["hindcast", "condensed"])
 
-
     if "swell" in DATA_OUT["Validation"]:
         print("   Validation swell")
         calc = DATA_OUT["Validation"]["swell"]
@@ -3115,7 +3163,7 @@ if INPUT["DataOut"]["CSV_out"]:
 
         data_hindcast_vm_vise = unpac_func_hindcast_vm_vise(calc)
         data_condensed_vm_vise = unpac_func_condensed_vm_vise(calc)
-        data_hindcast_added = unpac_func_condensed_added(calc)
+        data_hindcast_added = unpac_func_hindcast_added(calc)
         data_condensed_added = unpac_func_condensed_added(calc)
 
         table_names = unpack_funcs["flat_angles"](calc)

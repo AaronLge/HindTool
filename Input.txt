@@ -50,33 +50,33 @@ exclude_Tp_zero_wind		>		True									>	bool:	if True, Tp = 0 entrys are deleted
 
 
 *Toggle_Modules*
-calc_VMHS					>			['wind', 'total','swell']									>		'wind', 'swell']
-calc_HSTP					>			['wind', 'total','swell']									> 	['wind', 'swell']			
-calc_VMTP					>			['wind', 'total','swell']									>  ['wind', 'swell']
-#calc_RWI					>			['wind', 'total']									>	'wind'
-calc_Tables					>			['wind', 'total','swell']					>	['wind', 'swell']		
+#calc_VMHS					>			['wind', 'total','swell']									>		'wind', 'swell']
+#calc_HSTP					>			['wind', 'total','swell']									> 	['wind', 'swell']			
+#calc_VMTP					>			['wind', 'total','swell']									>  ['wind', 'swell']
+#calc_RWI					>			['wind']									>	'wind'
+calc_Tables					>			['wind']					>	['wind', 'swell']		
 #calc_WaveBreak_Steep		>			['wind', 'total']									>	'wind'
 #calc_AngleDeviation 		>			['dir_v_m', 'dir_T_mean_Wind', 'v_m']									>	angle_orig, angle_deviation, v_m
 #calc_Roseplots				>			[['dir_v_m', 'v_m'], ['dir_curr', 'v_curr'], ['dir_T_mean_Swell', 'H_s_swell'], ['dir_T_mean', 'H_s'], ['dir_T_mean_Wind', 'H_s_wind'] ]									>	 [[angle, magnitude],[angle, magnitude]]
 #calc_ExtremeValues			>			[['dir_T_mean', 'H_max']]									>	[[x,angle], [x,angle]]
-#calc_Validation 			>			['wind','swell']									>	['wind'], ['swell']
+#calc_Validation 			>			['wind']									>	['wind'], ['swell']
 #calc_SensorEval				>			['v_m','H_s','H_max','T_p','H_s_wind','T_p_wind','H_s_swell','T_p_swell','T_p_swell','WL','WL_tide','v_curr','v_curr_1m']
 #calc_Weibull				>			[['dir_v_m', 'v_m']]
 
 
-plot_VMHS					>		['wind', 'swell', 'total']		
-plot_HSTP					>		['wind', 'swell', 'total']		
-plot_VMTP					>		['wind', 'swell', 'total']
-plot_RWI					>		['wind', 'total']
-plot_BreakSteep				>		['wind', 'total']
-#plot_Tables					>		['wind', 'swell', 'total']	
-plot_AngleDeviation			>		True
-plot_as						>		["png"]
-plot_Roseplots				>		True
-plot_ExtremeValues			>		True				
-plot_Validation 			>		['wind', 'swell']
-plot_SensorEval				>		True
-plot_Weibull				>		True
+#plot_VMHS					>		['wind', 'swell', 'total']		
+#plot_HSTP					>		['wind', 'swell', 'total']		
+#plot_VMTP					>		['wind', 'swell', 'total']
+#plot_RWI					>		['wind', 'total']
+#plot_BreakSteep				>		['wind', 'total']
+plot_Tables					>		['wind', 'swell', 'total']	
+#plot_AngleDeviation			>		True
+#plot_as						>		["png"]
+#plot_Roseplots				>		True
+#plot_ExtremeValues			>		True				
+#plot_Validation 			>		['wind', 'swell']
+#plot_SensorEval				>		True
+#plot_Weibull				>		True
 
 
 dpi_figures					>		500									>	int: resolution (dots per sqinch) of all pdf's
