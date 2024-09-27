@@ -127,6 +127,7 @@ print("\n***Starting " + f"{script_name}" +
 print(f"reading Inputfile ({path_in})...")
 
 INPUT = gl.read_input_txt(path_in)
+INPUT_REPORT = gl.read_input_txt(INPUT["DataBase"]["Report_Input"])
 timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 
 # #ReportInput
@@ -2917,16 +2918,211 @@ if INPUT["Toggle_Modules"].get("plot_Weibull", {}):
 
 # %% plot report tables
 
-# if INPUT["Report"]["create_report"]:
-#     print("1")
-#
-#     #Condensation Tables
-#     if ['wind', 'swell', 'total'] in INPUT["Toggle_Modules"].get("calc_VMHS", {}):
-#         Input = INPUT["VMHS_wind"]
-#
-#         Parameter = []
+#if INPUT["Report"]["create_report"]:
+if True:
+    print("plotting report tables...")
+    # VMHS parameter
+    if INPUT["Toggle_Modules"].get("plot_VMHS", {}):
+        print("   plotting VMHS parameter table")
 
+        columns_table = []
+        col_labels = []
+        row_labels = ['Degree of regression',
+                      'Shape function f(x)',
+                      'Bin number',
+                      'Portion of datapoints evaluated with mean',
+                      'Regression range',
+                      'Evaluated range',
+                      'Applied percentile for condensation',
+                      'Averageing method']
 
+        if 'wind' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
+
+            Input = INPUT["VMHS_wind"]
+
+            new_col = [
+                Input["deg_reg"],
+                'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+                Input["N_grid"],
+                f"{Input['cut_reg']}" + r" \%",
+                f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
+                f"[{Input['zone_line'][0]} .. {'max' if Input['zone_line'][1] is None else Input['zone_line'][1]}]",
+                f"{Input['perc_mean']}" + r" \%",
+                Input["avrg_method"],
+                       ]
+            columns_table.append(new_col)
+            col_labels.append('Wind Sea')
+
+        if 'swell' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
+
+            Input = INPUT["VMHS_swell"]
+
+            new_col = [
+                Input["deg_reg"],
+                'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+                Input["N_grid"],
+                f"{Input['cut_reg']}" + r" \%",
+                f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
+                f"[{Input['zone_line'][0]} .. {'max' if Input['zone_line'][1] is None else Input['zone_line'][1]}]",
+                f"{Input['perc_mean']}" + r" \%",
+                Input["avrg_method"],
+                       ]
+            columns_table.append(new_col)
+            col_labels.append('Swell Sea')
+
+        if 'total' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
+
+            Input = INPUT["VMHS_total"]
+
+            new_col = [
+                Input["deg_reg"],
+                'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+                Input["N_grid"],
+                f"{Input['cut_reg']}" + r" %",
+                f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
+                f"[{Input['zone_line'][0]} .. {'max' if Input['zone_line'][1] is None else Input['zone_line'][1]}]",
+                f"{Input['perc_mean']}" + r" %",
+                Input["avrg_method"],
+                       ]
+            columns_table.append(new_col)
+            col_labels.append('Total Sea')
+
+        if len(columns_table) > 0:
+            data = np.array(columns_table)
+            data = data.T
+
+            FIG = hc_plt.table(data, collabels=col_labels, rowlabels=row_labels, row_label_name='Parameters', figsize=figsize_halfpage)
+
+            if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+                gl.save_figs_as_png([FIG], path_out + 'Report_table_VMHS', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+            if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+                gl.save_figs_as_pdf([FIG], path_out + 'Report_table_VMHS', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    # HSTP parameter
+    if INPUT["Toggle_Modules"].get("plot_HSTP", {}):
+        print("   plotting HSTP parameter table")
+
+        columns_table = []
+        col_labels = []
+        row_labels = ['Degree of regression',
+                      'Shape function f(x)',
+                      'Bin number',
+                      'Portion of datapoints evaluated with mean',
+                      'Regression range',
+                      'Evaluated range',
+                      'Quantiles for selected correlation',
+                      'Frequency band for selected correlation',
+                      'Applied percentile for condensation',
+                      'Averageing method']
+
+        Input = INPUT["HSTP_wind"]
+
+        if 'wind' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
+            Input = INPUT["HSTP_wind"]
+
+            new_col = [
+                Input["deg_reg"],
+                'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+                Input["N_grid"],
+                f"{Input['cut_reg']}" + r" $\%$",
+                f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
+                f"[{Input['zone_line'][0]} .. {'max' if Input['zone_line'][1] is None else Input['zone_line'][1]}]",
+                f"[{Input['percentiles'][0]}$\%$ .. {Input['percentiles'][1]}$\%$]" if Input['quantile'] else "none",
+                f"[{Input['quant_up']} .. {Input['quant_low']}]" if Input['quantile'] else "none",
+                f"{Input['perc_mean']}" + r" $\%$",
+                Input["avrg_method"],
+            ]
+            columns_table.append(new_col)
+            col_labels.append('Wind Sea')
+
+        if 'swell' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
+            Input = INPUT["HSTP_swell"]
+
+            new_col = [
+                Input["deg_reg"],
+                'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+                Input["N_grid"],
+                f"{Input['cut_reg']}" + r" $\%$",
+                f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
+                f"[{Input['zone_line'][0]} .. {'max' if Input['zone_line'][1] is None else Input['zone_line'][1]}]",
+                f"[{Input['percentiles'][0]}$\%$ .. {Input['percentiles'][1]}$\%$]" if Input['quantile'] else "none",
+                f"[{Input['quant_up']} .. {Input['quant_low']}]" if Input['quantile'] else "none",
+                f"{Input['perc_mean']}" + r" $\%$",
+                Input["avrg_method"],
+            ]
+            columns_table.append(new_col)
+            col_labels.append('Swell Sea')
+
+        if 'total' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
+            Input = INPUT["HSTP_total"]
+
+            new_col = [
+                Input["deg_reg"],
+                'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+                Input["N_grid"],
+                f"{Input['cut_reg']}" + r" $\%$",
+                f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
+                f"[{Input['zone_line'][0]} .. {'max' if Input['zone_line'][1] is None else Input['zone_line'][1]}]",
+                f"[{Input['percentiles'][0]}$\%$ .. {Input['percentiles'][1]}$\%$]" if Input['quantile'] else "none",
+                f"[{Input['quant_up']} .. {Input['quant_low']}]" if Input['quantile'] else "none",
+                f"{Input['perc_mean']}" + r" $\%$",
+                Input["avrg_method"],
+            ]
+            columns_table.append(new_col)
+            col_labels.append('Total Sea')
+
+        if len(columns_table) > 0:
+            data = np.array(columns_table)
+            data = data.T
+
+            FIG = hc_plt.table(data,
+                               collabels=col_labels,
+                               rowlabels=row_labels,
+                               row_label_name='Parameters',
+                               figsize=figsize_halfpage,
+                               datatype='str')
+
+            if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+                gl.save_figs_as_png([FIG], path_out + 'Report_table_HSTP', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+            if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+                gl.save_figs_as_pdf([FIG], path_out + 'Report_table_HSTP', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    # Sensor names
+    sensor_names = list(COLNAMES.values())
+    sensor_symbols = gl.alias(sensor_names, COLNAMES, INPUT_REPORT["Symbols"])
+    sensor_symbols = dict(zip(COLNAMES.keys(), sensor_symbols))
+
+    data = np.array([list(sensor_symbols.values()), sensor_names])
+    data = data.T
+    col_labels = ["Symbol", "Sensor name"]
+    FIG = hc_plt.table(data,
+                       collabels=col_labels,
+                       figsize=figsize_fullpage,
+                       datatype='str')
+
+    if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_png([FIG], path_out + 'Sensor_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_pdf([FIG], path_out + 'Sensor_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    # plot labels
+    Alias_symbol_pairs = []
+    Alias_symbol_pairs = [[sensor_symbols[key], INPUT["Aliase"][key]] for key in sensor_symbols if key in INPUT["Aliase"]]
+
+    col_labels = ["Symbol", "Plot name"]
+    FIG = hc_plt.table(Alias_symbol_pairs,
+                       collabels=col_labels,
+                       figsize=figsize_fullpage,
+                       datatype='str')
+
+if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+    gl.save_figs_as_png([FIG], path_out + 'Plot_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+    gl.save_figs_as_pdf([FIG], path_out + 'Plot_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
 # %% Data Out
 if INPUT["DataOut"]["CSV_out"]:
