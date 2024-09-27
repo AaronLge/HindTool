@@ -2920,7 +2920,43 @@ if INPUT["Toggle_Modules"].get("plot_Weibull", {}):
 
 #if INPUT["Report"]["create_report"]:
 if True:
-    print("plotting report tables...")
+
+    # crate COLNAME dataframe with symbols as master
+    COLNAMES_REPORT = pd.DataFrame(index=INPUT_REPORT["Symbols"].keys())
+    COLNAMES_REPORT["Symbols"] = INPUT_REPORT["Symbols"].values()
+    COLNAMES_REPORT["Sensor_names"] = [COLNAMES[key] if key in COLNAMES else float('nan') for key in list(COLNAMES_REPORT.index)]
+    COLNAMES_REPORT["Aliase"] = [INPUT["Aliase"][key] if key in INPUT["Aliase"] else float('nan') for key in COLNAMES_REPORT.index]
+
+    # plot sensor names
+    data = np.array([COLNAMES_REPORT["Symbols"], COLNAMES_REPORT["Sensor_names"]])
+    data = data.T
+    col_labels = ["Symbol", "Sensor name"]
+    FIG = hc_plt.table(data,
+                       collabels=col_labels,
+                       figsize=figsize_fullpage,
+                       datatype='str')
+
+    if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_png([FIG], path_out + 'Sensor_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_pdf([FIG], path_out + 'Sensor_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    # plot Plot_names
+    data = np.array([COLNAMES_REPORT["Symbols"], COLNAMES_REPORT["Aliase"]])
+    data = data.T
+    col_labels = ["Symbol", "Plot name"]
+    FIG = hc_plt.table(data,
+                       collabels=col_labels,
+                       figsize=figsize_fullpage,
+                       datatype='str')
+
+    if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_png([FIG], path_out + 'Plot_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_pdf([FIG], path_out + 'Plot_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
     # VMHS parameter
     if INPUT["Toggle_Modules"].get("plot_VMHS", {}):
         print("   plotting VMHS parameter table")
@@ -3089,40 +3125,8 @@ if True:
             if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
                 gl.save_figs_as_pdf([FIG], path_out + 'Report_table_HSTP', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-    # Sensor names
-    sensor_names = list(COLNAMES.values())
-    sensor_symbols = gl.alias(sensor_names, COLNAMES, INPUT_REPORT["Symbols"])
-    sensor_symbols = dict(zip(COLNAMES.keys(), sensor_symbols))
 
-    data = np.array([list(sensor_symbols.values()), sensor_names])
-    data = data.T
-    col_labels = ["Symbol", "Sensor name"]
-    FIG = hc_plt.table(data,
-                       collabels=col_labels,
-                       figsize=figsize_fullpage,
-                       datatype='str')
 
-    if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-        gl.save_figs_as_png([FIG], path_out + 'Sensor_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-    if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-        gl.save_figs_as_pdf([FIG], path_out + 'Sensor_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-    # plot labels
-    Alias_symbol_pairs = []
-    Alias_symbol_pairs = [[sensor_symbols[key], INPUT["Aliase"][key]] for key in sensor_symbols if key in INPUT["Aliase"]]
-
-    col_labels = ["Symbol", "Plot name"]
-    FIG = hc_plt.table(Alias_symbol_pairs,
-                       collabels=col_labels,
-                       figsize=figsize_fullpage,
-                       datatype='str')
-
-if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-    gl.save_figs_as_png([FIG], path_out + 'Plot_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-    gl.save_figs_as_pdf([FIG], path_out + 'Plot_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
 # %% Data Out
 if INPUT["DataOut"]["CSV_out"]:
@@ -3298,7 +3302,6 @@ if INPUT["DataOut"]["CSV_out"]:
         gl.save_df_list_to_excel(path_csv + r'//Validation_wind_hindcast_vm_vise', data_hindcast_vm_vise, sheet_names=table_names)
         gl.save_df_list_to_excel(path_csv + r'//Validation_wind_condensed_vm_vise', data_condensed_vm_vise, sheet_names=table_names)
         gl.save_df_list_to_excel(path_csv + r'//Validation_wind_added', table_wind_added, sheet_names=["hindcast", "condensed"])
-
 
     if "swell" in DATA_OUT["Validation"]:
         print("   Validation swell")
