@@ -299,7 +299,7 @@ if (('wind' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
                                     zone_reg=Input["zone_reg"],
                                     zone_line=Input["zone_line"],
                                     bin_min=Input["bin_min"],
-                                    perc_mean=Input["perc_mean"],
+                                    average_correction=Input["average_correction"],
                                     avrg_method=Input["avrg_method"],
                                     make_monotone=Input["make_monotone"])
 
@@ -312,7 +312,7 @@ if (('wind' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
                              zone_reg=Input["zone_reg"],
                              zone_line=Input["zone_line"],
                              bin_min=Input["bin_min"],
-                             perc_mean=Input["perc_mean"],
+                             average_correction=Input["average_correction"],
                              avrg_method=Input["avrg_method"],
                              make_monotone=Input["make_monotone"])
 
@@ -346,7 +346,7 @@ if (('swell' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
                                     zone_reg=Input["zone_reg"],
                                     zone_line=Input["zone_line"],
                                     bin_min=Input["bin_min"],
-                                    perc_mean=Input["perc_mean"],
+                                    average_correction=Input["average_correction"],
                                     avrg_method=Input["avrg_method"],
                                     make_monotone=Input["make_monotone"])
 
@@ -359,7 +359,7 @@ if (('swell' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
                              zone_reg=Input["zone_reg"],
                              zone_line=Input["zone_line"],
                              bin_min=Input["bin_min"],
-                             perc_mean=Input["perc_mean"],
+                             average_correction=Input["average_correction"],
                              avrg_method=Input["avrg_method"],
                              make_monotone=Input["make_monotone"])
 
@@ -392,7 +392,7 @@ if (('total' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
                                     zone_reg=Input["zone_reg"],
                                     zone_line=Input["zone_line"],
                                     bin_min=Input["bin_min"],
-                                    perc_mean=Input["perc_mean"],
+                                    average_correction=Input["average_correction"],
                                     avrg_method=Input["avrg_method"],
                                     make_monotone=Input["make_monotone"])
 
@@ -405,7 +405,7 @@ if (('total' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
                              zone_reg=Input["zone_reg"],
                              zone_line=Input["zone_line"],
                              bin_min=Input["bin_min"],
-                             perc_mean=Input["perc_mean"],
+                             average_correction=Input["average_correction"],
                              avrg_method=Input["avrg_method"],
                              make_monotone=Input["make_monotone"])
 
@@ -443,7 +443,6 @@ if (('wind' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
                              quant_up=Input["quant_up"],
                              quant_low=Input["quant_low"],
                              percentiles=Input["percentiles"],
-                             perc_mean=Input["perc_mean"],
                              avrg_method=Input["avrg_method"])
 
     directional = hc_calc.calc_HSTP(df[COLNAMES["H_s_wind"]], df[COLNAMES["T_p_wind"]], df[COLNAMES["dir_v_m"]], angle_grid_mod,
@@ -459,7 +458,6 @@ if (('wind' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
                                     quant_up=Input["quant_up"],
                                     quant_low=Input["quant_low"],
                                     percentiles=Input["percentiles"],
-                                    perc_mean=Input["perc_mean"],
                                     avrg_method=Input["avrg_method"])
 
     Calc.result = omni + directional
@@ -496,7 +494,6 @@ if (('swell' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
                                     quant_up=Input["quant_up"],
                                     quant_low=Input["quant_low"],
                                     percentiles=Input["percentiles"],
-                                    perc_mean=Input["perc_mean"],
                                     avrg_method=Input["avrg_method"])
 
     omni = hc_calc.calc_HSTP(df[COLNAMES["H_s_swell"]], df[COLNAMES["T_p_swell"]], df[COLNAMES["dir_T_mean_Swell"]], None,
@@ -512,7 +509,6 @@ if (('swell' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
                              quant_up=Input["quant_up"],
                              quant_low=Input["quant_low"],
                              percentiles=Input["percentiles"],
-                             perc_mean=Input["perc_mean"],
                              avrg_method=Input["avrg_method"])
 
     Calc.result = omni + directional
@@ -548,7 +544,6 @@ if (('total' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
                                     quant_up=Input["quant_up"],
                                     quant_low=Input["quant_low"],
                                     percentiles=Input["percentiles"],
-                                    perc_mean=Input["perc_mean"],
                                     avrg_method=Input["avrg_method"])
 
     omni = hc_calc.calc_HSTP(df[COLNAMES["H_s"]], df[COLNAMES["T_p"]], df[COLNAMES["dir_T_mean"]], None,
@@ -564,7 +559,6 @@ if (('total' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
                              quant_up=Input["quant_up"],
                              quant_low=Input["quant_low"],
                              percentiles=Input["percentiles"],
-                             perc_mean=Input["perc_mean"],
                              avrg_method=Input["avrg_method"])
 
     Calc.result = omni + directional

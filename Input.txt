@@ -140,7 +140,7 @@ weighting_reg				>		0										>	float:	weighting of regression by number of dat
 zone_reg 					>		[0,None]								>	list: 	range from which calculating the regression function is determined, if[.. , None], the upper limit is the maximal found value (from the current angle-section)
 zone_line					> 		[0, None] 								>	zone: 	zone, in which the regression (or mean) plot is shown (or displayed in the tables), if [.. , None]  the upper limit is the maximal found value, excuding values under n_bin (from the current angle-section)
 bin_min						>		0 										>	int:	mininmal number of Datapoints in one bin to include the bin in any calculation
-perc_mean					>		50
+average_correction			>		1
 avrg_method					>		"weighted mean" 							>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
 make_monotone 				>		True
 
@@ -153,7 +153,7 @@ weighting_reg				>		0										>	float:	weighting of regression by number of dat
 zone_reg 					>		[0,None]								>	list: 	range from which calculating the regression function is determined, if[.. , None], the upper limit is the maximal found value (from the current angle-section)
 zone_line					> 		[0,None] 								>	zone: 	zone, in which the regression (or mean) plot is shown (or displayed in the tables), if [.. , None]  the upper limit is the maximal found value, excuding values under n_bin (from the current angle-section)
 bin_min						>		0 										>	int:	mininmal number of Datapoints in one bin to include the bin in any calculation
-perc_mean					>		52
+average_correction					>		1.1
 avrg_method					>		"weighted mean" 							>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
 make_monotone 				>		True
 
@@ -166,7 +166,7 @@ weighting_reg				>		0										>	float:	weighting of regression by number of dat
 zone_reg 					>		[3,None]								>	list: 	range from which calculating the regression function is determined, if[.. , None], the upper limit is the maximal found value (from the current angle-section)
 zone_line					> 		[3, None] 								>	zone: 	zone, in which the regression (or mean) plot is shown (or displayed in the tables), if [.. , None]  the upper limit is the maximal found value, excuding values under n_bin (from the current angle-section)
 bin_min						>		0 										>	int:	mininmal number of Datapoints in one bin to include the bin in any calculation
-perc_mean					>		50
+perc_mean					>		1
 avrg_method					>		"weighted mean" 							>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
 make_monotone 				>		True
 
@@ -183,8 +183,7 @@ percentiles					>		[33,66]									>	list:	percentiles to display, 50% not neces
 quantile					>		True									>	bool:	if True: plot "quantile" line, is expectiong quant_low, quant_up and two percentiles, over and under mean
 quant_low					>		0.1647									>	float:	lower (Period) limit (higher frequency value) of resonance frequency band, if None: not plotted
 quant_up					>		0.1493									>	float:	upper (Period) limit (lower frequency value) of resonance frequency band, if None: not plotted
-perc_mean					>		50
-avrg_method					>		"mean"							>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
+avrg_method					>		"median"							>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
 make_monotone 				>		False
 
 *HSTP_swell*
@@ -200,7 +199,6 @@ percentiles					>		[]									>	list:	percentiles to display, 50% not necessary,
 quantile					>		False									>	bool:	if True: plot "quantile" line, is expectiong quant_low, quant_up and two percentiles, over and under mean
 quant_low					>		0.1647									>	float:	lower (Period) limit (higher frequency value) of resonance frequency band, if None: not plotted
 quant_up					>		0.1647									>	float:	upper (Period) limit (lower frequency value) of resonance frequency band, if None: not plotted
-perc_mean					>		50
 avrg_method					>		"median"							>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
 make_monotone 				>		False
 
@@ -217,8 +215,7 @@ percentiles					>		[]									>	list:	percentiles to display, 50% not necessary,
 quantile					>		False									>	bool:	if True: plot "quantile" line, is expectiong quant_low, quant_up and two percentiles, over and under mean
 quant_low					>		0.1647									>	float:	lower (Period) limit (higher frequency value) of resonance frequency band, if None: not plotted
 quant_up					>		0.1647									>	float:	upper (Period) limit (lower frequency value) of resonance frequency band, if None: not plotted
-perc_mean					>		50
-avrg_method					>		"mean"							>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
+avrg_method					>		"median"							>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
 make_monotone 				>		False
 
 
