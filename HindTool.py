@@ -244,17 +244,14 @@ elif INPUT["DataBase"]["colnames_preset"] == 'APGMer':
         "v_curr_tide": r"Cs,Tide",
         "v_curr_tide_surf": r"Cs,Tid,Surf",
         "v_curr_tide_bed": r"Cs,Tid,Bed",
-        }
+    }
 
 elif INPUT["DataBase"]["colnames_preset"] is None:
     COLNAMES = INPUT["ColumNames"]
 else:
     print("please choose colnames_preset from 'MetOcen', 'APGMer' or None to import Colnames from Input file")
 
-
 # %% Calculation
-
-
 angle_grid, angle_grid_mod = hc_calc.angles(INPUT["AngleSection"]["mode_angle"], INPUT["AngleSection"]["N_angle"], INPUT["AngleSection"]["angle_start"],
                                             width=INPUT["AngleSection"]["width_angle"])
 
@@ -269,6 +266,8 @@ DATA_OUT["AngleDeviation"] = {}
 DATA_OUT["Validation"] = {}
 DATA_OUT["SensorEval"] = {}
 DATA_OUT["Weibull"] = {}
+DATA_OUT["ExtremeConture"] = {}
+
 
 # VMHS
 if (('wind' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
@@ -969,6 +968,38 @@ if len(INPUT["Toggle_Modules"].get("calc_ExtremeValues", {})) > 0:
 
         DATA_OUT["ExtremeValues"][f"{cols[0]} over {cols[1]}"] = Calc
 
+# Extreme Conture Plots
+if len(INPUT["Toggle_Modules"].get("calc_ExtremeConture", {})) > 0:
+    print("calculating Extreme Conture Plots...")
+    DATA_OUT["ExtremeConturePlots"] = {}
+    for cols in INPUT["Toggle_Modules"]["calc_ExtremeConture"]:
+        table_name = 'Hindcast_combined'
+        column_names = [COLNAMES[col] for col in cols]
+
+        Calc = hc_calc.Calculation()
+        df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
+
+        # filter for nans
+        indizes_in = Calc.initilize_filter(None, mode='nans')
+        df = df.loc[indizes_in]
+
+        out_direc = hc_calc.calc_extreme_contures(df[column_names[0]],
+                                            df[column_names[1]],
+                                            df[column_names[2]],
+                                            angle_grid,
+                                            INPUT["ExtremeValues"]["T_return"])
+
+        out_omni = hc_calc.calc_extreme_contures(df[column_names[0]],
+                                            df[column_names[1]],
+                                            df[column_names[2]],
+                                            None,
+                                            INPUT["ExtremeValues"]["T_return"])
+
+        Calc.result = out_omni + out_direc
+        DATA_OUT["ExtremeConture"][f"{cols[0]} over {cols[1]}"] = Calc
+
+
+
 # Validation
 if 'wind' in INPUT["Toggle_Modules"].get("calc_Validation", {}):
     print("calculating Validation wind...")
@@ -1155,8 +1186,8 @@ if len(INPUT["Toggle_Modules"].get("calc_Weibull", {})) > 0:
 
         DATA_OUT["Weibull"][f"{colnames[1]} over {colnames[0]}"] = Calc
 # %% Plot
-figsize_fullpage = [size*0.39370079 for size in INPUT["Toggle_Modules"].get("writing_box", {})]
-figsize_halfpage = [figsize_fullpage[0], figsize_fullpage[1]/2]
+figsize_fullpage = [size * 0.39370079 for size in INPUT["Toggle_Modules"].get("writing_box", {})]
+figsize_halfpage = [figsize_fullpage[0], figsize_fullpage[1] / 2]
 
 if 'wind' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
     print('plotting VMHS wind...')
@@ -1470,7 +1501,7 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
             #                             label=key_perc[0].replace('result', '').replace('plot', ''),
             #                             color='black',
             #                             linestyle='--')
-            #tile_curr.add_line(Line_perc_low)
+            # tile_curr.add_line(Line_perc_low)
 
             # Line_perc_up = hc_plt.Line(x=Seg.result["x"],
             #                            y=Seg.result[key_perc[1]],
@@ -1569,7 +1600,7 @@ if 'total' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
             #                             label=key_perc[0].replace('result', '').replace('plot', ''),
             #                             color='black',
             #                             linestyle='--')
-            #tile_curr.add_line(Line_perc_low)
+            # tile_curr.add_line(Line_perc_low)
 
             # Line_perc_up = hc_plt.Line(x=Seg.result["x"],
             #                            y=Seg.result[key_perc[1]],
@@ -1968,7 +1999,8 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_BreakSteep", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], scatter_max='auto', scatter_min=INPUT["Structure"]["steep_crit"], figsize=figsize_fullpage)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], scatter_max='auto', scatter_min=INPUT["Structure"]["steep_crit"],
+                                      figsize=figsize_fullpage)
 
         FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
 
@@ -2026,7 +2058,8 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_BreakSteep", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], scatter_max='auto', scatter_min=INPUT["Structure"]["steep_crit"], figsize=figsize_fullpage)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], scatter_max='auto', scatter_min=INPUT["Structure"]["steep_crit"],
+                                      figsize=figsize_fullpage)
 
         FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
 
@@ -2141,7 +2174,7 @@ if INPUT["Toggle_Modules"].get("plot_AngleDeviation", {}):
         title = r"\small Occurrence probability of missalinment " + "\n" + f" ({Calc.result[0].colnames['ang_comp']} - {Calc.result[0].colnames['ang_orig']})"
         subtitle = Calc.create_segment_title(mode='sparse')
         subsubtitle = f"with v_m = {Calc.result[1].colnames['v_m']}"
-        titles = [title +"\n "+ subtitle_curr +"\n "+ subsubtitle for subtitle_curr in subtitle]
+        titles = [title + "\n " + subtitle_curr + "\n " + subsubtitle for subtitle_curr in subtitle]
         titles = gl.alias(titles, COLNAMES, INPUT["Aliase"])
 
         for i, Seg in enumerate(Calc.result):
@@ -2159,7 +2192,8 @@ if INPUT["Toggle_Modules"].get("plot_AngleDeviation", {}):
                 FIG_Tables.append(temp)
             else:
                 x_label = gl.alias(Seg.colnames['ang_orig'], COLNAMES, INPUT["Aliase"])
-                tile_scatter = hc_plt.Tile(i, x_label=x_label, y_label='deviation [°]', title=f"Missalignment to {Calc.result[0].colnames['ang_comp']}" + "\n" + f"over {Calc.result[1].colnames['ang_comp']}")
+                tile_scatter = hc_plt.Tile(i, x_label=x_label, y_label='deviation [°]',
+                                           title=f"Missalignment to {Calc.result[0].colnames['ang_comp']}" + "\n" + f"over {Calc.result[1].colnames['ang_comp']}")
 
                 point_data = df[df.index.isin(Seg.indizes)]
 
@@ -2173,7 +2207,7 @@ if INPUT["Toggle_Modules"].get("plot_AngleDeviation", {}):
 
                 line = hc_plt.Line(x=Seg.result["mean"].index,
                                    y=Seg.result["mean"].values,
-                                   label=f"rolling absolute mean (global mean = {round(np.mean(Seg.result['mean'].values),2) } deg)",
+                                   label=f"rolling absolute mean (global mean = {round(np.mean(Seg.result['mean'].values), 2)} deg)",
                                    color='black')
 
                 tile_scatter.add_line(line)
@@ -2355,9 +2389,9 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and len(INPUT["Toggle_M
 
         for i, Seg in enumerate(Calc.result):
 
-            title = titels[i] +"\n" + r"\scriptsize " + (f'intervall mode: {Seg.result["meta"]["intervall_mode"]}, '
-                                                   f'intervall algorithm: {Seg.result["meta"]["intervall_algorithm"]}, '
-                                                   f'itterations: {Seg.result["meta"]["N_itter"]}')
+            title = titels[i] + "\n" + r"\scriptsize " + (f'intervall mode: {Seg.result["meta"]["intervall_mode"]}, '
+                                                          f'intervall algorithm: {Seg.result["meta"]["intervall_algorithm"]}, '
+                                                          f'itterations: {Seg.result["meta"]["N_itter"]}')
 
             tile_curr = hc_plt.Tile(i, x_label='Returnperiod [years]',
                                     y_label=gl.alias(Seg.colnames['x'], COLNAMES, INPUT["Aliase"]),
@@ -2522,13 +2556,13 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
 
             if Seg.angles is not None:
                 Textbox_DEL = hc_plt.Textbox(Textbox_data,
-                             fontsize=7,
-                             corner1=[0.4, 1],
-                             corner2=[1, 0.4],
-                             colors=colors_data,
-                             orientation_h='left',
-                             orientation_v='center',
-                             header=False)
+                                             fontsize=7,
+                                             corner1=[0.4, 1],
+                                             corner2=[1, 0.4],
+                                             colors=colors_data,
+                                             orientation_h='left',
+                                             orientation_v='center',
+                                             header=False)
 
                 tile_curr.add_textbox(Textbox_DEL)
                 Tiles.append(tile_curr)
@@ -2698,13 +2732,13 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
 
             if Seg.angles is not None:
                 Textbox_DEL = hc_plt.Textbox(Textbox_data,
-                             fontsize=6,
-                             corner1=[0.4, 1],
-                             corner2=[1, 0.4],
-                             colors=colors_data,
-                             orientation_h='left',
-                             orientation_v='center',
-                             header=False)
+                                             fontsize=6,
+                                             corner1=[0.4, 1],
+                                             corner2=[1, 0.4],
+                                             colors=colors_data,
+                                             orientation_h='left',
+                                             orientation_v='center',
+                                             header=False)
 
                 tile_curr.add_textbox(Textbox_DEL)
                 Tiles.append(tile_curr)
@@ -2724,7 +2758,6 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
 
         FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage)
         FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
-
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'Valid_line_swell', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2908,7 +2941,74 @@ if INPUT["Toggle_Modules"].get("plot_Weibull", {}):
         if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f'Weibull_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
+if INPUT["Toggle_Modules"].get("plot_ExtremeConture", {}) and len(INPUT["Toggle_Modules"].get("calc_ExtremeConture", {})) > 0:
+    print('plotting ExtremeConture...')
 
+    for name, Calc in DATA_OUT["ExtremeConture"].items():
+
+        Input = INPUT["ExtremeValues"]
+        Tiles = []
+        Tiles_omni = []
+
+        df = Calc.load_from_db(colnames_ini=True)
+        titels = Calc.create_segment_title()
+        titels = gl.alias(titels, COLNAMES, INPUT["Aliase"])
+
+        for i, Seg in enumerate(Calc.result):
+
+            Seg.indizes = pd.to_datetime(Seg.indizes)
+            point_data = df[df.index.isin(Seg.indizes)]
+
+            tile_curr = hc_plt.Tile(i,
+                                    x_label=gl.alias(Seg.colnames['x'], COLNAMES, INPUT["Aliase"]),
+                                    y_label=gl.alias(Seg.colnames['y'], COLNAMES, INPUT["Aliase"]),
+                                    title=titels[i])
+
+            scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]],
+                                     y=point_data[Seg.colnames["y"]],
+                                     cmap='cool',
+                                     size=2,
+                                     cmap_norm='sqrt')
+
+            tile_curr.add_scatter(scatter)
+
+            # add contures
+            # Define the colors for the colormap: red to dark green
+            colors = [(1, 0, 0),  # Red
+                      (0, 0.4, 0)]  # Dark green
+            # Create the colormap
+            cmap_name = 'red_to_darkgreen'
+            red_to_darkgreen = LinearSegmentedColormap.from_list(cmap_name, colors)
+
+            color = np.linspace(1, 0, len(Seg.result))
+            i = 0
+            for name, data in Seg.result.items():
+
+                contour = hc_plt.Line(x=data["x"],
+                                      y=data["y"],
+                                      label=name,
+                                      color=red_to_darkgreen(color[i]),
+                                      linewidth=0.8)
+
+                tile_curr.add_line(contour)
+
+                i = i + 1
+            if Seg.angles is not None:
+                Tiles.append(tile_curr)
+
+            else:
+                Tiles_omni.append(tile_curr)
+
+
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage)
+
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
+
+        if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+            gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'ExtremeConture', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+        if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+            gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + 'ExtremeConture', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
 
 # %% Data Out
@@ -2992,7 +3092,6 @@ if INPUT["DataOut"]["CSV_out"]:
         for i, segment in enumerate(calc.result):
             df_temp = df.loc[segment.indizes]
 
-
             data[i] = pd.concat((data[i], df_temp), axis=1)
 
         table_names = unpack_funcs["flat_angles"](calc)
@@ -3008,7 +3107,6 @@ if INPUT["DataOut"]["CSV_out"]:
 
         for i, segment in enumerate(calc.result):
             df_temp = df.loc[segment.indizes]
-
 
             data[i] = pd.concat((data[i], df_temp), axis=1)
 
@@ -3033,7 +3131,7 @@ if INPUT["DataOut"]["CSV_out"]:
         table_names = unpack_funcs["flat_angles"](calc)
         table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
 
-        #combined
+        # combined
         combined = []
         for table in data:
             combined.append(table["value"])
@@ -3053,7 +3151,7 @@ if INPUT["DataOut"]["CSV_out"]:
         table_names = unpack_funcs["flat_angles"](calc)
         table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
 
-        #combined
+        # combined
         combined = []
         for table in data:
             combined.append(table["value"])
@@ -3073,7 +3171,7 @@ if INPUT["DataOut"]["CSV_out"]:
         table_names = unpack_funcs["flat_angles"](calc)
         table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
 
-        #combined
+        # combined
         combined = []
         for table in data:
             combined.append(table["value"])
@@ -3093,7 +3191,7 @@ if INPUT["DataOut"]["CSV_out"]:
         table_names = unpack_funcs["flat_angles"](calc)
         table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
 
-        #combined
+        # combined
         combined = []
         for table in data:
             combined.append(table["value"])
@@ -3177,8 +3275,6 @@ if INPUT["DataOut"]["CSV_out"]:
         gl.save_df_list_to_excel(path_csv + r'//Validation_swell_condensed_vm_vise', data_condensed_vm_vise, sheet_names=table_names)
         gl.save_df_list_to_excel(path_csv + r'//Validation_swell_added', table_wind_added, sheet_names=["hindcast", "condensed"])
 
-
-
 # %% MAIN - Save Infolog
 print("saving Log...")
 
@@ -3188,3 +3284,431 @@ del log_text
 
 print(f"{script_name} finished!")
 
+#
+# def Weibull_method_of_moment(X):
+#     import scipy.stats as stats
+#     X = X + 0.0001;
+#     n = len(X);
+#     m1 = np.mean(X);
+#     cm1 = np.mean((X - np.mean(X)) ** 1);
+#     m2 = np.var(X);
+#     cm2 = np.mean((X - np.mean(X)) ** 2);
+#     m3 = stats.skew(X);
+#     cm3 = np.mean((X - np.mean(X)) ** 3);
+#
+#     from scipy.special import gamma
+#     def m1fun(a, b, c):
+#         return a + b * gamma(1 + 1 / c)
+#
+#     def cm2fun(b, c):
+#         return b ** 2 * (gamma(1 + 2 / c) - gamma(1 + 1 / c) ** 2)
+#
+#     def cm3fun(b, c):
+#         return b ** 3 * (gamma(1 + 3 / c) - 3 * gamma(1 + 1 / c) * gamma(1 + 2 / c) + 2 * gamma(1 + 1 / c) ** 3)
+#
+#     def cfun(c):
+#         return abs(np.sqrt(cm3fun(1, c) ** 2 / cm2fun(1, c) ** 3) - np.sqrt(cm3 ** 2 / cm2 ** 3))
+#
+#     from scipy import optimize
+#     cHat = optimize.fminbound(cfun, -2, 5)  # shape
+#
+#     def bfun(b):
+#         return abs(cm2fun(b, cHat) - cm2)
+#
+#     bHat = optimize.fminbound(bfun, -5, 30)  # scale
+#
+#     def afun(a):
+#         return abs(m1fun(a, bHat, cHat) - m1)
+#
+#     aHat = optimize.fminbound(afun, -5, 30)  # location
+#
+#     return cHat, aHat, bHat  # shape, location, scale
+#
+#
+# def joint_distribution_Hs_Tp(data, var_hs='hs', var_tp='tp', periods=None, adjustment=None):
+#     """
+#     This fuction will plot Hs-Tp joint distribution using LogNoWe model (the Lognormal + Weibull distribution)
+#     df : dataframe,
+#     var1 : Hs: significant wave height,
+#     var2 : Tp: Peak period
+#     file_out: Hs-Tp joint distribution, optional
+#     """
+#     if periods is None:
+#         periods = [1, 10, 100, 10000]
+#
+#     if adjustment == 'NORSOK':
+#         periods_adj = np.array([x * 6 for x in periods])
+#     else:
+#         periods_adj = periods
+#
+#     df = data
+#     pd.options.mode.chained_assignment = None  # default='warn'
+#     df.loc[:, 'hs'] = df[var_hs].values
+#     df.loc[:, 'tp'] = Tp_correction(df[var_tp].values)
+#
+#     import scipy.stats as stats
+#     from scipy.optimize import curve_fit
+#     from scipy.signal import find_peaks
+#
+#     # calculate lognormal and weibull parameters and plot the PDFs
+#     mu = np.mean(np.log(df.hs.values))  # mean of ln(Hs)
+#     std = np.std(np.log(df.hs.values))  # standard deviation of ln(Hs)
+#     alpha = mu
+#     sigma = std
+#
+#     h = np.linspace(start=0.01, stop=30, num=1500)
+#
+#     if 0 < mu < 5:
+#         pdf_Hs1 = 1 / (np.sqrt(2 * np.pi) * alpha * h) * np.exp(-(np.log(h) - sigma) ** 2 / (2 * alpha ** 2))
+#     else:
+#         param = stats.lognorm.fit(df.hs.values, )  # shape, loc, scale
+#         pdf_lognorm = stats.lognorm.pdf(h, param[0], loc=param[1], scale=param[2])
+#         pdf_Hs1 = pdf_lognorm
+#
+#     param = Weibull_method_of_moment(df.hs.values)  # stats.weibull_min.fit(df.hs.values) # shape, loc, scale
+#     pdf_Hs2 = stats.weibull_min.pdf(h, param[0], loc=param[1], scale=param[2])
+#
+#     # Find the index where two PDF cut, between P60 and P99
+#     for i in range(len(h)):
+#         if abs(h[i] - np.percentile(df.hs.values, 60)) < 0.1:
+#             i1 = i
+#
+#         if abs(h[i] - np.percentile(df.hs.values, 99)) < 0.1:
+#             i2 = i
+#
+#     epsilon = abs(pdf_Hs1[i1:i2] - pdf_Hs2[i1:i2])
+#     param = find_peaks(1 / epsilon)
+#     try:
+#         index = param[0][1]
+#     except:
+#         try:
+#             index = param[0][0]
+#         except:
+#             index = np.where(epsilon == epsilon.min())[0]
+#     index = index + i1
+#
+#     # Merge two functions and do smoothing around the cut
+#     eta = h[index]
+#     pdf_Hs = h * 0
+#     for i in range(len(h)):
+#         if h[i] < eta:
+#             pdf_Hs[i] = pdf_Hs1[i]
+#         else:
+#             pdf_Hs[i] = pdf_Hs2[i]
+#
+#     for i in range(len(h)):
+#         if eta - 0.5 < h[i] < eta + 0.5:
+#             pdf_Hs[i] = np.mean(pdf_Hs[i - 10:i + 10])
+#
+#     #####################################################
+#     # calcualte a1, a2, a3, b1, b2, b3
+#     # firstly calcualte mean_hs, mean_lnTp, variance_lnTp
+#     Tp = df.tp.values
+#     Hs = df.hs.values
+#     maxHs = max(Hs)
+#     if maxHs < 2:
+#         intx = 0.05
+#     elif 2 <= maxHs < 3:
+#         intx = 0.1
+#     elif 3 <= maxHs < 4:
+#         intx = 0.2
+#     elif 4 <= maxHs < 10:
+#         intx = 0.5
+#     else:
+#         intx = 1.0
+#
+#     mean_hs = []
+#     variance_lnTp = []
+#     mean_lnTp = []
+#
+#     hs_bin = np.arange(0, maxHs + intx, intx)
+#     for i in range(len(hs_bin) - 1):
+#         idxs = np.where((hs_bin[i] <= Hs) & (Hs < hs_bin[i + 1]))
+#         if Hs[idxs].shape[0] > 15:
+#             mean_hs.append(np.mean(Hs[idxs]))
+#             mean_lnTp.append(np.mean(np.log(Tp[idxs])))
+#             variance_lnTp.append(np.var(np.log(Tp[idxs])))
+#
+#     mean_hs = np.asarray(mean_hs)
+#     mean_lnTp = np.asarray(mean_lnTp)
+#     variance_lnTp = np.asarray(variance_lnTp)
+#
+#     # calcualte a1, a2, a3
+#     parameters, covariance = curve_fit(Gauss3, mean_hs, mean_lnTp)
+#     a1 = parameters[0]
+#     a2 = parameters[1]
+#     a3 = 0.36
+#
+#     # calcualte b1, b2, b3
+#     start = 1
+#     x = mean_hs[start:]
+#     y = variance_lnTp[start:]
+#     parameters, covariance = curve_fit(Gauss4, x, y)
+#     b1 = 0.005
+#     b2 = parameters[0]
+#     b3 = parameters[1]
+#
+#     # calculate pdf Hs, Tp
+#     t = np.linspace(start=0.01, stop=40, num=2000)
+#
+#     f_Hs_Tp = np.zeros((len(h), len(t)))
+#     pdf_Hs_Tp = f_Hs_Tp * 0
+#
+#     for i in range(len(h)):
+#         mu = a1 + a2 * h[i] ** a3
+#         std2 = b1 + b2 * np.exp(-b3 * h[i])
+#         std = np.sqrt(std2)
+#
+#         f_Hs_Tp[i, :] = 1 / (np.sqrt(2 * np.pi) * std * t) * np.exp(-(np.log(t) - mu) ** 2 / (2 * std2))
+#         pdf_Hs_Tp[i, :] = pdf_Hs[i] * f_Hs_Tp[i, :]
+#
+#     interval = ((df.index[-1] - df.index[0]).days + 1) * 24 / df.shape[0]  # in hours
+#
+#     t3 = []
+#     h3 = []
+#     X = []
+#     hs_tpl_tph = pd.DataFrame()
+#
+#     # Assuming Hs_Tp_curve() returns four values, otherwise adjust accordingly
+#     for i in range(len(periods)):
+#         t3_val, h3_val, X_val, hs_tpl_tph_val = Hs_Tp_curve(df.hs.values, pdf_Hs, pdf_Hs_Tp, f_Hs_Tp, h, t, interval, X=periods_adj[i])
+#         t3.append(t3_val)
+#         h3.append(h3_val)
+#         X.append(X_val)
+#         hs_tpl_tph_val.columns = [f'{col}_{periods[i]}' for col in hs_tpl_tph_val.columns]
+#         hs_tpl_tph = pd.concat([hs_tpl_tph, hs_tpl_tph_val], axis=1)
+#
+#     # if save_rve:
+#     #    hs_tpl_tph[3].to_csv(str(param[2])+'_year.csv', index=False)
+#
+#     return a1, a2, a3, b1, b2, b3, pdf_Hs, h, t3, h3, X, hs_tpl_tph
+#
+#
+# def Tp_correction(Tp):
+#     """
+#     This function will correct the Tp from ocean model which are vertical straight lines in Hs-Tp distribution
+#     """
+#     new_Tp = 1 + np.log(Tp / 3.244) / 0.09525
+#     index = np.where(Tp >= 3.2)  # indexes of Tp
+#     r = np.random.uniform(low=-0.5, high=0.5, size=len(Tp[index]))
+#     Tp[index] = np.round(3.244 * np.exp(0.09525 * (new_Tp[index] - 1 - r)), 1)
+#     return Tp
+#
+#
+# def Hs_Tp_curve(data, pdf_Hs, pdf_Hs_Tp, f_Hs_Tp, h, t, interval, X=100):
+#     import scipy.stats as stats
+#     from scipy.signal import find_peaks
+#
+#     # RVE of X years
+#     shape, loc, scale = Weibull_method_of_moment(data)  # shape, loc, scale
+#
+#     if X == 1:
+#         period = 1.5873 * 365.2422 * 24 / interval
+#     else:
+#         period = X * 365.2422 * 24 / interval
+#     rve_X = stats.weibull_min.isf(1 / period, shape, loc, scale)
+#
+#     # Find index of Hs=value
+#     epsilon = abs(h - rve_X)
+#     param = find_peaks(1 / epsilon)  # to find the index of bottom
+#     index = param[0][0]  # the  index of Hs=value
+#
+#     # Find peak of pdf at Hs=RVE of X year
+#     pdf_Hs_Tp_X = pdf_Hs_Tp[index, :]  # Find pdf at RVE of X year
+#     param = find_peaks(pdf_Hs_Tp_X)  # find the peak
+#     index = param[0][0]
+#     f_Hs_Tp_100 = pdf_Hs_Tp_X[index]
+#
+#     h1 = []
+#     t1 = []
+#     t2 = []
+#     for i in range(len(h)):
+#         f3_ = f_Hs_Tp_100 / pdf_Hs[i]
+#         f3 = f_Hs_Tp[i, :]
+#         epsilon = abs(f3 - f3_)  # the difference
+#         para = find_peaks(1 / epsilon)  # to find the bottom
+#         index = para[0]
+#         if t[index].shape[0] == 2:
+#             h1.append(h[i])
+#             t1.append(t[index][0])
+#             t2.append(t[index][1])
+#
+#     h1 = np.asarray(h1)
+#     t1 = np.asarray(t1)
+#     t2 = np.asarray(t2)
+#     t3 = np.concatenate((t1, t2[::-1]))  # to get correct circle order
+#     h3 = np.concatenate((h1, h1[::-1]))  # to get correct circle order
+#     t3 = np.concatenate((t3, t1[0:1]))  # connect the last to the first point
+#     h3 = np.concatenate((h3, h1[0:1]))  # connect the last to the first point
+#
+#     df = pd.DataFrame()
+#     df['hs'] = h1
+#     df['t1'] = t1
+#     df['t2'] = t2
+#
+#     return t3, h3, X, df
+#
+#
+# def Gauss3(x, a1, a2):
+#     y = a1 + a2 * x ** 0.36
+#     return y
+#
+#
+# def Gauss4(x, b2, b3):
+#     y = 0.005 + b2 * np.exp(-x * b3)
+#     return y
+#
+#
+# import matplotlib.pyplot as plt
+#
+#
+# def plot_joint_distribution_Hs_Tp(data, var_hs='hs', var_tp='tp', periods=None, title='Hs-Tp joint distribution', output_file='Hs.Tp.joint.distribution.png',
+#                                   density_plot=False):
+#     if periods is None:
+#         periods = [1, 10, 100, 10000]
+#     a1, a2, a3, b1, b2, b3, pdf_Hs, h, t3, h3, X, hs_tpl_tph = joint_distribution_Hs_Tp(data=data, var_hs=var_hs, var_tp=var_tp, periods=periods)
+#     df = data
+#     # calculate pdf Hs, Tp
+#     t = np.linspace(start=0.01, stop=40, num=2000)
+#
+#     f_Hs_Tp = np.zeros((len(h), len(t)))
+#     pdf_Hs_Tp = f_Hs_Tp * 0
+#
+#     for i in range(len(h)):
+#         mu = a1 + a2 * h[i] ** a3
+#         std2 = b1 + b2 * np.exp(-b3 * h[i])
+#         std = np.sqrt(std2)
+#
+#         f_Hs_Tp[i, :] = 1 / (np.sqrt(2 * np.pi) * std * t) * np.exp(-(np.log(t) - mu) ** 2 / (2 * std2))
+#         pdf_Hs_Tp[i, :] = pdf_Hs[i] * f_Hs_Tp[i, :]
+#
+#     interval = ((df.index[-1] - df.index[0]).days + 1) * 24 / df.shape[0]  # in hours
+#     t_steepness, h_steepness = DVN_steepness(df, h, t, periods, interval)
+#     percentile05 = find_percentile(df.hs.values, pdf_Hs_Tp, h, t, 5, periods, interval)
+#     percentile50 = find_percentile(df.hs.values, pdf_Hs_Tp, h, t, 50, periods, interval)
+#     percentile95 = find_percentile(df.hs.values, pdf_Hs_Tp, h, t, 95, periods, interval)
+#
+#     fig, ax = plt.subplots(figsize=(8, 6))
+#     df = df[df['hs'] >= 0.1]
+#     if density_plot is False:
+#         plt.scatter(df.tp.values, df.hs.values, c='red', label='data', s=3)
+#     else:
+#         from matplotlib.colors import LogNorm
+#         # plt.scatter(df.tp.values,df.hs.values,c='red',label='data',s=3)
+#         plt.hist2d(df['tp'].values, df['hs'].values, bins=50, cmap='hot', cmin=1)
+#         plt.colorbar()
+#
+#     for i in range(len(periods)):
+#         plt.plot(t3[i], h3[i], label=str(X[i]) + '-year')
+#
+#     plt.plot(t_steepness, h_steepness, 'k--', label='steepness')
+#
+#     plt.plot(percentile50[0], percentile50[1], 'g', label='Tp-mean', linewidth=5)
+#     plt.plot(percentile05[0], percentile05[1], 'g:', label='Tp-5%', linewidth=2)
+#     plt.plot(percentile95[0], percentile95[1], 'g--', label='Tp-95%', linewidth=2)
+#
+#     plt.xlabel('Tp - Peak Period [s]')
+#     plt.suptitle(title)
+#     plt.ylabel('Hs - Significant Wave Height [m]')
+#     plt.grid()
+#     plt.legend()
+#     plt.xlim([0, np.round(hs_tpl_tph['t2_' + str(np.max(periods))].max() + 1)])
+#     plt.ylim([0, np.round(hs_tpl_tph['hs_' + str(np.max(periods))].max() + 1)])
+#     plt.savefig(output_file, dpi=100, facecolor='white', bbox_inches='tight')
+#
+#     return fig
+#
+#
+# def DVN_steepness(df, h, t, periods, interval):
+#     import scipy.stats as stats
+#     ## steepness
+#     max_y = max(periods)
+#     X = max_y  # get max 500 year
+#     period = X * 365.2422 * 24 / interval
+#     shape, loc, scale = Weibull_method_of_moment(df.hs.values)  # shape, loc, scale
+#     rve_X = stats.weibull_min.isf(1 / period, shape, loc, scale)
+#
+#     h1 = []
+#     t1 = []
+#     h2 = []
+#     t2 = []
+#     h3 = []
+#     t3 = []
+#     g = 9.80665
+#     j15 = 10000
+#     for j in range(len(t)):
+#         if t[j] <= 8:
+#             Sp = 1 / 15
+#             temp = Sp * g * t[j] ** 2 / (2 * np.pi)
+#             if temp <= rve_X:
+#                 h1.append(temp)
+#                 t1.append(t[j])
+#
+#             j8 = j  # t=8
+#             h1_t8 = temp
+#             t8 = t[j]
+#         elif t[j] >= 15:
+#             Sp = 1 / 25
+#             temp = Sp * g * t[j] ** 2 / (2 * np.pi)
+#             if temp <= rve_X:
+#                 h3.append(temp)
+#                 t3.append(t[j])
+#             if j < j15:
+#                 j15 = j  # t=15
+#                 h3_t15 = temp
+#                 t15 = t[j]
+#
+#     xp = [t8, t15]
+#     fp = [h1_t8, h3_t15]
+#     t2_ = t[j8 + 1:j15]
+#     h2_ = np.interp(t2_, xp, fp)
+#     for i in range(len(h2_)):
+#         if h2_[i] <= rve_X:
+#             h2.append(h2_[i])
+#             t2.append(t2_[i])
+#
+#     h_steepness = np.asarray(h1 + h2 + h3)
+#     t_steepness = np.asarray(t1 + t2 + t3)
+#
+#     return t_steepness, h_steepness
+#
+#
+# def find_percentile(data, pdf_Hs_Tp, h, t, p, periods, interval):
+#     import scipy.stats as stats
+#     from scipy.signal import find_peaks
+#
+#     ## find pecentile
+#     # RVE of X years
+#     max_y = max(periods)
+#     X = max_y  # get max 500 year
+#     period = X * 365.2422 * 24 / interval
+#     shape, loc, scale = Weibull_method_of_moment(data)  # shape, loc, scale
+#     rve_X = stats.weibull_min.isf(1 / period, shape, loc, scale)
+#     epsilon = abs(h - rve_X)
+#     param = find_peaks(1 / epsilon)  # to find the index of bottom
+#     index_X = param[0][0]  # the  index of Hs=value
+#
+#     h1 = []
+#     t1 = []
+#     # Find peak of pdf at Hs=RVE of X year
+#     for i in range(index_X):
+#         pdf_Hs_Tp_X = pdf_Hs_Tp[i, :]  # Find pdf at RVE of X year
+#         sum_pdf = sum(pdf_Hs_Tp_X)
+#         for j in range(len(pdf_Hs_Tp_X)):
+#             if (sum(pdf_Hs_Tp_X[:j]) / sum_pdf <= p / 100) and (sum(pdf_Hs_Tp_X[:j + 1]) / sum_pdf >= p / 100):
+#                 # print (i, h[i],j,t[j])
+#                 t1.append(t[j])
+#                 h1.append(h[i])
+#                 break
+#     h1 = np.asarray(h1)
+#     t1 = np.asarray(t1)
+#
+#     return t1, h1
+#
+#
+# df = gl.export_df_from_sql(db_path, table_name='Hindcast_combined', column_names=[COLNAMES["H_s"], COLNAMES["T_p"]])
+# out = joint_distribution_Hs_Tp(df, var_hs=COLNAMES["H_s"], var_tp=COLNAMES["T_p"])
+#
+# fig = plot_joint_distribution_Hs_Tp(df, var_hs=COLNAMES["H_s"], var_tp=COLNAMES["T_p"], density_plot=True)
+#
+# print("1")
