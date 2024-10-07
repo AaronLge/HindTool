@@ -1248,7 +1248,6 @@ if INPUT["Toggle_Modules"].get("plot_condensation_example", {}):
 
             Line_mean = hc_plt.Line(x=Seg.result["x"],
                                     y=Seg.result["mean"],
-                                    label='y (representative bin values)',
                                     color='black',
                                     linewidth=2.5,
                                     alpha=0.5)
@@ -1260,7 +1259,7 @@ if INPUT["Toggle_Modules"].get("plot_condensation_example", {}):
 
             scatter_mean = hc_plt.Scatter(x=Seg.result["x"],
                                           y=Seg.result["mean"],
-                                          label='y (representative bin values)',
+                                          label='$y$ (representative bin values)',
                                           color='black',
                                           size=20)
 
@@ -1272,7 +1271,6 @@ if INPUT["Toggle_Modules"].get("plot_condensation_example", {}):
 
             Line_regression_inrange = hc_plt.Line(x=Seg.result["x"].iloc[use_reg_zone],
                                           y=Seg.result["mean regression"].iloc[use_reg_zone],
-                                          label=r'$\hat{y}$ (values found by regression)',
                                           color='blue',
                                       linewidth=2.5)
 
@@ -1296,7 +1294,7 @@ if INPUT["Toggle_Modules"].get("plot_condensation_example", {}):
 
             scatter_regression = hc_plt.Scatter(x=Seg.result["x"].iloc[reg_zone],
                                                 y=Seg.result["mean"].iloc[reg_zone],
-                                                label=r'values used for regression',
+                                                label=r'values used for regression (inside "Range of the regression base")',
                                                 color='blue',
                                                 size=40)
 
