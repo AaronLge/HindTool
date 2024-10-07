@@ -244,13 +244,12 @@ elif INPUT["DataBase"]["colnames_preset"] == 'APGMer':
         "v_curr_tide": r"Cs,Tide",
         "v_curr_tide_surf": r"Cs,Tid,Surf",
         "v_curr_tide_bed": r"Cs,Tid,Bed",
-        }
+    }
 
 elif INPUT["DataBase"]["colnames_preset"] is None:
     COLNAMES = INPUT["ColumNames"]
 else:
     print("please choose colnames_preset from 'MetOcen', 'APGMer' or None to import Colnames from Input file")
-
 
 # %% Calculation
 
@@ -274,7 +273,8 @@ DATA_OUT["Weibull"] = {}
 if (('wind' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
         or ('wind' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
         or ('wind' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
-        or ('wind' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
+        or ('wind' in INPUT["Toggle_Modules"].get("calc_Validation", {}))
+        or (INPUT["Toggle_Modules"].get("plot_condensation_example", {}))):
     print("calculating VMHS Wind Sea...")
 
     Input = INPUT["VMHS_wind"]
@@ -1155,8 +1155,8 @@ if len(INPUT["Toggle_Modules"].get("calc_Weibull", {})) > 0:
 
         DATA_OUT["Weibull"][f"{colnames[1]} over {colnames[0]}"] = Calc
 # %% Plot
-figsize_fullpage = [size*0.39370079 for size in INPUT["Toggle_Modules"].get("writing_box", {})]
-figsize_halfpage = [figsize_fullpage[0], figsize_fullpage[1]/2]
+figsize_fullpage = [size * 0.39370079 for size in INPUT["Toggle_Modules"].get("writing_box", {})]
+figsize_halfpage = [figsize_fullpage[0], figsize_fullpage[1] / 2]
 
 if 'wind' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
     print('plotting VMHS wind...')
@@ -1214,6 +1214,130 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
 
         if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + 'VMHS_wind', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+if INPUT["Toggle_Modules"].get("plot_condensation_example", {}):
+
+    Calc = DATA_OUT["VMHS"]["wind"]
+
+    Tiles = []
+    Tiles_omni = []
+
+    df = Calc.load_from_db(colnames_ini=True)
+    titels = Calc.create_segment_title()
+    titels = gl.alias(titels, COLNAMES, INPUT["Aliase"])
+
+    for i, Seg in enumerate(Calc.result):
+
+        if Seg.angles is None:
+            Seg.indizes = pd.to_datetime(Seg.indizes)
+            point_data = df[df.index.isin(Seg.indizes)]
+            reg_zone = np.where(Seg.result["bool_reg_zone"] == 1)[0]
+            use_reg_zone = np.where(Seg.result["use_regression"] == 1)[0]
+            use_mean = np.where(Seg.result["use_regression"] == 0)[0]
+
+            tile_curr = hc_plt.Tile(i,
+                                    x_label=gl.alias(Seg.colnames['x'], COLNAMES, INPUT["Aliase"]),
+                                    y_label=gl.alias(Seg.colnames['y'], COLNAMES, INPUT["Aliase"]),
+                                    title=titels[i])
+
+            scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]],
+                                     y=point_data[Seg.colnames["y"]],
+                                     size=5,
+                                     cmap_norm='sqrt',
+                                     color=[0.8, 0.8, 0.8])
+
+            Line_mean = hc_plt.Line(x=Seg.result["x"],
+                                    y=Seg.result["mean"],
+                                    label='y (representative bin values)',
+                                    color='black',
+                                    linewidth=2.5,
+                                    alpha=0.5)
+
+            Line_mean_inrange = hc_plt.Line(x=Seg.result["x"].iloc[use_mean[0]:use_mean[-1]+2],
+                                    y=Seg.result["mean"].iloc[use_mean[0]:use_mean[-1]+2],
+                                    color='black',
+                                    linewidth=2.5)
+
+            scatter_mean = hc_plt.Scatter(x=Seg.result["x"],
+                                          y=Seg.result["mean"],
+                                          label='y (representative bin values)',
+                                          color='black',
+                                          size=20)
+
+            Line_regression = hc_plt.Line(x=Seg.result["x"],
+                                          y=Seg.result["mean regression"],
+                                          color='blue',
+                                          linewidth=2.5,
+                                          alpha=0.3)
+
+            Line_regression_inrange = hc_plt.Line(x=Seg.result["x"].iloc[use_reg_zone],
+                                          y=Seg.result["mean regression"].iloc[use_reg_zone],
+                                          label=r'$\hat{y}$ (values found by regression)',
+                                          color='blue',
+                                      linewidth=2.5)
+
+            Line_reg_zone_left = hc_plt.Line(x=[Seg.result['x'].iloc[reg_zone[0]]],
+                                             y=None,
+                                             label=r'Range of the regression base ',
+                                             color='blue',
+                                      linewidth=1)
+
+            Line_reg_zone_right = hc_plt.Line(x=[Seg.result['x'].iloc[reg_zone[-1]]],
+                                              y=None,
+                                              color='blue',
+                                      linewidth=1)
+
+            Line_use_reg = hc_plt.Line(x=[Seg.result['x'].iloc[use_reg_zone[0]]],
+                                       y=None,
+                                       label=r'start of datapoints evaluated with regression curve',
+                                       color='green',
+                                      linewidth=1,
+                                       linestyle='--')
+
+            scatter_regression = hc_plt.Scatter(x=Seg.result["x"].iloc[reg_zone],
+                                                y=Seg.result["mean"].iloc[reg_zone],
+                                                label=r'values used for regression',
+                                                color='blue',
+                                                size=40)
+
+            Line_result = hc_plt.Line(x=Seg.result["x"],
+                                      y=Seg.result["mean result"],
+                                      color='red',
+                                      linestyle='--',
+                                      linewidth=1)
+
+            Scatter_result = hc_plt.Scatter(x=Seg.result["x"],
+                                      y=Seg.result["mean result"],
+                                      label=r'resulting values',
+                                      color='red',
+                                      size=5)
+
+            tile_curr.add_scatter(scatter)
+            tile_curr.add_line(Line_mean)
+            tile_curr.add_line(Line_regression)
+
+            tile_curr.add_line(Line_regression_inrange)
+            tile_curr.add_line(Line_mean_inrange)
+
+            tile_curr.add_scatter(scatter_regression)
+            tile_curr.add_scatter(scatter_mean)
+
+            tile_curr.add_line(Line_reg_zone_right)
+            tile_curr.add_line(Line_reg_zone_left)
+            tile_curr.add_line(Line_use_reg)
+            tile_curr.add_scatter(Scatter_result)
+
+            Tiles.append(tile_curr)
+
+            Tiles_omni.append(tile_curr)
+
+    FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
+
+    if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_png(FIG_omni, path_out + 'VMHS_wind', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_pdf(FIG_omni, path_out + 'VMHS_wind', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
 if 'swell' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
     print('plotting VMHS swell...')
@@ -1470,7 +1594,7 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
             #                             label=key_perc[0].replace('result', '').replace('plot', ''),
             #                             color='black',
             #                             linestyle='--')
-            #tile_curr.add_line(Line_perc_low)
+            # tile_curr.add_line(Line_perc_low)
 
             # Line_perc_up = hc_plt.Line(x=Seg.result["x"],
             #                            y=Seg.result[key_perc[1]],
@@ -1569,7 +1693,7 @@ if 'total' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
             #                             label=key_perc[0].replace('result', '').replace('plot', ''),
             #                             color='black',
             #                             linestyle='--')
-            #tile_curr.add_line(Line_perc_low)
+            # tile_curr.add_line(Line_perc_low)
 
             # Line_perc_up = hc_plt.Line(x=Seg.result["x"],
             #                            y=Seg.result[key_perc[1]],
@@ -1968,7 +2092,8 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_BreakSteep", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], scatter_max='auto', scatter_min=INPUT["Structure"]["steep_crit"], figsize=figsize_fullpage)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], scatter_max='auto', scatter_min=INPUT["Structure"]["steep_crit"],
+                                      figsize=figsize_fullpage)
 
         FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
 
@@ -2026,7 +2151,8 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_BreakSteep", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], scatter_max='auto', scatter_min=INPUT["Structure"]["steep_crit"], figsize=figsize_fullpage)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], scatter_max='auto', scatter_min=INPUT["Structure"]["steep_crit"],
+                                      figsize=figsize_fullpage)
 
         FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
 
@@ -2141,7 +2267,7 @@ if INPUT["Toggle_Modules"].get("plot_AngleDeviation", {}):
         title = r"\small Occurrence probability of missalinment " + "\n" + f" ({Calc.result[0].colnames['ang_comp']} - {Calc.result[0].colnames['ang_orig']})"
         subtitle = Calc.create_segment_title(mode='sparse')
         subsubtitle = f"with v_m = {Calc.result[1].colnames['v_m']}"
-        titles = [title +"\n "+ subtitle_curr +"\n "+ subsubtitle for subtitle_curr in subtitle]
+        titles = [title + "\n " + subtitle_curr + "\n " + subsubtitle for subtitle_curr in subtitle]
         titles = gl.alias(titles, COLNAMES, INPUT["Aliase"])
 
         for i, Seg in enumerate(Calc.result):
@@ -2159,7 +2285,8 @@ if INPUT["Toggle_Modules"].get("plot_AngleDeviation", {}):
                 FIG_Tables.append(temp)
             else:
                 x_label = gl.alias(Seg.colnames['ang_orig'], COLNAMES, INPUT["Aliase"])
-                tile_scatter = hc_plt.Tile(i, x_label=x_label, y_label='deviation [°]', title=f"Missalignment to {Calc.result[0].colnames['ang_comp']}" + "\n" + f"over {Calc.result[1].colnames['ang_comp']}")
+                tile_scatter = hc_plt.Tile(i, x_label=x_label, y_label='deviation [°]',
+                                           title=f"Missalignment to {Calc.result[0].colnames['ang_comp']}" + "\n" + f"over {Calc.result[1].colnames['ang_comp']}")
 
                 point_data = df[df.index.isin(Seg.indizes)]
 
@@ -2173,7 +2300,7 @@ if INPUT["Toggle_Modules"].get("plot_AngleDeviation", {}):
 
                 line = hc_plt.Line(x=Seg.result["mean"].index,
                                    y=Seg.result["mean"].values,
-                                   label=f"rolling absolute mean (global mean = {round(np.mean(Seg.result['mean'].values),2) } deg)",
+                                   label=f"rolling absolute mean (global mean = {round(np.mean(Seg.result['mean'].values), 2)} deg)",
                                    color='black')
 
                 tile_scatter.add_line(line)
@@ -2355,9 +2482,9 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and len(INPUT["Toggle_M
 
         for i, Seg in enumerate(Calc.result):
 
-            title = titels[i] +"\n" + r"\scriptsize " + (f'intervall mode: {Seg.result["meta"]["intervall_mode"]}, '
-                                                   f'intervall algorithm: {Seg.result["meta"]["intervall_algorithm"]}, '
-                                                   f'itterations: {Seg.result["meta"]["N_itter"]}')
+            title = titels[i] + "\n" + r"\scriptsize " + (f'intervall mode: {Seg.result["meta"]["intervall_mode"]}, '
+                                                          f'intervall algorithm: {Seg.result["meta"]["intervall_algorithm"]}, '
+                                                          f'itterations: {Seg.result["meta"]["N_itter"]}')
 
             tile_curr = hc_plt.Tile(i, x_label='Returnperiod [years]',
                                     y_label=gl.alias(Seg.colnames['x'], COLNAMES, INPUT["Aliase"]),
@@ -2522,13 +2649,13 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
 
             if Seg.angles is not None:
                 Textbox_DEL = hc_plt.Textbox(Textbox_data,
-                             fontsize=7,
-                             corner1=[0.4, 1],
-                             corner2=[1, 0.4],
-                             colors=colors_data,
-                             orientation_h='left',
-                             orientation_v='center',
-                             header=False)
+                                             fontsize=7,
+                                             corner1=[0.4, 1],
+                                             corner2=[1, 0.4],
+                                             colors=colors_data,
+                                             orientation_h='left',
+                                             orientation_v='center',
+                                             header=False)
 
                 tile_curr.add_textbox(Textbox_DEL)
                 Tiles.append(tile_curr)
@@ -2698,13 +2825,13 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
 
             if Seg.angles is not None:
                 Textbox_DEL = hc_plt.Textbox(Textbox_data,
-                             fontsize=6,
-                             corner1=[0.4, 1],
-                             corner2=[1, 0.4],
-                             colors=colors_data,
-                             orientation_h='left',
-                             orientation_v='center',
-                             header=False)
+                                             fontsize=6,
+                                             corner1=[0.4, 1],
+                                             corner2=[1, 0.4],
+                                             colors=colors_data,
+                                             orientation_h='left',
+                                             orientation_v='center',
+                                             header=False)
 
                 tile_curr.add_textbox(Textbox_DEL)
                 Tiles.append(tile_curr)
@@ -2724,7 +2851,6 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
 
         FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage)
         FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
-
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'Valid_line_swell', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2908,9 +3034,7 @@ if INPUT["Toggle_Modules"].get("plot_Weibull", {}):
         if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f'Weibull_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-
-
-
+tile_curr.add_line(Line_mean)
 # %% Data Out
 if INPUT["DataOut"]["CSV_out"]:
     print("saving CSV Data...")
@@ -2992,7 +3116,6 @@ if INPUT["DataOut"]["CSV_out"]:
         for i, segment in enumerate(calc.result):
             df_temp = df.loc[segment.indizes]
 
-
             data[i] = pd.concat((data[i], df_temp), axis=1)
 
         table_names = unpack_funcs["flat_angles"](calc)
@@ -3008,7 +3131,6 @@ if INPUT["DataOut"]["CSV_out"]:
 
         for i, segment in enumerate(calc.result):
             df_temp = df.loc[segment.indizes]
-
 
             data[i] = pd.concat((data[i], df_temp), axis=1)
 
@@ -3033,7 +3155,7 @@ if INPUT["DataOut"]["CSV_out"]:
         table_names = unpack_funcs["flat_angles"](calc)
         table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
 
-        #combined
+        # combined
         combined = []
         for table in data:
             combined.append(table["value"])
@@ -3053,7 +3175,7 @@ if INPUT["DataOut"]["CSV_out"]:
         table_names = unpack_funcs["flat_angles"](calc)
         table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
 
-        #combined
+        # combined
         combined = []
         for table in data:
             combined.append(table["value"])
@@ -3073,7 +3195,7 @@ if INPUT["DataOut"]["CSV_out"]:
         table_names = unpack_funcs["flat_angles"](calc)
         table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
 
-        #combined
+        # combined
         combined = []
         for table in data:
             combined.append(table["value"])
@@ -3093,7 +3215,7 @@ if INPUT["DataOut"]["CSV_out"]:
         table_names = unpack_funcs["flat_angles"](calc)
         table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
 
-        #combined
+        # combined
         combined = []
         for table in data:
             combined.append(table["value"])
@@ -3177,8 +3299,6 @@ if INPUT["DataOut"]["CSV_out"]:
         gl.save_df_list_to_excel(path_csv + r'//Validation_swell_condensed_vm_vise', data_condensed_vm_vise, sheet_names=table_names)
         gl.save_df_list_to_excel(path_csv + r'//Validation_swell_added', table_wind_added, sheet_names=["hindcast", "condensed"])
 
-
-
 # %% MAIN - Save Infolog
 print("saving Log...")
 
@@ -3187,4 +3307,3 @@ with open(path_out + 'Info_LOG.txt', "w") as log_text:
 del log_text
 
 print(f"{script_name} finished!")
-
