@@ -51,10 +51,10 @@ exclude_Tp_zero_wind		>		True									>	bool:	if True, Tp = 0 entrys are deleted
 
 *Toggle_Modules*
 #calc_VMHS					>			['wind', 'total','swell']									>		'wind', 'swell']
-#calc_HSTP					>			['wind', 'total','swell']									> 	['wind', 'swell']			
+calc_HSTP					>			['wind']									> 	['wind', 'swell']			
 #calc_VMTP					>			['wind', 'total','swell']									>  ['wind', 'swell']
 #calc_RWI					>			['wind']									>	'wind'
-calc_Tables					>			['wind']					>	['wind', 'swell']		
+#calc_Tables					>			['wind']					>	['wind', 'swell']		
 #calc_WaveBreak_Steep		>			['wind', 'total']									>	'wind'
 #calc_AngleDeviation 		>			['dir_v_m', 'dir_T_mean_Wind', 'v_m']									>	angle_orig, angle_deviation, v_m
 #calc_Roseplots				>			[['dir_v_m', 'v_m'], ['dir_curr', 'v_curr'], ['dir_T_mean_Swell', 'H_s_swell'], ['dir_T_mean', 'H_s'], ['dir_T_mean_Wind', 'H_s_wind'] ]									>	 [[angle, magnitude],[angle, magnitude]]
@@ -64,19 +64,19 @@ calc_Tables					>			['wind']					>	['wind', 'swell']
 #calc_Weibull				>			[['dir_v_m', 'v_m']]
 
 
-#plot_VMHS					>		['wind', 'swell', 'total']		
-#plot_HSTP					>		['wind', 'swell', 'total']		
-#plot_VMTP					>		['wind', 'swell', 'total']
-#plot_RWI					>		['wind', 'total']
-#plot_BreakSteep				>		['wind', 'total']
-plot_Tables					>		['wind', 'swell', 'total']	
-#plot_AngleDeviation			>		True
-#plot_as						>		["png"]
-#plot_Roseplots				>		True
-#plot_ExtremeValues			>		True				
-#plot_Validation 			>		['wind', 'swell']
-#plot_SensorEval				>		True
-#plot_Weibull				>		True
+plot_VMHS					>		['wind', 'swell', 'total']		
+plot_HSTP					>		['wind', 'swell', 'total']		
+plot_VMTP					>		['wind', 'swell', 'total']
+plot_RWI					>		['wind', 'total']
+plot_BreakSteep				>		['wind', 'total']
+lot_Tables					>		['wind', 'swell', 'total']	
+plot_AngleDeviation			>		True
+plot_as						>		["png"]
+plot_Roseplots				>		True
+plot_ExtremeValues			>		True				
+plot_Validation 			>		['wind', 'swell']
+plot_SensorEval				>		True
+plot_Weibull				>		True
 
 
 dpi_figures					>		500									>	int: resolution (dots per sqinch) of all pdf's
@@ -166,7 +166,7 @@ weighting_reg				>		0										>	float:	weighting of regression by number of dat
 zone_reg 					>		[3,None]								>	list: 	range from which calculating the regression function is determined, if[.. , None], the upper limit is the maximal found value (from the current angle-section)
 zone_line					> 		[3, None] 								>	zone: 	zone, in which the regression (or mean) plot is shown (or displayed in the tables), if [.. , None]  the upper limit is the maximal found value, excuding values under n_bin (from the current angle-section)
 bin_min						>		0 										>	int:	mininmal number of Datapoints in one bin to include the bin in any calculation
-perc_mean					>		1
+average_correction					>		1
 avrg_method					>		"weighted mean" 							>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
 make_monotone 				>		True
 
