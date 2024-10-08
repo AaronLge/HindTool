@@ -252,8 +252,6 @@ else:
     print("please choose colnames_preset from 'MetOcen', 'APGMer' or None to import Colnames from Input file")
 
 # %% Calculation
-
-
 angle_grid, angle_grid_mod = hc_calc.angles(INPUT["AngleSection"]["mode_angle"], INPUT["AngleSection"]["N_angle"], INPUT["AngleSection"]["angle_start"],
                                             width=INPUT["AngleSection"]["width_angle"])
 
@@ -268,6 +266,8 @@ DATA_OUT["AngleDeviation"] = {}
 DATA_OUT["Validation"] = {}
 DATA_OUT["SensorEval"] = {}
 DATA_OUT["Weibull"] = {}
+DATA_OUT["ExtremeConture"] = {}
+
 
 # VMHS
 if (('wind' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
@@ -969,6 +969,38 @@ if len(INPUT["Toggle_Modules"].get("calc_ExtremeValues", {})) > 0:
 
         DATA_OUT["ExtremeValues"][f"{cols[0]} over {cols[1]}"] = Calc
 
+# Extreme Conture Plots
+if len(INPUT["Toggle_Modules"].get("calc_ExtremeConture", {})) > 0:
+    print("calculating Extreme Conture Plots...")
+    DATA_OUT["ExtremeConturePlots"] = {}
+    for cols in INPUT["Toggle_Modules"]["calc_ExtremeConture"]:
+        table_name = 'Hindcast_combined'
+        column_names = [COLNAMES[col] for col in cols]
+
+        Calc = hc_calc.Calculation()
+        df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
+
+        # filter for nans
+        indizes_in = Calc.initilize_filter(None, mode='nans')
+        df = df.loc[indizes_in]
+
+        out_direc = hc_calc.calc_extreme_contures(df[column_names[0]],
+                                            df[column_names[1]],
+                                            df[column_names[2]],
+                                            angle_grid,
+                                            INPUT["ExtremeValues"]["T_return"])
+
+        out_omni = hc_calc.calc_extreme_contures(df[column_names[0]],
+                                            df[column_names[1]],
+                                            df[column_names[2]],
+                                            None,
+                                            INPUT["ExtremeValues"]["T_return"])
+
+        Calc.result = out_omni + out_direc
+        DATA_OUT["ExtremeConture"][f"{cols[0]} over {cols[1]}"] = Calc
+
+
+
 # Validation
 if 'wind' in INPUT["Toggle_Modules"].get("calc_Validation", {}):
     print("calculating Validation wind...")
@@ -1592,7 +1624,7 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
             #                             label=key_perc[0].replace('result', '').replace('plot', ''),
             #                             color='black',
             #                             linestyle='--')
-            # tile_curr.add_line(Line_perc_low)
+            #tile_curr.add_line(Line_perc_low)
 
             # Line_perc_up = hc_plt.Line(x=Seg.result["x"],
             #                            y=Seg.result[key_perc[1]],
@@ -3032,7 +3064,76 @@ if INPUT["Toggle_Modules"].get("plot_Weibull", {}):
         if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f'Weibull_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-tile_curr.add_line(Line_mean)
+if INPUT["Toggle_Modules"].get("plot_ExtremeConture", {}) and len(INPUT["Toggle_Modules"].get("calc_ExtremeConture", {})) > 0:
+    print('plotting ExtremeConture...')
+
+    for name, Calc in DATA_OUT["ExtremeConture"].items():
+
+        Input = INPUT["ExtremeValues"]
+        Tiles = []
+        Tiles_omni = []
+
+        df = Calc.load_from_db(colnames_ini=True)
+        titels = Calc.create_segment_title()
+        titels = gl.alias(titels, COLNAMES, INPUT["Aliase"])
+
+        for i, Seg in enumerate(Calc.result):
+
+            Seg.indizes = pd.to_datetime(Seg.indizes)
+            point_data = df[df.index.isin(Seg.indizes)]
+
+            tile_curr = hc_plt.Tile(i,
+                                    x_label=gl.alias(Seg.colnames['x'], COLNAMES, INPUT["Aliase"]),
+                                    y_label=gl.alias(Seg.colnames['y'], COLNAMES, INPUT["Aliase"]),
+                                    title=titels[i])
+
+            scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]],
+                                     y=point_data[Seg.colnames["y"]],
+                                     cmap='cool',
+                                     size=2,
+                                     cmap_norm='sqrt')
+
+            tile_curr.add_scatter(scatter)
+
+            # add contures
+            # Define the colors for the colormap: red to dark green
+            colors = [(1, 0, 0),  # Red
+                      (0, 0.4, 0)]  # Dark green
+            # Create the colormap
+            cmap_name = 'red_to_darkgreen'
+            red_to_darkgreen = LinearSegmentedColormap.from_list(cmap_name, colors)
+
+            color = np.linspace(1, 0, len(Seg.result))
+            i = 0
+            for name, data in Seg.result.items():
+
+                contour = hc_plt.Line(x=data["x"],
+                                      y=data["y"],
+                                      label=name,
+                                      color=red_to_darkgreen(color[i]),
+                                      linewidth=0.8)
+
+                tile_curr.add_line(contour)
+
+                i = i + 1
+            if Seg.angles is not None:
+                Tiles.append(tile_curr)
+
+            else:
+                Tiles_omni.append(tile_curr)
+
+
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage)
+
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
+
+        if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+            gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'ExtremeConture', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+        if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+            gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + 'ExtremeConture', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+
 # %% Data Out
 if INPUT["DataOut"]["CSV_out"]:
     print("saving CSV Data...")
@@ -3305,3 +3406,4 @@ with open(path_out + 'Info_LOG.txt', "w") as log_text:
 del log_text
 
 print(f"{script_name} finished!")
+
