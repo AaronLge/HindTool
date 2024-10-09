@@ -268,7 +268,6 @@ DATA_OUT["SensorEval"] = {}
 DATA_OUT["Weibull"] = {}
 DATA_OUT["ExtremeConture"] = {}
 
-
 # VMHS
 if (('wind' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
         or ('wind' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
@@ -621,6 +620,7 @@ if (('wind' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
     Calc = hc_calc.Calculation()
     Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
+
     Calc.result = hc_calc.calc_VMTP(DATA_OUT["VMHS"]["wind"].result, DATA_OUT["HSTP"]["wind"].result, fill_range=False)
     DATA_OUT["VMTP"]["wind"] = Calc
 
@@ -635,6 +635,7 @@ if (('swell' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
     Calc = hc_calc.Calculation()
     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
+
     Calc.result = hc_calc.calc_VMTP(DATA_OUT["VMHS"]["swell"].result, DATA_OUT["HSTP"]["swell"].result, vm_points=df[COLNAMES["v_m"]], fill_range=True)
     DATA_OUT["VMTP"]["swell"] = Calc
 
@@ -648,6 +649,7 @@ if (('total' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
 
     Calc = hc_calc.Calculation()
     Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
+
 
     Calc.result = hc_calc.calc_VMTP(DATA_OUT["VMHS"]["total"].result, DATA_OUT["HSTP"]["total"].result, fill_range=False)
     DATA_OUT["VMTP"]["total"] = Calc
@@ -968,7 +970,7 @@ if len(INPUT["Toggle_Modules"].get("calc_ExtremeValues", {})) > 0:
 
         DATA_OUT["ExtremeValues"][f"{cols[0]} over {cols[1]}"] = Calc
 
-#Extreme Conture Plots
+# Extreme Conture Plots
 if len(INPUT["Toggle_Modules"].get("calc_ExtremeConture", {})) > 0:
     print("calculating Extreme Conture Plots...")
     DATA_OUT["ExtremeConturePlots"] = {}
@@ -984,21 +986,19 @@ if len(INPUT["Toggle_Modules"].get("calc_ExtremeConture", {})) > 0:
         df = df.loc[indizes_in]
 
         out_direc = hc_calc.calc_extreme_contures(df[column_names[0]],
-                                            df[column_names[1]],
-                                            df[column_names[2]],
-                                            angle_grid,
-                                            INPUT["ExtremeValues"]["T_return"])
+                                                  df[column_names[1]],
+                                                  df[column_names[2]],
+                                                  angle_grid,
+                                                  INPUT["ExtremeValues"]["T_return"])
 
         out_omni = hc_calc.calc_extreme_contures(df[column_names[0]],
-                                            df[column_names[1]],
-                                            df[column_names[2]],
-                                            None,
-                                            INPUT["ExtremeValues"]["T_return"])
+                                                 df[column_names[1]],
+                                                 df[column_names[2]],
+                                                 None,
+                                                 INPUT["ExtremeValues"]["T_return"])
 
         Calc.result = out_omni + out_direc
         DATA_OUT["ExtremeConture"][f"{cols[0]} over {cols[1]}"] = Calc
-
-
 
 # Validation
 if 'wind' in INPUT["Toggle_Modules"].get("calc_Validation", {}):
@@ -1216,11 +1216,10 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
                                     y_label=gl.alias(Seg.colnames['y'], COLNAMES, INPUT["Aliase"]),
                                     title=titels[i])
 
-            Line_mean = hc_plt.Line(x=Seg.result["x"],
-                                    y=Seg.result["mean result plot"],
+            Line_mean = hc_plt.Line(x=Seg.result["data"]["x"],
+                                    y=Seg.result["data"]["mean result plot"],
                                     label='Selected correlation',
                                     color='black')
-
 
             scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]],
                                      y=point_data[Seg.colnames["y"]],
@@ -1262,9 +1261,9 @@ if INPUT["Toggle_Modules"].get("plot_condensation_example", {}):
         if Seg.angles is None:
             Seg.indizes = pd.to_datetime(Seg.indizes)
             point_data = df[df.index.isin(Seg.indizes)]
-            reg_zone = np.where(Seg.result["bool_reg_zone"] == 1)[0]
-            use_reg_zone = np.where(Seg.result["use_regression"] == 1)[0]
-            use_mean = np.where(Seg.result["use_regression"] == 0)[0]
+            reg_zone = np.where(Seg.result["data"]["bool_reg_zone"] == 1)[0]
+            use_reg_zone = np.where(Seg.result["data"]["use_regression"] == 1)[0]
+            use_mean = np.where(Seg.result["data"]["use_regression"] == 0)[0]
 
             tile_curr = hc_plt.Tile(i,
                                     x_label=gl.alias(Seg.colnames['x'], COLNAMES, INPUT["Aliase"]),
@@ -1277,78 +1276,78 @@ if INPUT["Toggle_Modules"].get("plot_condensation_example", {}):
                                      cmap_norm='sqrt',
                                      color=[0.8, 0.8, 0.8])
 
-            Line_mean = hc_plt.Line(x=Seg.result["x"],
-                                    y=Seg.result["mean"],
+            Line_mean = hc_plt.Line(x=Seg.result["data"]["x"],
+                                    y=Seg.result["data"]["mean"],
                                     color='black',
                                     linewidth=2.5,
                                     alpha=0.5)
 
-            Line_mean_inrange = hc_plt.Line(x=Seg.result["x"].iloc[use_mean[0]:use_mean[-1]+2],
-                                    y=Seg.result["mean"].iloc[use_mean[0]:use_mean[-1]+2],
-                                    color='black',
-                                    linewidth=2.5)
+            Line_mean_inrange = hc_plt.Line(x=Seg.result["data"]["x"].iloc[use_mean[0]:use_mean[-1] + 2],
+                                            y=Seg.result["data"]["mean"].iloc[use_mean[0]:use_mean[-1] + 2],
+                                            color='black',
+                                            linewidth=2.5)
 
-            scatter_mean = hc_plt.Scatter(x=Seg.result["x"],
-                                          y=Seg.result["mean"],
+            scatter_mean = hc_plt.Scatter(x=Seg.result["data"]["x"],
+                                          y=Seg.result["data"]["mean"],
                                           label='$y$ (representative bin values)',
                                           color='black',
                                           size=30)
 
-            Line_regression = hc_plt.Line(x=Seg.result["x"],
-                                          y=Seg.result["mean regression"],
+            Line_regression = hc_plt.Line(x=Seg.result["data"]["x"],
+                                          y=Seg.result["data"]["mean regression"],
                                           color='blue',
                                           linewidth=2.5,
                                           alpha=0.3)
 
-            Line_regression_inrange = hc_plt.Line(x=Seg.result["x"].iloc[use_reg_zone],
-                                          y=Seg.result["mean regression"].iloc[use_reg_zone],
-                                          label='Resulting regression curve',
-                                          color='blue',
-                                          linewidth=1.5)
+            Line_regression_inrange = hc_plt.Line(x=Seg.result["data"]["x"].iloc[use_reg_zone],
+                                                  y=Seg.result["data"]["mean regression"].iloc[use_reg_zone],
+                                                  label='Resulting regression curve',
+                                                  color='blue',
+                                                  linewidth=1.5)
 
-            Line_reg_zone_left = hc_plt.Line(x=[Seg.result['x'].iloc[reg_zone[0]]],
+            Line_reg_zone_left = hc_plt.Line(x=[Seg.result["data"]['x'].iloc[reg_zone[0]]],
                                              y=None,
                                              label=r'Range of the regression base (start, end)',
                                              color='#20D503',
-                                      linewidth=2)
+                                             linewidth=2)
 
-            Line_reg_zone_right = hc_plt.Line(x=[Seg.result['x'].iloc[reg_zone[-1]]],
+            Line_reg_zone_right = hc_plt.Line(x=[Seg.result["data"]['x'].iloc[reg_zone[-1]]],
                                               y=None,
                                               color='#20D503',
-                                      linewidth=2)
+                                              linewidth=2)
 
-            Line_use_reg = hc_plt.Line(x=[Seg.result['x'].iloc[use_reg_zone[0]]],
+            Line_use_reg = hc_plt.Line(x=[Seg.result["data"]['x'].iloc[use_reg_zone[0]]],
                                        y=None,
                                        label=r'Start of datapoints evaluated with regression curve',
                                        color='#20D503',
                                        linewidth=2,
                                        linestyle='--')
 
-            scatter_regression = hc_plt.Scatter(x=Seg.result["x"].iloc[reg_zone],
-                                                y=Seg.result["mean"].iloc[reg_zone],
+            scatter_regression = hc_plt.Scatter(x=Seg.result["data"]["x"].iloc[reg_zone],
+                                                y=Seg.result["data"]["mean"].iloc[reg_zone],
                                                 label=r'Values used for regression (inside "Range of the regression base")',
                                                 color='blue',
                                                 size=40,
                                                 marker='x')
 
-            Line_result = hc_plt.Line(x=Seg.result["x"],
-                                      y=Seg.result["mean result"],
+            Line_result = hc_plt.Line(x=Seg.result["data"]["x"],
+                                      y=Seg.result["data"]["mean result"],
                                       color='red',
                                       linestyle='--',
                                       linewidth=1)
 
-            Scatter_result = hc_plt.Scatter(x=Seg.result["x"],
-                                      y=Seg.result["mean result"],
-                                      label=r'Selected correlation',
-                                      color='red',
-                                      size=5)
+            Scatter_result = hc_plt.Scatter(x=Seg.result["data"]["x"],
+                                            y=Seg.result["data"]["mean result"],
+                                            label=r'Selected correlation',
+                                            color='red',
+                                            size=5)
 
             tile_curr.add_scatter(scatter)
-           # tile_curr.add_line(Line_mean)
+            # tile_curr.add_line(Line_mean)
             tile_curr.add_line(Line_regression)
 
             tile_curr.add_line(Line_regression_inrange)
-          #  tile_curr.add_line(Line_mean_inrange)
+            #  tile_curr.add_line(Line_mean_inrange)
 
             tile_curr.add_scatter(scatter_mean)
             tile_curr.add_scatter(scatter_regression)
@@ -1396,11 +1395,10 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
                                     y_label=gl.alias(Seg.colnames['y'], COLNAMES, INPUT["Aliase"]),
                                     title=titels[i])
 
-            Line_mean = hc_plt.Line(x=Seg.result["x"],
-                                    y=Seg.result["mean result plot"],
+            Line_mean = hc_plt.Line(x=Seg.result["data"]["x"],
+                                    y=Seg.result["data"]["mean result plot"],
                                     label='Selected correlation',
                                     color='black')
-
 
             scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]],
                                      y=point_data[Seg.colnames["y"]],
@@ -1452,11 +1450,10 @@ if 'total' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
                                     y_label=gl.alias(Seg.colnames['y'], COLNAMES, INPUT["Aliase"]),
                                     title=titels[i])
 
-            Line_mean = hc_plt.Line(x=Seg.result["x"],
-                                    y=Seg.result["mean result plot"],
+            Line_mean = hc_plt.Line(x=Seg.result["data"]["x"],
+                                    y=Seg.result["data"]["mean result plot"],
                                     label='Selected correlation',
                                     color='black')
-
 
             scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]],
                                      y=point_data[Seg.colnames["y"]],
@@ -1508,25 +1505,25 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
                                     y_label=gl.alias(Seg.colnames['y'], COLNAMES, INPUT["Aliase"]),
                                     title=titels[i])
 
-            key_plot = [key for key in Seg.result.columns if 'plot' in key]
+            key_plot = [key for key in Seg.result["data"].columns if 'plot' in key]
             key_mean = [key for key in key_plot if 'mean' in key]
             key_perc = [key for key in key_plot if 'percentile' in key]
-            key_quantile = [key for key in Seg.result.columns if 'quantile' in key]
+            key_quantile = [key for key in Seg.result["data"].columns if 'quantile' in key]
 
-            Line_perc_low = hc_plt.Line(x=Seg.result["x"],
-                                        y=Seg.result[key_perc[0]],
+            Line_perc_low = hc_plt.Line(x=Seg.result["data"]["x"],
+                                        y=Seg.result["data"][key_perc[0]],
                                         label=key_perc[0].replace('result', '').replace('plot', ''),
                                         color='black',
                                         linestyle='--')
 
-            Line_mean = hc_plt.Line(x=Seg.result["x"],
-                                    y=Seg.result["mean result plot"],
+            Line_mean = hc_plt.Line(x=Seg.result["data"]["x"],
+                                    y=Seg.result["data"]["mean result plot"],
                                     label='50 percentile',
                                     color='black',
                                     linestyle='-')
 
-            Line_perc_up = hc_plt.Line(x=Seg.result["x"],
-                                       y=Seg.result[key_perc[1]],
+            Line_perc_up = hc_plt.Line(x=Seg.result["data"]["x"],
+                                       y=Seg.result["data"][key_perc[1]],
                                        label=key_perc[1].replace('result', '').replace('plot', ''),
                                        color='black',
                                        linestyle=':')
@@ -1543,8 +1540,8 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
             tile_curr.add_line(Line_mean)
 
             if len(key_quantile) > 0:
-                Line_quant = hc_plt.Line(x=Seg.result["x"],
-                                         y=Seg.result[key_quantile[0]],
+                Line_quant = hc_plt.Line(x=Seg.result["data"]["x"],
+                                         y=Seg.result["data"][key_quantile[0]],
                                          label='Selected correlation',
                                          color='red',
                                          linestyle='-')
@@ -1552,14 +1549,14 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
 
                 Line_quant_up = hc_plt.Line(x=None,
                                             y=[1 / Input["quant_up"]],
-                                            label=r'$f_{up}$'+ f"$={round(Input['quant_up'], 3)}$ Hz",
+                                            label=r'$f_{up}$' + f"$={round(Input['quant_up'], 3)}$ Hz",
                                             color='green',
                                             linestyle=':')
                 tile_curr.add_line(Line_quant_up)
 
                 Line_quant_low = hc_plt.Line(x=None,
                                              y=[1 / Input["quant_low"]],
-                                             label=r'$f_{low}$' + f"$={round(Input['quant_low'],3)}$ Hz",
+                                             label=r'$f_{low}$' + f"$={round(Input['quant_low'], 3)}$ Hz",
                                              color='green',
                                              linestyle='--')
                 tile_curr.add_line(Line_quant_low)
@@ -1614,13 +1611,13 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
                                      size=2,
                                      cmap_norm='sqrt')
 
-            key_plot = [key for key in Seg.result.columns if 'plot' in key]
+            key_plot = [key for key in Seg.result["data"].columns if 'plot' in key]
             key_mean = [key for key in key_plot if 'mean' in key]
             key_perc = [key for key in key_plot if 'percentile' in key]
-            key_quantile = [key for key in Seg.result.columns if 'quantile' in key]
+            key_quantile = [key for key in Seg.result["data"].columns if 'quantile' in key]
 
-            Line_mean = hc_plt.Line(x=Seg.result["x"],
-                                    y=Seg.result["mean result plot"],
+            Line_mean = hc_plt.Line(x=Seg.result["data"]["x"],
+                                    y=Seg.result["data"]["mean result plot"],
                                     label='Selected correlation',
                                     color='black',
                                     linestyle='-')
@@ -1671,13 +1668,13 @@ if 'total' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
                                     y_label=gl.alias(Seg.colnames['y'], COLNAMES, INPUT["Aliase"]),
                                     title=titels[i])
 
-            key_plot = [key for key in Seg.result.columns if 'plot' in key]
+            key_plot = [key for key in Seg.result["data"].columns if 'plot' in key]
             key_mean = [key for key in key_plot if 'mean' in key]
             key_perc = [key for key in key_plot if 'percentile' in key]
-            key_quantile = [key for key in Seg.result.columns if 'quantile' in key]
+            key_quantile = [key for key in Seg.result["data"].columns if 'quantile' in key]
 
-            Line_mean = hc_plt.Line(x=Seg.result["x"],
-                                    y=Seg.result["mean result plot"],
+            Line_mean = hc_plt.Line(x=Seg.result["data"]["x"],
+                                    y=Seg.result["data"]["mean result plot"],
                                     label='Selected correlation',
                                     color='black',
                                     linestyle='-')
@@ -1733,11 +1730,10 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_VMTP", {}):
                                     y_label=gl.alias(Seg.colnames['y'], COLNAMES, INPUT["Aliase"]),
                                     title=titels[i])
 
-            Line_mean = hc_plt.Line(x=Seg.result["x"],
-                                    y=Seg.result["mean result plot"],
+            Line_mean = hc_plt.Line(x=Seg.result["data"]["x"],
+                                    y=Seg.result["data"]["mean result plot"],
                                     label='Extracted correlation',
                                     color='black')
-
 
             scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]],
                                      y=point_data[Seg.colnames["y"]],
@@ -1791,11 +1787,10 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_VMTP", {}):
                                     y_label=gl.alias(Seg.colnames['y'], COLNAMES, INPUT["Aliase"]),
                                     title=titels[i])
 
-            Line_mean = hc_plt.Line(x=Seg.result["x"],
-                                    y=Seg.result["mean result plot"],
+            Line_mean = hc_plt.Line(x=Seg.result["data"]["x"],
+                                    y=Seg.result["data"]["mean result plot"],
                                     label='Extracted correlation',
                                     color='black')
-
 
             scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]],
                                      y=point_data[Seg.colnames["y"]],
@@ -1849,11 +1844,10 @@ if 'total' in INPUT["Toggle_Modules"].get("plot_VMTP", {}):
                                     y_label=gl.alias(Seg.colnames['y'], COLNAMES, INPUT["Aliase"]),
                                     title=titels[i])
 
-            Line_mean = hc_plt.Line(x=Seg.result["x"],
-                                    y=Seg.result["mean result plot"],
+            Line_mean = hc_plt.Line(x=Seg.result["data"]["x"],
+                                    y=Seg.result["data"]["mean result plot"],
                                     label='Extracted correlation',
                                     color='black')
-
 
             scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]],
                                      y=point_data[Seg.colnames["y"]],
@@ -1917,7 +1911,6 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_RWI", {}):
                                      cbar_label="RWI = $\\sqrt{S(f_0)}$ (Resonance Wave Intesity) $[\\sqrt{m^2/Hz}]$",
                                      cbar_label_fontsize=6)
 
-
             Line_f0 = hc_plt.Line(x=None,
                                   y=[1 / INPUT["Structure"]["f_0"]],
                                   label=f'f_0, f={INPUT["Structure"]["f_0"]} Hz',
@@ -1979,7 +1972,6 @@ if 'total' in INPUT["Toggle_Modules"].get("plot_RWI", {}):
                                      cbar=True,
                                      cbar_label="RWI = $\\sqrt{S(f_0)}$ (Resonance Wave Intesity) $[\\sqrt{m^2/Hz}]$",
                                      cbar_label_fontsize=6)
-
 
             Line_f0 = hc_plt.Line(x=None,
                                   y=[1 / INPUT["Structure"]["f_0"]],
@@ -3034,7 +3026,6 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeConture", {}) and len(INPUT["Toggle_
             color = np.linspace(1, 0, len(Seg.result))
             i = 0
             for name, data in Seg.result.items():
-
                 contour = hc_plt.Line(x=data["x"],
                                       y=data["y"],
                                       label=name,
@@ -3050,7 +3041,6 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeConture", {}) and len(INPUT["Toggle_
             else:
                 Tiles_omni.append(tile_curr)
 
-
         FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage)
 
         FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
@@ -3061,13 +3051,12 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeConture", {}) and len(INPUT["Toggle_
         if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + 'ExtremeConture', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-
 # %% Data Out
 if INPUT["DataOut"]["CSV_out"]:
     print("saving CSV Data...")
 
     path_csv = os.path.join(path_out, 'csv_data')
-
+    Coeffs_string = "Regression Coefficients, order: c_0, c_1, ..., c_deg\n \n"
     try:
         # Create the new folder
         os.makedirs(path_csv, exist_ok=True)  # exist_ok=True prevents an error if the folder already exists
@@ -3075,68 +3064,51 @@ if INPUT["DataOut"]["CSV_out"]:
     except Exception as e:
         print(f"An error occurred: {e}")
 
-    unpack_funcs = {"flat_data": lambda x: [segment.result for segment in x.result],
-                    "flat_angles": lambda x: [segment.angles for segment in x.result],
-                    "flat_exclude_omni": lambda x: [segment.result for segment in x.result if segment.angles is not None],
-                    }
+    unpack_funcs = {"flat_data": lambda x: [seg.result for seg in x.result],
+                    "flat_angles": lambda x: [seg.angles for seg in x.result],
+                    "flat_exclude_omni": lambda x: [seg.result for seg in x.result if segment.angles is not None],
+                    "deep_data": lambda x: [seg.result["data"] for seg in x.result],
+                    "deep_coeffs": lambda x: [seg.result["coeffs"] for seg in x.result]}
 
-    if "wind" in DATA_OUT["VMHS"]:
-        print("   VMHS wind")
-        calc = DATA_OUT["VMHS"]["wind"]
-        data = unpack_funcs["flat_data"](calc)
+    for seastate, calc in DATA_OUT["VMHS"].items():
+        print(f"   VMHS {seastate}")
+        data = unpack_funcs["deep_data"](calc)
+        coeffs = unpack_funcs["deep_coeffs"](calc)
         table_names = unpack_funcs["flat_angles"](calc)
         table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
 
-        gl.save_df_list_to_excel(path_csv + r'//VMHS_wind', data, sheet_names=table_names)
+        Coeffs = {table_name: coeff for table_name, coeff in zip(table_names, coeffs)}
 
-    if "swell" in DATA_OUT["VMHS"]:
-        print("   VMHS swell")
-        calc = DATA_OUT["VMHS"]["swell"]
-        data = unpack_funcs["flat_data"](calc)
+        Coeffs_string += f"VMHS {seastate} \n \n"
+        Coeffs_string += gl.write_dict(Coeffs) + "\n \n"
+
+        gl.save_df_list_to_excel(path_csv + f'/VMHS_{seastate}', data, sheet_names=table_names)
+
+    for seastate, calc in DATA_OUT["HSTP"].items():
+        print(f"   HSTP {seastate}")
+        data = unpack_funcs["deep_data"](calc)
+        coeffs = unpack_funcs["deep_coeffs"](calc)
         table_names = unpack_funcs["flat_angles"](calc)
         table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
 
-        gl.save_df_list_to_excel(path_csv + r'//VMHS_swell', data, sheet_names=table_names)
+        Coeffs = {table_name: coeff for table_name, coeff in zip(table_names, coeffs)}
 
-    if "wind" in DATA_OUT["HSTP"]:
-        print("   HSTP wind")
-        calc = DATA_OUT["HSTP"]["wind"]
-        data = unpack_funcs["flat_data"](calc)
+        Coeffs_string += f"HSTP {seastate} \n \n"
+        Coeffs_string += gl.write_dict(Coeffs) + "\n \n"
+
+        gl.save_df_list_to_excel(path_csv + f'/HSTP_{seastate}', data, sheet_names=table_names)
+
+    for seastate, calc in DATA_OUT["VMTP"].items():
+        print(f"   VMTP {seastate}")
+        data = unpack_funcs["deep_data"](calc)
         table_names = unpack_funcs["flat_angles"](calc)
         table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
 
-        gl.save_df_list_to_excel(path_csv + r'//HSTP_wind', data, sheet_names=table_names)
+        gl.save_df_list_to_excel(path_csv + f'/VMTP_{seastate}', data, sheet_names=table_names)
 
-    if "swell" in DATA_OUT["HSTP"]:
-        print("   HSTP swell")
-        calc = DATA_OUT["HSTP"]["swell"]
-        data = unpack_funcs["flat_data"](calc)
-        table_names = unpack_funcs["flat_angles"](calc)
-        table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
+    for seastate, calc in DATA_OUT["RWI"].items():
+        print(f"   RWI {seastate}")
 
-        gl.save_df_list_to_excel(path_csv + r'//HSTP_swell', data, sheet_names=table_names)
-
-    if "wind" in DATA_OUT["VMTP"]:
-        print("   VMTP wind")
-        calc = DATA_OUT["VMTP"]["wind"]
-        data = unpack_funcs["flat_data"](calc)
-        table_names = unpack_funcs["flat_angles"](calc)
-        table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
-
-        gl.save_df_list_to_excel(path_csv + r'//VMTP_wind', data, sheet_names=table_names)
-
-    if "swell" in DATA_OUT["VMTP"]:
-        print("   VMTP swell")
-        calc = DATA_OUT["VMTP"]["swell"]
-        data = unpack_funcs["flat_data"](calc)
-        table_names = unpack_funcs["flat_angles"](calc)
-        table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
-
-        gl.save_df_list_to_excel(path_csv + r'//VMTP_swell', data, sheet_names=table_names)
-
-    if "wind" in DATA_OUT["RWI"]:
-        print("   RWI wind")
-        calc = DATA_OUT["RWI"]["wind"]
         df = calc.load_from_db(colnames_ini=True)
         data = unpack_funcs["flat_data"](calc)
 
@@ -3148,36 +3120,20 @@ if INPUT["DataOut"]["CSV_out"]:
         table_names = unpack_funcs["flat_angles"](calc)
         table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
 
-        gl.save_df_list_to_excel(path_csv + r'//RWI_wind', data, sheet_names=table_names)
+        gl.save_df_list_to_excel(path_csv + f'/RWI_{seastate}', data, sheet_names=table_names)
 
-    if "total" in DATA_OUT["RWI"]:
-        print("   RWI total")
-        calc = DATA_OUT["RWI"]["total"]
-        df = calc.load_from_db(colnames_ini=True)
-        data = unpack_funcs["flat_data"](calc)
+    for seastate, calc in DATA_OUT["WaveBreak_Steep"].items():
+        print(f"   WaveBreak_Steep {seastate}")
 
-        for i, segment in enumerate(calc.result):
-            df_temp = df.loc[segment.indizes]
-
-            data[i] = pd.concat((data[i], df_temp), axis=1)
-
-        table_names = unpack_funcs["flat_angles"](calc)
-        table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
-
-        gl.save_df_list_to_excel(path_csv + r'//RWI_swell', data, sheet_names=table_names)
-
-    if "wind" in DATA_OUT["WaveBreak_Steep"]:
-        print("   WaveBreak_Steep wind")
-        calc = DATA_OUT["WaveBreak_Steep"]["wind"]
         data = unpack_funcs["flat_data"](calc)
         table_names = unpack_funcs["flat_angles"](calc)
         table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
 
-        gl.save_df_list_to_excel(path_csv + r'//WaveBreak_Steep_wind', data, sheet_names=table_names)
+        gl.save_df_list_to_excel(path_csv + f'/WaveBreak_Steep_{seastate}', data, sheet_names=table_names)
 
-    if "wind" in DATA_OUT["table_vmhs"]:
-        print("   table_vmhs wind")
-        calc = DATA_OUT["table_vmhs"]["wind"]
+    for seastate, calc in DATA_OUT["table_vmhs"].items():
+        print(f"   table_vmhs {seastate}")
+
         data = unpack_funcs["flat_data"](calc)
         table_names = unpack_funcs["flat_angles"](calc)
         table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
@@ -3193,11 +3149,11 @@ if INPUT["DataOut"]["CSV_out"]:
 
         data.insert(0, df_combined)
         table_names.insert(0, 'combined')
-        gl.save_df_list_to_excel(path_csv + r'//table_vmhs_wind', data, sheet_names=table_names)
+        gl.save_df_list_to_excel(path_csv + f'/table_vmhs_{seastate}', data, sheet_names=table_names)
 
-    if "swell" in DATA_OUT["table_vmhs"]:
-        print("   table_vmh sswell")
-        calc = DATA_OUT["table_vmhs"]["swell"]
+    for seastate, calc in DATA_OUT["table_vmtp"].items():
+        print(f"   table_vmtp {seastate}")
+
         data = unpack_funcs["flat_data"](calc)
         table_names = unpack_funcs["flat_angles"](calc)
         table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
@@ -3213,50 +3169,11 @@ if INPUT["DataOut"]["CSV_out"]:
 
         data.insert(0, df_combined)
         table_names.insert(0, 'combined')
-        gl.save_df_list_to_excel(path_csv + r'//table_vmhs_swell', data, sheet_names=table_names)
-
-    if "wind" in DATA_OUT["table_vmtp"]:
-        print("   table_vmtp wind")
-        calc = DATA_OUT["table_vmtp"]["wind"]
-        data = unpack_funcs["flat_data"](calc)
-        table_names = unpack_funcs["flat_angles"](calc)
-        table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
-
-        # combined
-        combined = []
-        for table in data:
-            combined.append(table["value"])
-
-        combined = np.array(combined).T
-
-        df_combined = pd.DataFrame(combined, columns=table_names, index=data[0]["vm_edges"])
-
-        data.insert(0, df_combined)
-        table_names.insert(0, 'combined')
-        gl.save_df_list_to_excel(path_csv + r'//table_vmtp_wind', data, sheet_names=table_names)
-
-    if "swell" in DATA_OUT["table_vmtp"]:
-        print("   table_vmtp swell")
-        calc = DATA_OUT["table_vmtp"]["swell"]
-        data = unpack_funcs["flat_data"](calc)
-        table_names = unpack_funcs["flat_angles"](calc)
-        table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
-
-        # combined
-        combined = []
-        for table in data:
-            combined.append(table["value"])
-
-        combined = np.array(combined).T
-
-        df_combined = pd.DataFrame(combined, columns=table_names, index=data[0]["vm_edges"])
-
-        data.insert(0, df_combined)
-        table_names.insert(0, 'combined')
-        gl.save_df_list_to_excel(path_csv + r'//table_vmtp_swell', data, sheet_names=table_names)
+        gl.save_df_list_to_excel(path_csv + f'/table_vmtp_{seastate}', data, sheet_names=table_names)
 
     if DATA_OUT["AngleDeviation"]:
         print("   AngleDeviation")
+
         calc = DATA_OUT["AngleDeviation"]
         data = unpack_funcs["flat_exclude_omni"](calc)
         table_names = unpack_funcs["flat_angles"](calc)
@@ -3264,9 +3181,8 @@ if INPUT["DataOut"]["CSV_out"]:
         table_names = [f"{name[0]} to {name[1]}" for name in table_names]
         gl.save_df_list_to_excel(path_csv + r'//AngleDeviation', data, sheet_names=table_names)
 
-    if "wind" in DATA_OUT["Validation"]:
-        print("   Validation wind")
-        calc = DATA_OUT["Validation"]["wind"]
+    for seastate, calc in DATA_OUT["Validation"].items():
+        print(f"   Validation {seastate}")
 
         unpac_func_hindcast_vm_vise = lambda x: [df.result["hindcast"]["vm_vise"] for df in x.result]
         unpac_func_condensed_vm_vise = lambda x: [df.result["condensed"]["vm_vise"] for df in x.result]
@@ -3291,40 +3207,13 @@ if INPUT["DataOut"]["CSV_out"]:
 
         table_wind_added = [table_hindcast_added_combined, table_condensed_added_combined]
 
-        gl.save_df_list_to_excel(path_csv + r'//Validation_wind_hindcast_vm_vise', data_hindcast_vm_vise, sheet_names=table_names)
-        gl.save_df_list_to_excel(path_csv + r'//Validation_wind_condensed_vm_vise', data_condensed_vm_vise, sheet_names=table_names)
-        gl.save_df_list_to_excel(path_csv + r'//Validation_wind_added', table_wind_added, sheet_names=["hindcast", "condensed"])
+        gl.save_df_list_to_excel(path_csv + f'/Validation_{seastate}_hindcast_vm_vise', data_hindcast_vm_vise, sheet_names=table_names)
+        gl.save_df_list_to_excel(path_csv + f'/Validation_{seastate}_condensed_vm_vise', data_condensed_vm_vise, sheet_names=table_names)
+        gl.save_df_list_to_excel(path_csv + f'/Validation_{seastate}_added', table_wind_added, sheet_names=["hindcast", "condensed"])
 
-    if "swell" in DATA_OUT["Validation"]:
-        print("   Validation swell")
-        calc = DATA_OUT["Validation"]["swell"]
-
-        unpac_func_hindcast_vm_vise = lambda x: [df.result["hindcast"]["vm_vise"] for df in x.result]
-        unpac_func_condensed_vm_vise = lambda x: [df.result["condensed"]["vm_vise"] for df in x.result]
-        unpac_func_condensed_added = lambda x: [df.result["condensed"]["added"] for df in x.result]
-        unpac_func_hindcast_added = lambda x: [df.result["hindcast"]["added"] for df in x.result]
-
-        data_hindcast_vm_vise = unpac_func_hindcast_vm_vise(calc)
-        data_condensed_vm_vise = unpac_func_condensed_vm_vise(calc)
-        data_hindcast_added = unpac_func_hindcast_added(calc)
-        data_condensed_added = unpac_func_condensed_added(calc)
-
-        table_names = unpack_funcs["flat_angles"](calc)
-        table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
-
-        table_hindcast_added_combined = [list(table.values[0]) for table in data_hindcast_added]
-        table_hindcast_added_combined = pd.DataFrame(table_hindcast_added_combined, columns=data_hindcast_added[0].columns)
-        table_hindcast_added_combined["angles"] = table_names
-
-        table_condensed_added_combined = [list(table.values[0]) for table in data_condensed_added]
-        table_condensed_added_combined = pd.DataFrame(table_condensed_added_combined, columns=data_condensed_added[0].columns)
-        table_condensed_added_combined["angles"] = table_names
-
-        table_wind_added = [table_hindcast_added_combined, table_condensed_added_combined]
-
-        gl.save_df_list_to_excel(path_csv + r'//Validation_swell_hindcast_vm_vise', data_hindcast_vm_vise, sheet_names=table_names)
-        gl.save_df_list_to_excel(path_csv + r'//Validation_swell_condensed_vm_vise', data_condensed_vm_vise, sheet_names=table_names)
-        gl.save_df_list_to_excel(path_csv + r'//Validation_swell_added', table_wind_added, sheet_names=["hindcast", "condensed"])
+    if len(Coeffs_string) > 0:
+        with open(path_csv + "/Coeffs.txt", "w") as text_file:
+            text_file.write(Coeffs_string)
 
 # %% MAIN - Save Infolog
 print("saving Log...")
@@ -3334,4 +3223,3 @@ with open(path_out + 'Info_LOG.txt', "w") as log_text:
 del log_text
 
 print(f"{script_name} finished!")
-
