@@ -41,5 +41,20 @@ WL_tide						>		r"[m]"
 v_curr 						>		r"[m/s]"
 v_curr_1m					>		r"[m/s]"
 
-
-adkahwd
+*DocumentMeta*
+DocumentType
+DocumentTitle
+ProjectTitle
+ProjectSubtitle
+Client
+Client_Logo
+EmployerNumber
+RefNumber
+DocStatus
+Revision_JBO
+Revision_Employer
+Revision_Date
+Revision_Description
+Author
+QualityCheck
+Approval
