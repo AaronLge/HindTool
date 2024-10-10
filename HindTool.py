@@ -362,7 +362,7 @@ if (INPUT["Toggle_Modules"].get("plot_condensation_example", {})):
 
     Calc.result = omni + directional
 
-    DATA_OUT["VMHS"]["wind"] = Calc
+    DATA_OUT["VMHS"]["wind_example"] = Calc
 
 if (('swell' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
         or ('swell' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
@@ -1247,7 +1247,7 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
 
 if INPUT["Toggle_Modules"].get("plot_condensation_example", {}):
 
-    Calc = DATA_OUT["VMHS"]["wind"]
+    Calc = DATA_OUT["VMHS"]["wind_example"]
 
     Tiles = []
     Tiles_omni = []
