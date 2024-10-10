@@ -3056,7 +3056,9 @@ if INPUT["DataOut"]["CSV_out"]:
     print("saving CSV Data...")
 
     path_csv = os.path.join(path_out, 'csv_data')
-    Coeffs_string = "Regression Coefficients, order: c_0, c_1, ..., c_deg\n \n"
+    Coeffs_string = ("Regression Coefficients \n"
+                     "order: [c_0, c_1, ..., c_deg]\n "
+                     "with: y(x) = c_0 + c_1 * x + ... + c_deg * x^deg \n \n")
     try:
         # Create the new folder
         os.makedirs(path_csv, exist_ok=True)  # exist_ok=True prevents an error if the folder already exists
@@ -3177,7 +3179,7 @@ if INPUT["DataOut"]["CSV_out"]:
         calc = DATA_OUT["AngleDeviation"]
         data = unpack_funcs["flat_exclude_omni"](calc)
         table_names = unpack_funcs["flat_angles"](calc)
-        table_names = table_names[1:]
+        table_names = table_names
         table_names = [f"{name[0]} to {name[1]}" for name in table_names]
         gl.save_df_list_to_excel(path_csv + r'//AngleDeviation', data, sheet_names=table_names)
 

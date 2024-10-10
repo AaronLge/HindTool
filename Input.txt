@@ -50,9 +50,9 @@ exclude_Tp_zero_wind		>		True									>	bool:	if True, Tp = 0 entrys are deleted
 
 
 *Toggle_Modules*
-#calc_VMHS					>			['wind', 'total','swell']									>		'wind', 'swell']
-#calc_HSTP					>			['wind', 'total','swell']									> 	['wind', 'swell']
-#calc_VMTP					>			['wind', 'total','swell']									>  ['wind', 'swell']
+calc_VMHS					>			['wind', 'total','swell']									>		'wind', 'swell']
+calc_HSTP					>			['wind', 'total','swell']									> 	['wind', 'swell']
+calc_VMTP					>			['wind', 'total','swell']									>  ['wind', 'swell']
 #calc_RWI					>			['wind', 'total']									>	'wind'
 #calc_Tables					>			['wind', 'total']					>	['wind', 'swell']
 #calc_WaveBreak_Steep		>			['wind', 'total']									>	'wind'
@@ -65,9 +65,9 @@ exclude_Tp_zero_wind		>		True									>	bool:	if True, Tp = 0 entrys are deleted
 #calc_Weibull				>			[['dir_v_m', 'v_m']]
 #calc_ExtremeConture			>			[['H_s', 'T_p', 'dir_v_m']]
 #
-#plot_VMHS					>		['wind', 'swell', 'total']
-#plot_HSTP					>		['wind', 'swell', 'total']
-#plot_VMTP					>		['wind', 'swell', 'total']
+plot_VMHS					>		['wind', 'swell', 'total']
+plot_HSTP					>		['wind', 'swell', 'total']
+plot_VMTP					>		['wind', 'swell', 'total']
 #plot_RWI					>		['wind', 'total']
 #plot_BreakSteep				>		['wind', 'total']
 #plot_Tables					>		['wind', 'swell', 'total']
@@ -77,7 +77,7 @@ exclude_Tp_zero_wind		>		True									>	bool:	if True, Tp = 0 entrys are deleted
 #plot_Validation 			>		['wind', 'swell']
 #plot_SensorEval				>		True
 #plot_Weibull				>		True
-plot_condensation_example	>		True
+#plot_condensation_example	>		True
 
 plot_as						>		["png"]
 
