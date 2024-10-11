@@ -13,6 +13,9 @@ mode						>		None
 colnames_preset 			>		None
 encoding					>		"cp1252"	> "auto" detects encoding
 
+create_Report 				> 		True
+Report_Input				>		"ReportInput.txt"
+
 # when mode is None:
 nans						>		"-"
 resample_rate				>		"1h"
@@ -23,8 +26,8 @@ skiprows					>		None
 drop_rows					>		0
 low_memory					>		False
 
-JBOOST_proj				>			"A:/2024/24A516_NSCB_NC3_and_NC4/NSCB_Hindcast/JBOOST_Dp_b/proj.lua"						
-JBOOST_input				>		"A:/2024/24A516_NSCB_NC3_and_NC4/NSCB_Hindcast/JBOOST_Dp_b/Input JBOOST V236 - DP-B PreFeed L1.G0.S0.lua"
+JBOOST_proj				>			"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/NSCB_Hindcast/JBOOST_Dp_b/proj.lua"						
+JBOOST_input				>		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/NSCB_Hindcast/JBOOST_Dp_b/Input JBOOST V236 - DP-B PreFeed L0.G0.S0.lua"
 
 *Structure*
 steep_crit					>		0.04									>	float:	Steepness limit (Hs/lamda(Tp)) for WaveBreaking 
@@ -83,6 +86,9 @@ plot_as						>		["png"]
 
 dpi_figures					>		500									>	int: resolution (dots per sqinch) of all pdf's
 writing_box					>		[17, 22]
+plot_as						>		["png"]
+
+
 
 *DataOut*
 path_out					>		'../_Hindcast_out/'								>	str:	path for output-files, it is created if it doesent exist
@@ -131,7 +137,6 @@ dir_curr					>		"Current Direction [deg]"
 WL_tide						>		"Water Level, Tide [mMSL]"
 v_curr 						>		"Current Speed [m/s]"
 v_curr_1m					>		"Current Speed, 1m [m/s]"
-
 
 *VMHS_wind*
 N_grid						>		20										>	int: 	number of bins in Vm-Axis
@@ -234,7 +239,7 @@ rot_r_label					> 		0										>	float:	roation of r-lables in degree
 
 *Validation_wind*
 from_DB						> 		True
-table_name					>		"DEL_config_7"							
+table_name					>		"DEL_config_7"
 nodes_to_load				>		['501']							> bei None: 'all'
 scatter_configs				>		['IDLING node 501']
 
@@ -266,7 +271,7 @@ freq_samp					>		1
 
 *VMHS_docu*
 N_grid						>		20										>	int: 	number of bins in Vm-Axis
-deg_reg						>		3									>	int: 	degree used for regression 
+deg_reg						>		3									>	int: 	degree used for regression
 model_reg					>		'poly'									>	str: 	method used for regression ('poly' : polynominal, 'sqrt' : squareroot), see documentation
 cut_reg						>		95										>	float: 	percentage calculated with mean-values, the top (100 - cut_reg)% by regression
 weighting_reg				>		0										>	float:	weighting of regression by number of data-points in bin, 1: full weighting 0: no weighting
@@ -276,5 +281,4 @@ bin_min						>		0 										>	int:	mininmal number of Datapoints in one bin to i
 average_correction			>		1
 avrg_method					>		"weighted mean" 							>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
 make_monotone 				>		True
-
 

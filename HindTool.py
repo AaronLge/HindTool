@@ -22,7 +22,7 @@ sys.path.insert(0, path)
 from allib import general as gl
 from allib import hindtoolcalc as hc_calc
 from allib import hindtoolplot as hc_plt
-
+from allib import latex as ltx
 
 # %% FUNCTIONS - General
 
@@ -127,6 +127,7 @@ print("\n***Starting " + f"{script_name}" +
 print(f"reading Inputfile ({path_in})...")
 
 INPUT = gl.read_input_txt(path_in)
+INPUT_REPORT = gl.read_input_txt(INPUT["DataBase"]["Report_Input"])
 timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 
 # #ReportInput
@@ -2984,72 +2985,243 @@ if INPUT["Toggle_Modules"].get("plot_Weibull", {}):
         if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f'Weibull_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-if INPUT["Toggle_Modules"].get("plot_ExtremeConture", {}) and len(INPUT["Toggle_Modules"].get("calc_ExtremeConture", {})) > 0:
-    print('plotting ExtremeConture...')
 
-    for name, Calc in DATA_OUT["ExtremeConture"].items():
+# %% plot report tables
 
-        Input = INPUT["ExtremeValues"]
-        Tiles = []
-        Tiles_omni = []
+#if INPUT["Report"]["create_report"]:
 
-        df = Calc.load_from_db(colnames_ini=True)
-        titels = Calc.create_segment_title()
-        titels = gl.alias(titels, COLNAMES, INPUT["Aliase"])
+path_report = os.path.join(path_out, 'report')
+try:
+    # Create the new folder
+    os.makedirs(path_report, exist_ok=True)  # exist_ok=True prevents an error if the folder already exists
+    print(f"Folder created successfully at: {path_report}")
+except Exception as e:
+    print(f"An error occurred: {e}")
 
-        for i, Seg in enumerate(Calc.result):
+if False:
 
-            Seg.indizes = pd.to_datetime(Seg.indizes)
-            point_data = df[df.index.isin(Seg.indizes)]
+    # crate COLNAME dataframe with symbols as master
+    COLNAMES_REPORT = pd.DataFrame(index=INPUT_REPORT["Symbols"].keys())
+    COLNAMES_REPORT["Symbols"] = INPUT_REPORT["Symbols"].values()
+    COLNAMES_REPORT["Sensor_names"] = [COLNAMES[key] if key in COLNAMES else float('nan') for key in list(COLNAMES_REPORT.index)]
+    COLNAMES_REPORT["Aliase"] = [INPUT["Aliase"][key] if key in INPUT["Aliase"] else float('nan') for key in COLNAMES_REPORT.index]
 
-            tile_curr = hc_plt.Tile(i,
-                                    x_label=gl.alias(Seg.colnames['x'], COLNAMES, INPUT["Aliase"]),
-                                    y_label=gl.alias(Seg.colnames['y'], COLNAMES, INPUT["Aliase"]),
-                                    title=titels[i])
+    # plot sensor names
+    data = np.array([COLNAMES_REPORT["Symbols"], COLNAMES_REPORT["Sensor_names"]])
+    data = data.T
+    col_labels = ["Symbol", "Sensor name"]
+    FIG = hc_plt.table(data,
+                       collabels=col_labels,
+                       figsize=figsize_fullpage,
+                       datatype='str')
 
-            scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]],
-                                     y=point_data[Seg.colnames["y"]],
-                                     cmap='cool',
-                                     size=2,
-                                     cmap_norm='sqrt')
+    if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_png([FIG], path_out + 'Sensor_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-            tile_curr.add_scatter(scatter)
+    if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_pdf([FIG], path_out + 'Sensor_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-            # add contures
-            # Define the colors for the colormap: red to dark green
-            colors = [(1, 0, 0),  # Red
-                      (0, 0.4, 0)]  # Dark green
-            # Create the colormap
-            cmap_name = 'red_to_darkgreen'
-            red_to_darkgreen = LinearSegmentedColormap.from_list(cmap_name, colors)
+    # plot Plot_names
+    data = np.array([COLNAMES_REPORT["Symbols"], COLNAMES_REPORT["Aliase"]])
+    data = data.T
+    col_labels = ["Symbol", "Plot name"]
+    FIG = hc_plt.table(data,
+                       collabels=col_labels,
+                       figsize=figsize_fullpage,
+                       datatype='str')
 
-            color = np.linspace(1, 0, len(Seg.result))
-            i = 0
-            for name, data in Seg.result.items():
-                contour = hc_plt.Line(x=data["x"],
-                                      y=data["y"],
-                                      label=name,
-                                      color=red_to_darkgreen(color[i]),
-                                      linewidth=0.8)
+    if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_png([FIG], path_out + 'Plot_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-                tile_curr.add_line(contour)
+    if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_pdf([FIG], path_out + 'Plot_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-                i = i + 1
-            if Seg.angles is not None:
-                Tiles.append(tile_curr)
+    # VMHS parameter
+    if INPUT["Toggle_Modules"].get("plot_VMHS", {}):
+        print("   plotting VMHS parameter table")
 
-            else:
-                Tiles_omni.append(tile_curr)
+        columns_table = []
+        col_labels = []
+        row_labels = ['Degree of regression',
+                      'Shape function f(x)',
+                      'Bin number',
+                      'Portion of datapoints evaluated with mean',
+                      'Regression range',
+                      'Evaluated range',
+                      'Applied percentile for condensation',
+                      'Averageing method']
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage)
+        if 'wind' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
+            Input = INPUT["VMHS_wind"]
 
-        if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'ExtremeConture', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+            new_col = [
+                Input["deg_reg"],
+                'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+                Input["N_grid"],
+                f"{Input['cut_reg']}" + r" \%",
+                f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
+                f"[{Input['zone_line'][0]} .. {'max' if Input['zone_line'][1] is None else Input['zone_line'][1]}]",
+                f"{Input['perc_mean']}" + r" \%",
+                Input["avrg_method"],
+                       ]
+            columns_table.append(new_col)
+            col_labels.append('Wind Sea')
 
-        if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + 'ExtremeConture', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+        if 'swell' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
+
+            Input = INPUT["VMHS_swell"]
+
+            new_col = [
+                Input["deg_reg"],
+                'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+                Input["N_grid"],
+                f"{Input['cut_reg']}" + r" \%",
+                f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
+                f"[{Input['zone_line'][0]} .. {'max' if Input['zone_line'][1] is None else Input['zone_line'][1]}]",
+                f"{Input['perc_mean']}" + r" \%",
+                Input["avrg_method"],
+                       ]
+            columns_table.append(new_col)
+            col_labels.append('Swell Sea')
+
+        if 'total' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
+
+            Input = INPUT["VMHS_total"]
+
+            new_col = [
+                Input["deg_reg"],
+                'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+                Input["N_grid"],
+                f"{Input['cut_reg']}" + r" %",
+                f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
+                f"[{Input['zone_line'][0]} .. {'max' if Input['zone_line'][1] is None else Input['zone_line'][1]}]",
+                f"{Input['perc_mean']}" + r" %",
+                Input["avrg_method"],
+                       ]
+            columns_table.append(new_col)
+            col_labels.append('Total Sea')
+
+        if len(columns_table) > 0:
+            data = np.array(columns_table)
+            data = data.T
+
+            FIG = hc_plt.table(data, collabels=col_labels, rowlabels=row_labels, row_label_name='Parameters', figsize=figsize_halfpage)
+
+            if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+                gl.save_figs_as_png([FIG], path_out + 'Report_table_VMHS', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+            if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+                gl.save_figs_as_pdf([FIG], path_out + 'Report_table_VMHS', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    # HSTP parameter
+    if INPUT["Toggle_Modules"].get("plot_HSTP", {}):
+        print("   plotting HSTP parameter table")
+
+        columns_table = []
+        col_labels = []
+        row_labels = ['Degree of regression',
+                      'Shape function f(x)',
+                      'Bin number',
+                      'Portion of datapoints evaluated with mean',
+                      'Regression range',
+                      'Evaluated range',
+                      'Quantiles for selected correlation',
+                      'Frequency band for selected correlation',
+                      'Applied percentile for condensation',
+                      'Averageing method']
+
+        Input = INPUT["HSTP_wind"]
+
+        if 'wind' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
+            Input = INPUT["HSTP_wind"]
+
+            new_col = [
+                Input["deg_reg"],
+                'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+                Input["N_grid"],
+                f"{Input['cut_reg']}" + r" $\%$",
+                f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
+                f"[{Input['zone_line'][0]} .. {'max' if Input['zone_line'][1] is None else Input['zone_line'][1]}]",
+                f"[{Input['percentiles'][0]}$\%$ .. {Input['percentiles'][1]}$\%$]" if Input['quantile'] else "none",
+                f"[{Input['quant_up']} .. {Input['quant_low']}]" if Input['quantile'] else "none",
+                f"{Input['perc_mean']}" + r" $\%$",
+                Input["avrg_method"],
+            ]
+            columns_table.append(new_col)
+            col_labels.append('Wind Sea')
+
+        if 'swell' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
+            Input = INPUT["HSTP_swell"]
+
+            new_col = [
+                Input["deg_reg"],
+                'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+                Input["N_grid"],
+                f"{Input['cut_reg']}" + r" $\%$",
+                f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
+                f"[{Input['zone_line'][0]} .. {'max' if Input['zone_line'][1] is None else Input['zone_line'][1]}]",
+                f"[{Input['percentiles'][0]}$\%$ .. {Input['percentiles'][1]}$\%$]" if Input['quantile'] else "none",
+                f"[{Input['quant_up']} .. {Input['quant_low']}]" if Input['quantile'] else "none",
+                f"{Input['perc_mean']}" + r" $\%$",
+                Input["avrg_method"],
+            ]
+            columns_table.append(new_col)
+            col_labels.append('Swell Sea')
+
+        if 'total' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
+            Input = INPUT["HSTP_total"]
+
+            new_col = [
+                Input["deg_reg"],
+                'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+                Input["N_grid"],
+                f"{Input['cut_reg']}" + r" $\%$",
+                f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
+                f"[{Input['zone_line'][0]} .. {'max' if Input['zone_line'][1] is None else Input['zone_line'][1]}]",
+                f"[{Input['percentiles'][0]}$\%$ .. {Input['percentiles'][1]}$\%$]" if Input['quantile'] else "none",
+                f"[{Input['quant_up']} .. {Input['quant_low']}]" if Input['quantile'] else "none",
+                f"{Input['perc_mean']}" + r" $\%$",
+                Input["avrg_method"],
+            ]
+            columns_table.append(new_col)
+            col_labels.append('Total Sea')
+
+        if len(columns_table) > 0:
+            data = np.array(columns_table)
+            data = data.T
+
+            FIG = hc_plt.table(data,
+                               collabels=col_labels,
+                               rowlabels=row_labels,
+                               row_label_name='Parameters',
+                               figsize=figsize_halfpage,
+                               datatype='str')
+
+            if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+                gl.save_figs_as_png([FIG], path_out + 'Report_table_HSTP', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+            if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+                gl.save_figs_as_pdf([FIG], path_out + 'Report_table_HSTP', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+# %% Create Latex File
+
+#if INPUT["Report"]["create_report"]:
+
+if True:
+    TEX = {}
+    TEX_Main = ltx.insertLatexVars(INPUT_REPORT["General"]["path_latex_templates"] + "/template_main.txt", INPUT_REPORT["DocumentMeta"])
+
+    TEX["titlepage"] = ltx.insertLatexVars(INPUT_REPORT["General"]["path_latex_templates"] + "/template_titlepage.txt", INPUT_REPORT["DocumentMeta"])
+    TEX_Main = ltx.include_include(TEX_Main, 'titlepage')
+
+    with open(path_report + r'\main.txt', 'w', encoding='utf-8') as file:
+        lines = file.write(TEX_Main)
+
+    for name, tex in TEX.items():
+        with open(path_report+r'\\' + name+'.txt', 'w', encoding='utf-8') as file:
+            lines = file.write(tex)
+
 
 # %% Data Out
 if INPUT["DataOut"]["CSV_out"]:
