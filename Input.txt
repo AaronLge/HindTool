@@ -13,6 +13,7 @@ mode						>		None
 colnames_preset 			>		None
 encoding					>		"cp1252"	> "auto" detects encoding
 
+create_Report 				> 		True
 Report_Input				>		"ReportInput.txt"
 
 # when mode is None:
@@ -66,8 +67,8 @@ exclude_Tp_zero_wind		>		True									>	bool:	if True, Tp = 0 entrys are deleted
 #calc_Weibull				>			[['dir_v_m', 'v_m']]
 
 
-plot_VMHS					>		['wind', 'swell', 'total']		
-plot_HSTP					>		['wind', 'swell', 'total']		
+#plot_VMHS					>		['wind', 'swell', 'total']		
+#plot_HSTP					>		['wind', 'swell', 'total']		
 #plot_VMTP					>		['wind', 'swell', 'total']
 #plot_RWI					>		['wind', 'total']
 #plot_BreakSteep				>		['wind', 'total']

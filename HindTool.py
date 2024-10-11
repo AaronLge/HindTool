@@ -22,7 +22,7 @@ sys.path.insert(0, path)
 from allib import general as gl
 from allib import hindtoolcalc as hc_calc
 from allib import hindtoolplot as hc_plt
-
+from allib import latex as ltx
 
 # %% FUNCTIONS - General
 
@@ -2919,7 +2919,7 @@ if INPUT["Toggle_Modules"].get("plot_Weibull", {}):
 # %% plot report tables
 
 #if INPUT["Report"]["create_report"]:
-if True:
+if False:
 
     # crate COLNAME dataframe with symbols as master
     COLNAMES_REPORT = pd.DataFrame(index=INPUT_REPORT["Symbols"].keys())
@@ -3125,7 +3125,21 @@ if True:
             if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
                 gl.save_figs_as_pdf([FIG], path_out + 'Report_table_HSTP', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
+# %% Create Latex File
 
+#if INPUT["Report"]["create_report"]:
+
+if True:
+    TEX = {}
+    TEX_Main = ltx.insertLatexVars(INPUT_REPORT["General"]["path_latex_templates"] + "/template_main.txt", INPUT_REPORT["DocumentMeta"])
+    TEX["titlepage"] = ltx.insertLatexVars(INPUT_REPORT["General"]["path_latex_templates"] + "/template_titlepage.txt", INPUT_REPORT["DocumentMeta"])
+
+    with open('TEX_Main.txt', 'w', encoding='utf-8') as file:
+        lines = file.write(TEX_Main)
+
+    for name, tex in TEX.items():
+        with open(name+'.txt', 'w', encoding='utf-8') as file:
+            lines = file.write(tex)
 
 
 # %% Data Out

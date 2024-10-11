@@ -1,3 +1,7 @@
+*General*
+path_latex_templates 		> 		".\latex_templates"	
+
+
 *Symbols*
 # master over used symbols, has to contain all Sensors used
 datetime					>		r"datetime"
@@ -42,19 +46,19 @@ v_curr 						>		r"[m/s]"
 v_curr_1m					>		r"[m/s]"
 
 *DocumentMeta*
-DocumentType
-DocumentTitle
-ProjectTitle
-ProjectSubtitle
-Client
-Client_Logo
-EmployerNumber
-RefNumber
-DocStatus
-Revision_JBO
-Revision_Employer
-Revision_Date
-Revision_Description
-Author
-QualityCheck
-Approval
+DocumentType 				>		r"Technical Note"
+DocumentTitle				>		r"Hindcast Evaluation for Monopile \newline Design"
+ProjectTitle				>		r"Offshore Wind Farm"
+ProjectSubtitle				>		r"pipapo"
+Client						>		r"RWE"
+ClientLogo					>		None
+EmployerNumber				>		"01"
+RefNumber					>		"99Z999-JBO-TNHDCD-EN-3001"
+DocumentStatus				>		"DRA"
+RevisionJBO					>		"01"
+RevisionEmployer			>		"01"
+RevisionDate				>		"14.09.2023"
+RevisionDescription			>		"first Draft"
+DocumentAuthor				>		"ALa"
+QualityCheck				>		"FOs"
+Approval					>		"FOs"
