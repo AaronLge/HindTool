@@ -2988,17 +2988,16 @@ if INPUT["Toggle_Modules"].get("plot_Weibull", {}):
 
 # %% plot report tables
 
-#if INPUT["Report"]["create_report"]:
+if INPUT["Report"]["create_report"]:
 
-path_report = os.path.join(path_out, 'report')
-try:
-    # Create the new folder
-    os.makedirs(path_report, exist_ok=True)  # exist_ok=True prevents an error if the folder already exists
-    print(f"Folder created successfully at: {path_report}")
-except Exception as e:
-    print(f"An error occurred: {e}")
+    path_report = os.path.join(path_out, 'report')
+    try:
+        # Create the new folder
+        os.makedirs(path_report, exist_ok=True)  # exist_ok=True prevents an error if the folder already exists
+        print(f"Folder created successfully at: {path_report}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
-if False:
 
     # crate COLNAME dataframe with symbols as master
     COLNAMES_REPORT = pd.DataFrame(index=INPUT_REPORT["Symbols"].keys())
@@ -3206,9 +3205,6 @@ if False:
 
 # %% Create Latex File
 
-#if INPUT["Report"]["create_report"]:
-
-if True:
     TEX = {}
     TEX_Main = ltx.insertLatexVars(INPUT_REPORT["General"]["path_latex_templates"] + "/template_main.txt", INPUT_REPORT["DocumentMeta"])
 
