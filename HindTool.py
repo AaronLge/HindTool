@@ -2919,6 +2919,15 @@ if INPUT["Toggle_Modules"].get("plot_Weibull", {}):
 # %% plot report tables
 
 #if INPUT["Report"]["create_report"]:
+
+path_report = os.path.join(path_out, 'report')
+try:
+    # Create the new folder
+    os.makedirs(path_report, exist_ok=True)  # exist_ok=True prevents an error if the folder already exists
+    print(f"Folder created successfully at: {path_report}")
+except Exception as e:
+    print(f"An error occurred: {e}")
+
 if False:
 
     # crate COLNAME dataframe with symbols as master
@@ -3132,13 +3141,15 @@ if False:
 if True:
     TEX = {}
     TEX_Main = ltx.insertLatexVars(INPUT_REPORT["General"]["path_latex_templates"] + "/template_main.txt", INPUT_REPORT["DocumentMeta"])
-    TEX["titlepage"] = ltx.insertLatexVars(INPUT_REPORT["General"]["path_latex_templates"] + "/template_titlepage.txt", INPUT_REPORT["DocumentMeta"])
 
-    with open('TEX_Main.txt', 'w', encoding='utf-8') as file:
+    TEX["titlepage"] = ltx.insertLatexVars(INPUT_REPORT["General"]["path_latex_templates"] + "/template_titlepage.txt", INPUT_REPORT["DocumentMeta"])
+    TEX_Main = ltx.include_include(TEX_Main, 'titlepage')
+
+    with open(path_report + r'\main.txt', 'w', encoding='utf-8') as file:
         lines = file.write(TEX_Main)
 
     for name, tex in TEX.items():
-        with open(name+'.txt', 'w', encoding='utf-8') as file:
+        with open(path_report+r'\\' + name+'.txt', 'w', encoding='utf-8') as file:
             lines = file.write(tex)
 
 
