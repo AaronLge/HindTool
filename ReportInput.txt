@@ -62,3 +62,6 @@ RevisionDescription			>		"first Draft"
 DocumentAuthor				>		"ALa"
 QualityCheck				>		"FOs"
 Approval					>		"FOs"
+
+*introduction*
+siteSpecific				>		"The here investigated project site is a generic site in the German North Sea. Monopile substructures are assumed to be derived as substructure type."
