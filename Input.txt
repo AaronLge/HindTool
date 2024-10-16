@@ -6,9 +6,6 @@
 path_DataBase				>		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Tool/Data_Omexon/Waterkant.db"
 CreateDataBase				>		False
 
-create_report 				>		False
-Report_Input				>		"ReportInput.txt"
-
 # when create DataBase is False:
 path_csvs					>		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Tool/Data_Omexon/"
 name_DataBase				>		"Waterkant.db"

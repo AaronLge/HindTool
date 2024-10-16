@@ -2,24 +2,19 @@ import argparse
 import datetime
 import inspect
 import os
-import re
 import shutil
-import subprocess
 from warnings import simplefilter
 import numpy as np
 import pandas as pd
 import scipy as sc
 import warnings
 import re
-import sys
-import matplotlib
 # matplotlib.use('TkAgg',force=True)
 from matplotlib.colors import LinearSegmentedColormap
 
 from libaries import general as gl
 from libaries import hindtoolcalc as hc_calc
 from libaries import hindtoolplot as hc_plt
-from libaries import latex as ltx
 
 # %% FUNCTIONS - General
 
@@ -2973,239 +2968,6 @@ if INPUT["Toggle_Modules"].get("plot_Weibull", {}):
 
         if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f'Weibull_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-
-# %% plot report tables
-if INPUT["DataBase"]["create_report"] or INPUT["Toggle_Modules"].get("plot_report_tables", {}):
-    try:
-        INPUT_REPORT = gl.read_input_txt(INPUT["DataBase"]["Report_Input"])
-    except:
-        print(f"Report input file {INPUT['DataBase']['Report_Input']} not fond")
-
-if INPUT["Toggle_Modules"].get("plot_report_tables", {}):
-
-    path_report = os.path.join(path_out, 'report')
-
-    try:
-        # Create the new folder
-        os.makedirs(path_report, exist_ok=True)  # exist_ok=True prevents an error if the folder already exists
-        print(f"Folder created successfully at: {path_report}")
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-    # crate COLNAME dataframe with symbols as master
-    COLNAMES_REPORT = pd.DataFrame(index=INPUT_REPORT["Symbols"].keys())
-    COLNAMES_REPORT["Symbols"] = INPUT_REPORT["Symbols"].values()
-    COLNAMES_REPORT["Sensor_names"] = [COLNAMES[key] if key in COLNAMES else float('nan') for key in list(COLNAMES_REPORT.index)]
-    COLNAMES_REPORT["Aliase"] = [INPUT["Aliase"][key] if key in INPUT["Aliase"] else float('nan') for key in COLNAMES_REPORT.index]
-
-    # plot sensor names
-    data = np.array([COLNAMES_REPORT["Symbols"], COLNAMES_REPORT["Sensor_names"]])
-    data = data.T
-    col_labels = ["Symbol", "Sensor name"]
-    FIG = hc_plt.table(data,
-                       collabels=col_labels,
-                       figsize=figsize_fullpage,
-                       datatype='str')
-
-    if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-        gl.save_figs_as_png([FIG], path_out + 'Sensor_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-    if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-        gl.save_figs_as_pdf([FIG], path_out + 'Sensor_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-    # plot Plot_names
-    data = np.array([COLNAMES_REPORT["Symbols"], COLNAMES_REPORT["Aliase"]])
-    data = data.T
-    col_labels = ["Symbol", "Plot name"]
-    FIG = hc_plt.table(data,
-                       collabels=col_labels,
-                       figsize=figsize_fullpage,
-                       datatype='str')
-
-    if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-        gl.save_figs_as_png([FIG], path_out + 'Plot_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-    if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-        gl.save_figs_as_pdf([FIG], path_out + 'Plot_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-    # VMHS parameter
-
-    print("   plotting VMHS parameter table")
-
-    columns_table = []
-    col_labels = []
-    row_labels = ['Bin number',
-                  'Method to derive representative value',
-                  '(highest) datapoints evaluated with regression curve',
-                  'Degree of regression curve $n$',
-                  'Shape function $f(x)$',
-                  'Range of Regression base']
-
-    if 'wind' in INPUT["Toggle_Modules"].get("calc_VMHS", {}):
-
-        Input = INPUT["VMHS_wind"]
-
-        new_col = [
-            Input["N_grid"],
-            Input["avrg_method"],
-            f"{100-Input['cut_reg']} $\\%$",
-            Input["deg_reg"],
-            'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-            f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
-                   ]
-        columns_table.append(new_col)
-        col_labels.append('Wind Sea')
-
-    if 'swell' in INPUT["Toggle_Modules"].get("calc_VMHS", {}):
-
-        Input = INPUT["VMHS_swell"]
-
-        new_col = [
-            Input["N_grid"],
-            Input["avrg_method"],
-            f"{100-Input['cut_reg']} $\\%$",
-            Input["deg_reg"],
-            'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-            f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
-                   ]
-        columns_table.append(new_col)
-        col_labels.append('Swell Sea')
-
-    if 'total' in INPUT["Toggle_Modules"].get("calc_VMHS", {}):
-
-        Input = INPUT["VMHS_total"]
-
-        new_col = [
-            Input["N_grid"],
-            Input["avrg_method"],
-            f"{100-Input['cut_reg']} $\\%$",
-            Input["deg_reg"],
-            'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-            f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
-                   ]
-        columns_table.append(new_col)
-        col_labels.append('Total Sea')
-
-    if len(columns_table) > 0:
-        data = np.array(columns_table)
-        data = data.T
-
-        FIG = hc_plt.table(data, collabels=col_labels, rowlabels=row_labels, row_label_name='Parameters', figsize=figsize_halfpage)
-
-        if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_png([FIG], path_out + 'Report_table_VMHS', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-        if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_pdf([FIG], path_out + 'Report_table_VMHS', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-    # HSTP parameter
-        print("   plotting HSTP parameter table")
-
-    columns_table = []
-    col_labels = []
-    row_labels = ['Selected quantiles ',
-                  'Frequency bandwidth for selected correlation',
-                  'Bin number',
-                  'Method to derive representative value',
-                  '(highest) datapoints evaluated with regression curve',
-                  'Degree of regression curve $n$',
-                  'Shape function f(x)',
-                  'Range of Regression base']
-
-    Input = INPUT["HSTP_wind"]
-
-    if 'wind' in INPUT["Toggle_Modules"].get("calc_HSTP", {}):
-        Input = INPUT["HSTP_wind"]
-
-        new_col = [
-            f"[{Input['percentiles'][0]}$\\%$ .. {Input['percentiles'][1]}$\\%$]" if Input['quantile'] else "-",
-            f"[{round(Input['quant_up'],3)} .. {round(Input['quant_low'],3)}]" if Input['quantile'] else "-",
-            Input["N_grid"],
-            'quantile' if Input["avrg_method"] == 'median' and Input['quantile'] else Input["avrg_method"],
-            f"{100 - Input['cut_reg']} $\\%$",
-            Input["deg_reg"],
-            'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-            f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
-        ]
-        columns_table.append(new_col)
-        col_labels.append('Wind Sea')
-
-    if 'swell' in INPUT["Toggle_Modules"].get("calc_HSTP", {}):
-        Input = INPUT["HSTP_swell"]
-
-        new_col = [
-            f"[{Input['percentiles'][0]}$\\%$ .. {Input['percentiles'][1]}$\\%$]" if Input['quantile'] else "-",
-            f"[{round(Input['quant_up'],3)} .. {round(Input['quant_low'],3)}]" if Input['quantile'] else "-",
-            Input["N_grid"],
-            'quantile' if Input["avrg_method"] == 'median' and Input['quantile'] else Input["avrg_method"],
-            f"{100 - Input['cut_reg']} $\\%$",
-            Input["deg_reg"],
-            'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-            f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
-        ]
-        columns_table.append(new_col)
-        col_labels.append('Swell Sea')
-
-    if 'total' in INPUT["Toggle_Modules"].get("calc_HSTP", {}):
-        Input = INPUT["HSTP_total"]
-
-        new_col = [
-            f"[{Input['percentiles'][0]}$\\%$ .. {Input['percentiles'][1]}$\\%$]" if Input['quantile'] else "-",
-            f"[{round(Input['quant_up'],3)} .. {round(Input['quant_low'],3)}]" if Input['quantile'] else "-",
-            Input["N_grid"],
-            'quantile' if Input["avrg_method"] == 'median' and Input['quantile'] else Input["avrg_method"],
-            f"{100 - Input['cut_reg']} $\\%$",
-            Input["deg_reg"],
-            'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-            f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
-        ]
-        columns_table.append(new_col)
-        col_labels.append('Total Sea')
-
-    if len(columns_table) > 0:
-        data = np.array(columns_table)
-        data = data.T
-
-        FIG = hc_plt.table(data,
-                           collabels=col_labels,
-                           rowlabels=row_labels,
-                           row_label_name='Parameters',
-                           figsize=figsize_halfpage,
-                           datatype='str')
-
-        if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_png([FIG], path_out + 'Report_table_HSTP', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-        if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_pdf([FIG], path_out + 'Report_table_HSTP', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-# %% Create Latex File
-
-if INPUT["DataBase"].get("create_report", {}):
-    TEX = {}
-
-    # Main
-    TEX_Main = ltx.insertLatexVars(INPUT_REPORT["General"]["path_latex_templates"] + "/template_main.txt", INPUT_REPORT["DocumentMeta"])
-
-    # Titlepage
-    TEX["titlepage"] = ltx.insertLatexVars(INPUT_REPORT["General"]["path_latex_templates"] + "/template_titlepage.txt", INPUT_REPORT["DocumentMeta"])
-    TEX_Main = ltx.include_include(TEX_Main, 'titlepage')
-
-    # introduction
-    sections = ['introduction']
-
-    for section in sections:
-        TEX[section] = ltx.insertLatexVars(INPUT_REPORT["General"]["path_latex_templates"] + f"/template_{section}.txt", INPUT_REPORT[section])
-        TEX_Main = ltx.include_include(TEX_Main, section)
-
-    # write latex files
-    with open(path_report + r'\main.txt', 'w', encoding='utf-8') as file:
-        file.write(TEX_Main)
-
-    for name, tex in TEX.items():
-        with open(path_report+r'\\' + name+'.txt', 'w', encoding='utf-8') as file:
-            file.write(tex)
 
 
 # %% Data Out
