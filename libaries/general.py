@@ -521,14 +521,14 @@ def interpolate_increasing_decreasing(new_x_values, x_values, y_values, kind='li
     return new_y_values
 
 
-def read_input_txt(file_path):
+def read_input_txt(file_path, encoding='utf-8'):
     data_dicts = []
     dict_names = []
     cd = {}
     dict_num = 0
     DICT_OUT = {}
 
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding=encoding) as file:
         for line in file:
 
             # auskommentieren
@@ -1690,7 +1690,6 @@ def fill_nans_constant(x_vector, mask=None):
     return filled_vector
 
 
-
 def fill_nan_with_linspace(vector):
     # Convert the input to a NumPy array if it's not already one
     vector = np.asarray(vector)
@@ -1716,3 +1715,44 @@ def fill_nan_with_linspace(vector):
     filled_vector[np.isnan(vector)] = linspace_values[np.isnan(vector)]
 
     return filled_vector
+
+
+def xlsx2csv(excel_file, output_dir, exclude_sheets=None):
+    """
+    Save each sheet of an Excel file as a CSV file in the specified output directory.
+
+    Parameters:
+    excel_file (str): Path to the input Excel file.
+    output_dir (str): Directory where CSV files will be saved. Created if it doesn't exist.
+    exclude_sheets (list of int, optional): List of sheet indices (1-based) to exclude.
+                                            For example, [1, 3] will exclude the first and third sheets.
+
+    Returns:
+    None
+    """
+    # Load the Excel file
+    excel_data = pd.ExcelFile(excel_file)
+
+    # Ensure output directory exists
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    # Normalize exclude_sheets to 0-based indexing
+    if exclude_sheets:
+        exclude_sheets = [i - 1 for i in exclude_sheets]
+
+    # Loop through each sheet in the Excel file
+    for sheet_index, sheet_name in enumerate(excel_data.sheet_names):
+        if exclude_sheets and sheet_index in exclude_sheets:
+            print(f"Skipping sheet {sheet_name} (index {sheet_index + 1})")
+            continue
+
+        # Read the sheet into a DataFrame
+        df = pd.read_excel(excel_file, sheet_name=sheet_name)
+
+        # Define the output CSV file path
+        csv_file = os.path.join(output_dir, f"{sheet_name}.csv")
+
+        # Save the DataFrame to a CSV file
+        df.to_csv(csv_file, index=False)
+        print(f"Saved {sheet_name} to {csv_file}")

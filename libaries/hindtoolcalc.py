@@ -1,5 +1,4 @@
 import numpy as np
-from allib import general as gl
 import scipy as sc
 import pandas as pd
 import sys
@@ -9,9 +8,8 @@ import os
 import shutil
 import chardet
 
-path = r"C:\\temp\\python_self_crated\\packages"
-sys.path.insert(0, path)
-from allib import general as gl
+
+from libaries import general as gl
 
 
 # %%classes
@@ -1108,7 +1106,6 @@ def weibull_fit(x):
     prob = np.array(count) / ((sum(count)) * bin_size)
 
     return bin_size, center, prob, weibull, params
-
 
 
 def cross_correlation(VM_grid, HS_values, HS_grid, TP_values, fill_range=None):

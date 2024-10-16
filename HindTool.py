@@ -155,22 +155,8 @@ else:
     timeframe = None
 # %% DataRead
 
-if INPUT['DataBase']["CreateDataBase"]:
-    db_path = hc_calc.csv_to_sqlDB(INPUT["DataBase"]["path_csvs"],
-                                   INPUT["DataBase"]["name_DataBase"],
-                                   INPUT["DataBase"]["resample_rate"],
-                                   data_kind=INPUT["DataBase"]["mode"],
-                                   encoding=INPUT["DataBase"]["encoding"],
-                                   nans=INPUT["DataBase"]["nans"],
-                                   skiprows=INPUT["DataBase"]["skiprows"],
-                                   delimiter=INPUT["DataBase"]["delimiter"],
-                                   dayfirst=INPUT["DataBase"]["dayfirst"],
-                                   datetime_mode=INPUT["DataBase"]["datetime_mode"],
-                                   low_memory=INPUT["DataBase"]["low_memory"],
-                                   drop_rows=INPUT["DataBase"]["drop_rows"])
 
-else:
-    db_path = INPUT["DataBase"]["path_DataBase"]
+db_path = INPUT["DataBase"]["path_DataBase"]
 
 if INPUT["DataBase"]["colnames_preset"] == 'MetOcean':
     COLNAMES = {
@@ -261,7 +247,7 @@ if (('wind' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
     print("calculating VMHS Wind Sea...")
 
     Input = INPUT["VMHS_wind"]
-    table_name = 'Hindcast_combined'
+    table_name = 'Hind_combined'
     column_names = [COLNAMES["dir_v_m"], COLNAMES["v_m"], COLNAMES["H_s_wind"]]
 
     Calc = hc_calc.Calculation()
@@ -307,7 +293,7 @@ if (INPUT["Toggle_Modules"].get("plot_condensation_example", {})):
     print("calculating VMHS Wind Sea example plot...")
 
     Input = INPUT["VMHS_docu"]
-    table_name = 'Hindcast_combined'
+    table_name = 'Hind_combined'
     column_names = [COLNAMES["dir_v_m"], COLNAMES["v_m"], COLNAMES["H_s_wind"]]
 
     Calc = hc_calc.Calculation()
@@ -356,7 +342,7 @@ if (('swell' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
     print("calculating VMHS Swell Sea...")
 
     Input = INPUT["VMHS_swell"]
-    table_name = 'Hindcast_combined'
+    table_name = 'Hind_combined'
     column_names = [COLNAMES["dir_T_mean_Swell"], COLNAMES["v_m"], COLNAMES["H_s_swell"]]
 
     Calc = hc_calc.Calculation()
@@ -402,7 +388,7 @@ if (('total' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
     print("calculating VMHS Total Sea...")
 
     Input = INPUT["VMHS_total"]
-    table_name = 'Hindcast_combined'
+    table_name = 'Hind_combined'
     column_names = [COLNAMES["dir_T_mean"], COLNAMES["v_m"], COLNAMES["H_s"]]
 
     Calc = hc_calc.Calculation()
@@ -449,7 +435,7 @@ if (('wind' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
     print("calculating HSTP Wind Sea...")
 
     Input = INPUT["HSTP_wind"]
-    table_name = 'Hindcast_combined'
+    table_name = 'Hind_combined'
     column_names = [COLNAMES["H_s_wind"], COLNAMES["T_p_wind"], COLNAMES["dir_v_m"]]
 
     Calc = hc_calc.Calculation()
@@ -500,7 +486,7 @@ if (('swell' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
     print("calculating HSTP Swell Sea...")
 
     Input = INPUT["HSTP_swell"]
-    table_name = 'Hindcast_combined'
+    table_name = 'Hind_combined'
     column_names = [COLNAMES["H_s_swell"], COLNAMES["T_p_swell"], COLNAMES["dir_T_mean_Swell"]]
 
     Calc = hc_calc.Calculation()
@@ -550,7 +536,7 @@ if (('total' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
     print("calculating HSTP total Sea...")
 
     Input = INPUT["HSTP_total"]
-    table_name = 'Hindcast_combined'
+    table_name = 'Hind_combined'
     column_names = [COLNAMES["H_s"], COLNAMES["T_p"], COLNAMES["dir_T_mean"]]
 
     Calc = hc_calc.Calculation()
@@ -599,7 +585,7 @@ if (('wind' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
         or ('wind' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
     print("calculating VMTP Wind Sea...")
 
-    table_name = 'Hindcast_combined'
+    table_name = 'Hind_combined'
     column_names = [COLNAMES["T_p_wind"], COLNAMES["v_m"], COLNAMES["dir_v_m"]]
 
     Calc = hc_calc.Calculation()
@@ -614,7 +600,7 @@ if (('swell' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
         or ('swell' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
     print("calculating VMTP Swell Sea...")
 
-    table_name = 'Hindcast_combined'
+    table_name = 'Hind_combined'
     column_names = [COLNAMES["T_p_swell"], COLNAMES["v_m"], COLNAMES["dir_T_mean_Swell"]]
 
     Calc = hc_calc.Calculation()
@@ -629,7 +615,7 @@ if (('total' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
         or ('total' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
     print("calculating VMTP total Sea...")
 
-    table_name = 'Hindcast_combined'
+    table_name = 'Hind_combined'
     column_names = [COLNAMES["T_p"], COLNAMES["v_m"], COLNAMES["dir_T_mean"]]
 
     Calc = hc_calc.Calculation()
@@ -724,7 +710,7 @@ if (('total' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
 if 'wind' in INPUT["Toggle_Modules"].get("calc_RWI", {}):
     print("calculating RWI Wind Sea...")
 
-    table_name = 'Hindcast_combined'
+    table_name = 'Hind_combined'
     column_names = [COLNAMES["H_s_wind"], COLNAMES["T_p_wind"], COLNAMES["dir_v_m"]]
 
     Calc = hc_calc.Calculation()
@@ -753,7 +739,7 @@ if 'wind' in INPUT["Toggle_Modules"].get("calc_RWI", {}):
 if 'total' in INPUT["Toggle_Modules"].get("calc_RWI", {}):
     print("calculating RWI total Sea...")
 
-    table_name = 'Hindcast_combined'
+    table_name = 'Hind_combined'
     column_names = [COLNAMES["H_s"], COLNAMES["T_p"], COLNAMES["dir_v_m"]]
 
     Calc = hc_calc.Calculation()
@@ -784,7 +770,7 @@ if 'wind' in INPUT["Toggle_Modules"].get("calc_WaveBreak_Steep", {}):
     print("calculating WaveBreakSteep Wind Sea...")
 
     Input = INPUT["Structure"]
-    table_name = 'Hindcast_combined'
+    table_name = 'Hind_combined'
     column_names = [COLNAMES["dir_v_m"], COLNAMES["H_s_wind"], COLNAMES["T_p_wind"]]
 
     Calc = hc_calc.Calculation()
@@ -816,7 +802,7 @@ if 'total' in INPUT["Toggle_Modules"].get("calc_WaveBreak_Steep", {}):
     print("calculating WaveBreakSteep total Sea...")
 
     Input = INPUT["Structure"]
-    table_name = 'Hindcast_combined'
+    table_name = 'Hind_combined'
     column_names = [COLNAMES["dir_v_m"], COLNAMES["H_s"], COLNAMES["T_p"]]
 
     Calc = hc_calc.Calculation()
@@ -849,7 +835,7 @@ if INPUT["Toggle_Modules"].get("calc_AngleDeviation", {}):
     print("calculating Angle Deviation...")
 
     Input = INPUT["AngleDeviation"]
-    table_name = 'Hindcast_combined'
+    table_name = 'Hind_combined'
     column_names = [COLNAMES[INPUT["Toggle_Modules"]["calc_AngleDeviation"][0]],
                     COLNAMES[INPUT["Toggle_Modules"]["calc_AngleDeviation"][1]],
                     COLNAMES[INPUT["Toggle_Modules"]["calc_AngleDeviation"][2]]]
@@ -896,7 +882,7 @@ if len(INPUT["Toggle_Modules"].get("calc_Roseplots", {})) > 0:
     print("calculating Roseplots...")
     DATA_OUT["Roseplot"] = {}
     for Roseplot_cols in INPUT["Toggle_Modules"]["calc_Roseplots"]:
-        table_name = 'Hindcast_combined'
+        table_name = 'Hind_combined'
         column_names = [COLNAMES[col] for col in Roseplot_cols]
 
         Calc = hc_calc.Calculation()
@@ -919,7 +905,7 @@ if len(INPUT["Toggle_Modules"].get("calc_ExtremeValues", {})) > 0:
     DATA_OUT["ExtremeValues"] = {}
     Input = INPUT["ExtremeValues"]
     for cols in INPUT["Toggle_Modules"]["calc_ExtremeValues"]:
-        table_name = 'Hindcast_combined'
+        table_name = 'Hind_combined'
         column_names = [COLNAMES[col] for col in cols]
 
         Calc = hc_calc.Calculation()
@@ -960,7 +946,7 @@ if len(INPUT["Toggle_Modules"].get("calc_ExtremeConture", {})) > 0:
     print("calculating Extreme Conture Plots...")
     DATA_OUT["ExtremeConturePlots"] = {}
     for cols in INPUT["Toggle_Modules"]["calc_ExtremeConture"]:
-        table_name = 'Hindcast_combined'
+        table_name = 'Hind_combined'
         column_names = [COLNAMES[col] for col in cols]
 
         Calc = hc_calc.Calculation()
@@ -990,7 +976,7 @@ if 'wind' in INPUT["Toggle_Modules"].get("calc_Validation", {}):
     print("calculating Validation wind...")
 
     Input = INPUT["Validation_wind"]
-    table_name = 'Hindcast_combined'
+    table_name = 'Hind_combined'
     column_names = [COLNAMES["H_s_wind"], COLNAMES["T_p_wind"], COLNAMES["dir_v_m"], COLNAMES["v_m"]]
 
     Calc = hc_calc.Calculation()
@@ -1052,7 +1038,7 @@ if 'swell' in INPUT["Toggle_Modules"].get("calc_Validation", {}):
     print("calculating Validation swell...")
 
     Input = INPUT["Validation_swell"]
-    table_name = 'Hindcast_combined'
+    table_name = 'Hind_combined'
     column_names = [COLNAMES["H_s_swell"], COLNAMES["T_p_swell"], COLNAMES["dir_T_mean_Swell"], COLNAMES["v_m"]]
 
     Calc = hc_calc.Calculation()
@@ -1122,7 +1108,7 @@ if len(INPUT["Toggle_Modules"].get("calc_SensorEval", {})) > 0:
     print("calculating Sensor Evaluation...")
 
     for colname in INPUT["Toggle_Modules"]["calc_SensorEval"]:
-        table_name = 'Hindcast_combined'
+        table_name = 'Hind_combined'
         colname_data = COLNAMES[colname]
 
         Calc = hc_calc.Calculation()
@@ -1149,7 +1135,7 @@ if len(INPUT["Toggle_Modules"].get("calc_Weibull", {})) > 0:
     print("calculating Weibull fit...")
 
     for colnames in INPUT["Toggle_Modules"]["calc_Weibull"]:
-        table_name = 'Hindcast_combined'
+        table_name = 'Hind_combined'
         column_names = [COLNAMES[colnames[0]], COLNAMES[colnames[1]]]
 
         Calc = hc_calc.Calculation()
