@@ -1,0 +1,13 @@
+\section{Introduction}
+\subsection{General}
+For the support structure design of an offshore wind farm, the interpretation of the metocean data is required.
+Hydrodynamic load analysis will be conducted on this basis, which basically follow the recommendations in
+DNV\nobreakdash-ST\nobreakdash-0437 [N1] supported by IEC~61400\nobreakdash-3\nobreakdash-1 [N2].
+\\
+\\
+?siteSpecific
+
+\subsection{Document purpose}
+This document describes the marine assessment of metocean hindcast data to determine the hydrodynamic load impact in an
+offshore wind project. The evaluated design parameter shall fulfil the requirements for a preliminary design phase of
+substructure and foundation.

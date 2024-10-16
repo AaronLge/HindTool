@@ -16,13 +16,10 @@ import matplotlib
 # matplotlib.use('TkAgg',force=True)
 from matplotlib.colors import LinearSegmentedColormap
 
-path = r"C:\\temp\\python_self_crated\\packages"
-sys.path.insert(0, path)
-
-from allib import general as gl
-from allib import hindtoolcalc as hc_calc
-from allib import hindtoolplot as hc_plt
-from allib import latex as ltx
+from libaries import general as gl
+from libaries import hindtoolcalc as hc_calc
+from libaries import hindtoolplot as hc_plt
+from libaries import latex as ltx
 
 # %% FUNCTIONS - General
 
