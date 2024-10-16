@@ -6,7 +6,7 @@
 path_DataBase				>		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Tool/Data_Omexon/Waterkant.db"
 CreateDataBase				>		False
 
-create_report 				>		True
+create_report 				>		False
 Report_Input				>		"ReportInput.txt"
 
 # when create DataBase is False:
@@ -53,7 +53,7 @@ exclude_Tp_zero_wind		>		True									>	bool:	if True, Tp = 0 entrys are deleted
 
 
 *Toggle_Modules*
-#calc_VMHS					>		['wind', 'total','swell']									
+calc_VMHS					>		['wind', 'total','swell']									
 #calc_HSTP					>		['wind', 'total','swell']							
 #calc_VMTP					>		['wind', 'total','swell']								
 #calc_RWI					>		['wind', 'total']								
