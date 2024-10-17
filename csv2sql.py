@@ -100,11 +100,11 @@ def csv_to_df(path_csvs, resample_rate, data_kind='MetOcean', encoding='auto', n
         if encoding == 'auto':
             encoding_full = check_encoding(file)
 
-            if encoding_full["confidence"] > 0.9:
-                encoding = encoding_full["endcoding"]
+            if encoding_full["confidence"] == 1:
+                encoding = encoding_full["encoding"]
 
             else:
-                print(f"encoding confidence less than 0.9 ({encoding_full['confidence']}), 'utf-8' used.")
+                print(f"encoding confidence less than 1 ({encoding_full['confidence']}), 'utf-8' used.")
                 encoding = 'utf-8'
 
         if data_kind == 'MetOcean':
@@ -116,7 +116,7 @@ def csv_to_df(path_csvs, resample_rate, data_kind='MetOcean', encoding='auto', n
             drop_rows = None
             drop_cols = None
 
-        if data_kind == 'APGMer':
+        if data_kind == 'APGMer_floating':
             nans = ['', ' ', '-']
             skiprows = 6
             delimiter = ','
@@ -125,6 +125,16 @@ def csv_to_df(path_csvs, resample_rate, data_kind='MetOcean', encoding='auto', n
             low_memory = False
             drop_rows = 0
             drop_cols = 0
+
+        if data_kind == 'APGMer_tight':
+            nans = ['', ' ', 'NaN']
+            skiprows = None
+            delimiter = ','
+            dayfirst = False
+            datetime_mode = 'multi_col'
+            low_memory = False
+            drop_rows = 0
+            drop_cols = None
 
         df_NAN = pd.read_csv(file, skiprows=skiprows, encoding=encoding, delimiter=delimiter, na_values=nans, low_memory=low_memory, na_filter=True)
 
@@ -145,8 +155,6 @@ def csv_to_df(path_csvs, resample_rate, data_kind='MetOcean', encoding='auto', n
             df_datetime = df_NAN[df_NAN.columns[[0, 1, 2, 3, 4]]]
 
             df_NAN.drop(df_NAN.columns[[0, 1, 2, 3, 4]], axis=1, inplace=True)
-            df_NAN = df_NAN.drop(drop_rows)
-            df_datetime = df_datetime.drop(drop_rows)
             df_datetime = pd.to_datetime(df_datetime, dayfirst=dayfirst)
 
         else:

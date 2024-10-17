@@ -1,7 +1,7 @@
 *General*
 xlsx_concvert	>	True
 xlsx_path 		>	"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Tool/Data_Omexon/xlsx/R4596_v1_Time_Series.xlsx"
-sheet_exclude	>	1
+exclude_sheets	>	1
 
 csv_path		>	"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Tool/HindTool/db_example/"
 db_path			>	"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Tool/HindTool/db_example/db_generic.db"
