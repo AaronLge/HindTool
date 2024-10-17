@@ -2,17 +2,13 @@ import argparse
 import datetime
 import inspect
 import os
-import re
 import shutil
-import subprocess
 from warnings import simplefilter
 import numpy as np
 import pandas as pd
 import scipy as sc
 import warnings
 import re
-import sys
-import matplotlib
 # matplotlib.use('TkAgg',force=True)
 from matplotlib.colors import LinearSegmentedColormap
 
@@ -124,16 +120,8 @@ print("\n***Starting " + f"{script_name}" +
 print(f"reading Inputfile ({path_in})...")
 
 INPUT = gl.read_input_txt(path_in)
-INPUT_REPORT = gl.read_input_txt(INPUT["DataBase"]["Report_Input"])
 timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 
-# #ReportInput
-# if INPUT.get("Report", {}):
-#     try:
-#         INPUT_REPORT = gl.read_input_txt(INPUT["Report"]["ReportInput"])
-#
-#     except:
-#         print(f"Report input file {INPUT['Report']['ReportInput']} not fond")
 
 if args.o is None:
     if INPUT['DataOut']['dir_name'] is None:
@@ -182,8 +170,7 @@ if INPUT['DataBase']["CreateDataBase"]:
                                    low_memory=INPUT["DataBase"]["low_memory"],
                                    drop_rows=INPUT["DataBase"]["drop_rows"])
 
-else:
-    db_path = INPUT["DataBase"]["path_DataBase"]
+db_path = INPUT["DataBase"]["path_DataBase"]
 
 if INPUT["DataBase"]["colnames_preset"] == 'MetOcean':
     COLNAMES = {
@@ -274,7 +261,7 @@ if (('wind' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
     print("calculating VMHS Wind Sea...")
 
     Input = INPUT["VMHS_wind"]
-    table_name = 'Hindcast_combined'
+    table_name = 'Hind_combined'
     column_names = [COLNAMES["dir_v_m"], COLNAMES["v_m"], COLNAMES["H_s_wind"]]
 
     Calc = hc_calc.Calculation()
@@ -1135,7 +1122,7 @@ if len(INPUT["Toggle_Modules"].get("calc_SensorEval", {})) > 0:
     print("calculating Sensor Evaluation...")
 
     for colname in INPUT["Toggle_Modules"]["calc_SensorEval"]:
-        table_name = 'Hindcast_combined'
+        table_name = 'Hind_combined'
         colname_data = COLNAMES[colname]
 
         Calc = hc_calc.Calculation()
@@ -2575,7 +2562,7 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
                 textbox.append(f"DEL Hindcast: {Seg.result['hindcast']['added'][config].values[0]:.3e}")
                 textbox.append(f"DEL Condensed: {Seg.result['condensed']['added'][config].values[0]:.3e}")
                 textbox.append(
-                    f"Condensed/Hindcast: {round(Seg.result['condensed']['added'][config].values[0] / Seg.result['hindcast']['added'][config].values[0] * 100, 1)}" + r"\%")
+                    f"Condensed/Hindcast: {round(Seg.result['condensed']['added'][config].values[0] / Seg.result['hindcast']['added'][config].values[0] * 100, 1)}" + "$\\%$")
                 colors.append([cmap_lines(range_colors[i])])
                 colors.append(['black'])
                 colors.append(['black'])
@@ -2751,7 +2738,7 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
                 textbox.append(f"DEL Hindcast: {Seg.result['hindcast']['added'][config].values[0]:.3e}")
                 textbox.append(f"DEL Condensed: {Seg.result['condensed']['added'][config].values[0]:.3e}")
                 textbox.append(
-                    f"Condensed/Hindcast: {round(Seg.result['condensed']['added'][config].values[0] / Seg.result['hindcast']['added'][config].values[0] * 100, 1)}" + r"\%")
+                    f"Condensed/Hindcast: {round(Seg.result['condensed']['added'][config].values[0] / Seg.result['hindcast']['added'][config].values[0] * 100, 1)}" + "$\\%$")
                 colors.append([cmap_lines(range_colors[i])])
                 colors.append(['black'])
                 colors.append(['black'])
@@ -2986,6 +2973,8 @@ if INPUT["Toggle_Modules"].get("plot_Weibull", {}):
 # %% plot report tables
 
 if INPUT["Report"]["create_report"]:
+
+    INPUT_REPORT = gl.read_input_txt(INPUT["DataBase"]["Report_Input"])
 
     path_report = os.path.join(path_out, 'report')
     try:

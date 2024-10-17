@@ -1,0 +1,64 @@
+*General*
+xlsx_concvert	>	True
+xlsx_path 		>	"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Tool/Data_Omexon/xlsx/R4596_v1_Time_Series.xlsx"
+exclude_sheets	>	1
+
+csv_path		>	"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Tool/HindTool/db_example/"
+db_path			>	"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Tool/HindTool/db_example/db_generic.db"
+type			>	"MetOcean"
+encoding		>	"auto"
+
+#manual: 
+nans						>		"-"
+resample_rate				>		"1h"
+datetime_mode				>		"single_col"			> "single_col", "multi_col"
+dayfirst					>		True									
+delimiter					>		";"
+skiprows					>		None
+drop_rows					>		0
+low_memory					>		False
+drop_cols					>		None
+
+*Generic Site A_Athmo.csv*
+Source 			>	"DHI: TimeSeries order: “DutchWindFarms, Atmosphere, WeatherResearchandForecasting (WRF), 10min, 010m, OWC”, accessed on 2024-05-31 on https://www.metocean-on-demand.com"
+Date created	>	"2024-05-31 07:24:40"
+Point Name		>	"Generic Site A"
+Longitude 		>	4.918762
+Latitude 		>	54.983196
+Projection		>	"EPSG:4326"
+Water Depth		>	100
+Start Date		>	'auto'
+End Date		>	'auto'
+Time Step		>	'auto'
+Number of samples	>	'auto'
+Cell size		>	1665.2
+
+
+*Generic Site A_Ocean.csv*
+Source 			>	"Seidel, M.: “Wave induced fatigue loads on monopiles – new approaches for lumping of scatter tables and site specific interpolation of fatigue loads”, International Wind Engineering Conference IWEC, 2014"
+Date created	>	"2024-05-31 07:24:40"
+Point Name		>	"Generic Site A"
+Longitude 		>	4.918762
+Latitude 		>	54.983196
+Projection		>	"EPSG:4326"
+Water Depth		>	40
+Start Date		>	'auto' 
+End Date		>	'auto'
+Time Step		>	'auto'
+Number of samples	>	'auto'
+Cell size		>	1665.2
+
+
+*Generic Site A_Waves.csv*
+Source 			>	"Seidel, M.: “Wave induced fatigue loads on monopiles – new approaches for lumping of scatter tables and site specific interpolation of fatigue loads”, International Wind Engineering Conference IWEC, 2014"
+Date created	>	"2024-05-31 07:24:40"
+Point Name		>	"Generic Site A"
+Longitude 		>	4.918762
+Latitude 		>	54.983196
+Projection		>	"EPSG:4326"
+Water Depth		>	40
+Start Date		>	'auto' 
+End Date		>	'auto'
+Time Step		>	'auto'
+Number of samples	>	'auto'
+Cell size		>	1665.2

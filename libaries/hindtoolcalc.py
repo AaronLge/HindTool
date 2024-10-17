@@ -1,5 +1,4 @@
 import numpy as np
-from allib import general as gl
 import scipy as sc
 import pandas as pd
 import sys
@@ -9,9 +8,8 @@ import os
 import shutil
 import chardet
 
-path = r"C:\\temp\\python_self_crated\\packages"
-sys.path.insert(0, path)
-from allib import general as gl
+
+from libaries import general as gl
 
 
 # %%classes
@@ -420,149 +418,6 @@ def quantiles(perc_low, middle, perc_up, quant_low, quant_up):
             f"    quantile not possible for segment, check if graph is monotone in 'zone_line' or if percentiles cross in the frequency band. quantile is set to mean")
 
     return quantile
-
-
-# def MetOcan_to_sqlDB(Paths, db_name, resample_rate):
-#     """accepts Dict of csv paths (Metocean Format!) and stores the individual data as well a resampled version in
-#     a combined table to a sql database. If the database already exists, it will be overwritten
-#
-#     Parameters:
-#         Paths: dict with the keys: {path_wave, path_atmo, path_ocean} and the corresponding paths to the csv files, can be None
-#         db_name: sting to name the database, with path if necessary
-#         resample_rate: resample rate in the fomrat: float {y,d,s,m} for year, day, second, month. Example: "1d"
-#
-#     Return:
-#         sql Database at the desired path
-#     """
-#
-#     def join_dataframes_by_index(dfs_all):
-#         # Filter out empty dataframes
-#         dataframes = [df for df in dfs_all if not df.empty]
-#
-#         # Perform the join operation on the non-empty dataframes
-#         if dataframes:
-#             res = dataframes[0]
-#             for df in dataframes[1:]:
-#                 res = res.join(df, how='inner')
-#             return res
-#         else:
-#             return pd.DataFrame()  # Return
-#
-#     def read_MetaData(file):
-#         global name
-#         Names = []
-#         Values = []
-#         with open(file) as input_file:
-#             for _ in range(14):
-#                 line = input_file.readline()
-#                 line = line.replace('\n', '')
-#                 line = line.replace('"', '')
-#                 splited = line.split('\t')
-#                 name = splited[0]
-#                 value = splited[-1][2:]
-#                 Names.append(name)
-#                 Values.append(value)
-#
-#         return Names, Values
-#
-#     NAMES = []
-#     VALUES = []
-#     db_path = os.path.dirname(Paths[list(Paths.keys())[0]]) + "/" + db_name
-#     db_exists = os.path.exists(db_path)
-#
-#     if db_exists:
-#         overwrite = input(f"    Database {db_path} already exists, overwrite? (y/n)")
-#         if overwrite == 'y':
-#             os.remove(db_path)
-#         else:
-#             return None
-#
-#     conn = sqlite3.connect(db_path)
-#
-#     if Paths["path_wave"] is not None:
-#         print("    wave data found")
-#
-#         df_wave_NAN = pd.read_csv(Paths["path_wave"], skiprows=15, na_filter=False)
-#         df_wave = df_wave_NAN.dropna(how='any')
-#         df_wave.set_index('datetime (ISO 8601) [UTC]', inplace=True)
-#         df_wave.index = pd.to_datetime(df_wave.index)
-#
-#         temp = read_MetaData(Paths["path_wave"])
-#         temp[0].append("NANs")
-#         temp[1].append(len(df_wave_NAN) - len(df_wave))
-#         temp[0].insert(0, "DataSet")
-#         temp[1].insert(0, "Waves Data")
-#         NAMES.append(temp[0])
-#         VALUES.append(temp[1])
-#
-#         df_wave.to_sql('Waves', conn)
-#
-#         df_wave_resample = df_wave.resample(resample_rate).mean()
-#
-#     else:
-#         df_wave_resample = pd.DataFrame()
-#         print("    no wave data found")
-#
-#     if Paths["path_atmo"] is not None:
-#         print('    atmospheric data found')
-#
-#         df_wind_NAN = pd.read_csv(Paths["path_atmo"], skiprows=15, na_filter=False)
-#         df_wind = df_wind_NAN.dropna(how='any')
-#         df_wind.set_index('datetime (ISO 8601) [UTC]', inplace=True)
-#         df_wind.index = pd.to_datetime(df_wind.index)
-#
-#         temp = read_MetaData(Paths["path_atmo"])
-#         temp[0].append("NANs")
-#         temp[1].append(len(df_wave_NAN) - len(df_wave))
-#         temp[0].insert(0, "DataSet")
-#         temp[1].insert(0, "Athmospheric Data")
-#         NAMES.append(temp[0])
-#         VALUES.append(temp[1])
-#
-#         df_wind.to_sql('Athmosphere', conn)
-#
-#         df_wind_resample = df_wind.resample(resample_rate).mean()
-#
-#     else:
-#         df_wind_resample = pd.DataFrame()
-#         print("    no Athmospheric Data data found")
-#
-#     if Paths["path_ocean"] is not None:
-#         print('    oceanic data found')
-#         df_water_NAN = pd.read_csv(Paths["path_ocean"], skiprows=15, na_filter=False)
-#         df_water = df_water_NAN.dropna(how='any')
-#         df_water.set_index('datetime (ISO 8601) [UTC]', inplace=True)
-#         df_water.index = pd.to_datetime(df_water.index)
-#         temp = read_MetaData(Paths["path_ocean"])
-#         temp[0].append("NANs")
-#         temp[1].append(len(df_wave_NAN) - len(df_wave))
-#         temp[0].insert(0, "DataSet")
-#         temp[1].insert(0, "Ocean Data")
-#         NAMES.append(temp[0])
-#         VALUES.append(temp[1])
-#
-#         df_water.to_sql('Ocean', conn)
-#         df_water_resample = df_water.resample(resample_rate).mean()
-#     else:
-#         df_water_resample = pd.DataFrame()
-#         print("    no oceanic data found")
-#
-#     df_ges = join_dataframes_by_index([df_wave_resample, df_wind_resample, df_water_resample])
-#
-#     df_ges.to_sql('Combined', conn)
-#
-#     # Metadata
-#
-#     df_Meta = pd.DataFrame(columns=NAMES[0][1:], index=[values[0] for values in VALUES])
-#
-#     for values in VALUES:
-#         df_Meta.loc[values[0], :] = values[1:]
-#
-#     df_Meta.to_sql('MetaData', conn)
-#
-#     conn.close()
-#
-#     return db_path
 
 
 def csv_to_sqlDB(path_csvs, db_name, resample_rate, data_kind='MetOcean', encoding='auto', nans=None, skiprows=None, delimiter=';', dayfirst=False, datetime_mode='single_col', low_memory=True, drop_rows=None):

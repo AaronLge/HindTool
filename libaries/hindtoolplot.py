@@ -1212,6 +1212,7 @@ def update_axis_colors_ticksize_axlabels(
 #             break  # Exit the loop if the right axis is found
 
 #%% macros:
+
 def plot_table_condesation(Segments, figsize=(8.268, 11.693), titel=None):
     """"wrapper to plot condesation data in table from list of angle segments calculated before"""
 
