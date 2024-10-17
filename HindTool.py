@@ -9,7 +9,7 @@ import pandas as pd
 import scipy as sc
 import warnings
 import re
-# matplotlib.use('TkAgg',force=True)
+
 from matplotlib.colors import LinearSegmentedColormap
 
 from libaries import general as gl
@@ -155,21 +155,6 @@ if INPUT['Filter']['timeframe']:
 else:
     timeframe = None
 # %% DataRead
-
-if INPUT['DataBase']["CreateDataBase"]:
-    db_path = hc_calc.csv_to_sqlDB(INPUT["DataBase"]["path_csvs"],
-                                   INPUT["DataBase"]["name_DataBase"],
-                                   INPUT["DataBase"]["resample_rate"],
-                                   data_kind=INPUT["DataBase"]["mode"],
-                                   encoding=INPUT["DataBase"]["encoding"],
-                                   nans=INPUT["DataBase"]["nans"],
-                                   skiprows=INPUT["DataBase"]["skiprows"],
-                                   delimiter=INPUT["DataBase"]["delimiter"],
-                                   dayfirst=INPUT["DataBase"]["dayfirst"],
-                                   datetime_mode=INPUT["DataBase"]["datetime_mode"],
-                                   low_memory=INPUT["DataBase"]["low_memory"],
-                                   drop_rows=INPUT["DataBase"]["drop_rows"])
-
 db_path = INPUT["DataBase"]["path_DataBase"]
 
 if INPUT["DataBase"]["colnames_preset"] == 'MetOcean':
@@ -2971,8 +2956,7 @@ if INPUT["Toggle_Modules"].get("plot_Weibull", {}):
 
 
 # %% plot report tables
-
-if INPUT["Report"]["create_report"]:
+if INPUT["DataBase"]["create_report"]:
 
     INPUT_REPORT = gl.read_input_txt(INPUT["DataBase"]["Report_Input"])
 
@@ -3020,6 +3004,10 @@ if INPUT["Report"]["create_report"]:
 
     if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_pdf([FIG], path_out + 'Plot_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    # plot databases
+    colnames = gl.export_colnames_from_db(INPUT["path_DataBase"])
+
 
     # VMHS parameter
     if INPUT["Toggle_Modules"].get("plot_VMHS", {}):

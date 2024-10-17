@@ -5,14 +5,16 @@
 *DataBase*
 path_DataBase				>		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Tool/Data_Omexon/Waterkant.db"
 colnames_preset				>		None
-JBOOST_proj				>			"A:/2024/24A523_Waterkant/JBOOST/JBOOST_Model_Gravity/proj.lua"						
+JBOOST_proj					>		"A:/2024/24A523_Waterkant/JBOOST/JBOOST_Model_Gravity/proj.lua"						
 JBOOST_input				>		"A:/2024/24A523_Waterkant/JBOOST/JBOOST_Model_Gravity/Input JBOOST WAK-DP-A-LILA-MySE18-260-v0.lua"
+create_report				>		True
+
 
 *Structure*
 steep_crit					>		0.04									>	float:	Steepness limit (Hs/lamda(Tp)) for WaveBreaking 
 f_0							>		0.1531									>	float:	first resonance-frequency (overrides value in ".\JBOOST\proj.lua")
 
-d_from_proj					> 		True
+d_from_proj					> 		False
 d							>		20
 
 *DataOut*
@@ -32,7 +34,7 @@ datetime_start				>		'1979-01-01 07:00:00'							>	str:	startdatetime in the for
 datetime_end				>		'1981-07-01 07:00:00'							>	str:	enddatetime in the format: "YYYY-MM-DD"
 
 *Toggle_Modules*
-calc_VMHS					>		['wind', 'total','swell']									
+#calc_VMHS					>		['wind', 'total','swell']									
 #calc_HSTP					>		['wind', 'total','swell']							
 #calc_VMTP					>		['wind', 'total','swell']								
 #calc_RWI					>		['wind', 'total']								
@@ -60,7 +62,7 @@ calc_VMHS					>		['wind', 'total','swell']
 #plot_Weibull				>		True
 #plot_condensation_example	>		True
 plot_report_tables			>		True
-plot_as						>		["png"]
+plot_as						>		[]
 
 dpi_figures					>		500									>	int: resolution (dots per sqinch) of all pdf's
 writing_box					>		[17, 22]

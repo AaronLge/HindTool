@@ -672,6 +672,7 @@ def export_df_from_sql(db_file, table_name, column_names=None, timeframe=None, i
         if conn:
             conn.close()
 
+
 def export_colnames_from_db(database_path):
 
     # Connect to the SQLite database
