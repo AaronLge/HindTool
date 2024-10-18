@@ -160,10 +160,5 @@
 \begin{document}
 
 
-\section{Section title}
-
-\pagestyle{fancy}
-\lipsum[1-10]
-
 
 \end{document}

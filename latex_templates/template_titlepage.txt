@@ -27,8 +27,8 @@
         \hline
         
         % Row 2
-        \makebox[3cm][l]{ % Ensures horizontal centering with specified width
-            \raisebox{6pt}[0.9cm][0pt]{ % Adjust height for vertical centering
+        \makebox[3cm][l]{ % 	Ensures horizontal centering with specified width
+            \raisebox{2pt}[0.6cm][0pt]{ % Adjust height for vertical centering
                 {\fontsize{10}{12}\selectfont Reference Number}
             }
         }
@@ -70,7 +70,7 @@
         } 
         & 
         \makebox[0.9cm][l]{ 
-            \raisebox{-11pt}[0cm][0pt]{ % Keep this consistent with other columns
+            \raisebox{-4pt}[0cm][0pt]{ % Keep this consistent with other columns
                 \shortstack{
                     {\fontsize{7}{5}\selectfont JBO} \\
                     {\fontsize{9}{5}\selectfont \textbf{ ?RevisionJBO }}
@@ -80,7 +80,7 @@
         
         &
         \makebox[1cm][c]{ 
-            \raisebox{-11pt}[0cm][0pt]{ % Keep this consistent with other columns
+            \raisebox{-4pt}[0cm][0pt]{ % Keep this consistent with other columns
                 \shortstack{
                     {\fontsize{7}{5}\selectfont Employer} \\
                     {\fontsize{9}{5}\selectfont \textbf{ ?RevisionEmployer }}
@@ -136,7 +136,6 @@
 
 \vfill
 
-{\large \today}
 
 \vspace{0.8cm}
 

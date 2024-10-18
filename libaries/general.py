@@ -1,19 +1,18 @@
-import pandas as pd
+import datetime
+import os
+import random
+import sqlite3
+import subprocess
+
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import numpy as np
+import pandas as pd
 import scipy as sc
 import sklearn as skl
 from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import make_pipeline
-import sqlite3
-import re
-import datetime
-import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
-import random
-import shutil
-import subprocess
-import os
+from sklearn.preprocessing import PolynomialFeatures
 
 
 def model_regression(x: pd.core.series.Series, y: pd.core.series.Series,
@@ -233,7 +232,7 @@ def grid_pointcloud_in_x(x, y, grid, **kwargs):
     method = kwargs.get('method', False)
 
     def mean_weight(i):
-        #i[i == 0] = float('nan')
+        # i[i == 0] = float('nan')
         mean_w = np.sqrt(np.sum(i ** 2) / np.size(i[~np.isnan(i)]))
         return mean_w
 
@@ -269,7 +268,7 @@ def grid_pointcloud_in_x(x, y, grid, **kwargs):
     return averaged, std, count, bin_ident
 
 
-def JONSWAP(f: list, T_p: float, H_s: float,  gamma_mode = 'torset') -> list:
+def JONSWAP(f: list, T_p: float, H_s: float, gamma_mode='torset') -> list:
     """calculates the JONSWAP Spectrum
         
     Parameters
@@ -299,8 +298,7 @@ def JONSWAP(f: list, T_p: float, H_s: float,  gamma_mode = 'torset') -> list:
             gamma = 1
 
     if gamma_mode == 'torset':
-        gamma = 35 * ((2 * np.pi * H_s)/(9.81 * T_p**2)) **(6/7)
-
+        gamma = 35 * ((2 * np.pi * H_s) / (9.81 * T_p ** 2)) ** (6 / 7)
 
     sigma_under = 0.07
 
@@ -388,7 +386,6 @@ def calculate_histogram(x, **kwargs):
     bin_size_fix = kwargs.get('bin_size_fix', None)
     x_min = kwargs.get('x_min', min(x))
 
-
     # get significant Digits
     x_str = [str(value) for value in x]
     lenths = [len(dig.split('.')[1]) for dig in x_str]
@@ -442,7 +439,6 @@ def fit_weibull_distribution(data, x_grid, **kwargs):
         params: A dictionary containing the parameters of the fitted Weibull distribution.
                 {"shape": shape, "loc": loc, "scale": scale, "mean": mean, "std": std}
     """
-
 
     floc = kwargs.get("floc", None)
     # Fit the Weibull distribution to the data
@@ -583,7 +579,7 @@ def string_to_latex(string):
 
     string = repr(string)
     string = string.replace(r'\n', r'\\')
-    string = "$"+string+"$"
+    string = "$" + string + "$"
     return string
 
 
@@ -613,7 +609,6 @@ def export_df_from_sql(db_file, table_name, column_names=None, timeframe=None, i
         cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}';")
         if not cursor.fetchone():
             raise ValueError(f"Table '{table_name}' does not exist in the database.")
-
 
         # Check if specified columns exist in the table
         cursor.execute(f"PRAGMA table_info({table_name});")
@@ -653,16 +648,17 @@ def export_df_from_sql(db_file, table_name, column_names=None, timeframe=None, i
 
             try:
                 index_col = pd.to_datetime(index_col)
-            except ValueError:
+            except:
+                print("could not convert index to datetime object")
                 index_col = index_col
             df.index = index_col
 
             if timeframe is not None:
                 df = df.loc[timeframe[0]:timeframe[1]]
-        
+
         if indizes is not None:
             df = df.loc[indizes]
-        
+
         return df
 
     except sqlite3.Error as e:
@@ -674,7 +670,6 @@ def export_df_from_sql(db_file, table_name, column_names=None, timeframe=None, i
 
 
 def export_colnames_from_db(database_path):
-
     # Connect to the SQLite database
     conn = sqlite3.connect(database_path)
     cursor = conn.cursor()
@@ -727,13 +722,13 @@ def auto_ticks(start, end, num_ticks=10, fix_end=False, edges=False):
     if fix_end:
         # # Ensure the last tick is exactly the end value
         ticks = np.append(ticks[:-1], end)
-    
+
     if edges:
         # Calculate the bin edges based on the ticks (treating ticks as midpoints)
         bin_width = np.diff(ticks) / 2
         edges = np.concatenate(([ticks[0] - bin_width[0]], ticks[:-1] + bin_width, [ticks[-1] + bin_width[-1]]))
         return ticks, edges
-    
+
     else:
         return ticks
 
@@ -1072,7 +1067,6 @@ def compare_values(value1, value2, operation="=="):
     if value1 is None and value2 is None:
         return False
 
-
     # If the types of the values are different, return False
     if type(value1) != type(value2):
         return False
@@ -1177,7 +1171,7 @@ def filter_df_cols_by_keywords(df, keywords):
     Returns:
         pd.DataFrame: A new dataframe containing only the columns with names that match any of the keywords.
     """
-    
+
     # Create a boolean mask for columns containing any of the keywords
     mask = df.columns.to_series().str.contains('|'.join(keywords), case=False, na=False)
 
@@ -1367,7 +1361,6 @@ def x_max_sampeling(x, time_window_offeset, n_samp=None):
 
 
 def gumbel_conf_intervall(x_max, beta=None, mu=None, mode='percentile', algorithm='1', N_itter=1000, freq_samp=1, perc_up=95, perc_down=5, T_max=100):
-
     N_xmax = len(x_max)
     if beta is None or mu is None:
         beta, mu = Gumbel_coeff(x_max)
@@ -1397,7 +1390,6 @@ def gumbel_conf_intervall(x_max, beta=None, mu=None, mode='percentile', algorith
             band_up = [middle[i] + std_dev_curr for i, std_dev_curr in enumerate(std_dev)]
             band_down = [middle[i] - std_dev_curr for i, std_dev_curr in enumerate(std_dev)]
 
-    
     return band_down, middle, band_up, T_R_grid
 
 
@@ -1437,19 +1429,18 @@ def add_unique_row(df1, df2):
     return df2, matching_indices
 
 
-#Validation
+# Validation
 def calc_JBOOST(path_exe, proj_name, Hs, Tp, gamma):
-
     # exporting JBOOST input Files of Database
-    write_JBOOST_wave(Hs, Tp, gamma, path_exe+'wave.lua')
+    write_JBOOST_wave(Hs, Tp, gamma, path_exe + 'wave.lua')
 
     # Run JBOOST
     subprocess.check_call(['JBOOST.exe', proj_name],
                           cwd=path_exe, shell=True)
 
     # import points of Database
-    temp, debug = import_JBOOST(path_exe+'Results_JBOOST_Text/JBOOST.out')
-    
+    temp, debug = import_JBOOST(path_exe + 'Results_JBOOST_Text/JBOOST.out')
+
     out = {}
     for ck, cd in temp.items():
         out[ck] = pd.DataFrame(data=cd.values, index=Hs.index, columns=cd.columns)
@@ -1506,7 +1497,6 @@ def import_JBOOST(path):
 
 
 def write_JBOOST_wave(Hs, Tp, gamma, path):
-    
     if isinstance(gamma, float):
         gamma = [gamma for i in range(Hs.shape[0])]
 
@@ -1530,10 +1520,9 @@ def write_JBOOST_wave(Hs, Tp, gamma, path):
 
 
 def write_DEL_base(path_DataBase, DEL_data, Meta_Data):
-    
     # write meta data in dataframe
     df_Meta = pd.DataFrame(columns=list(Meta_Data.keys()))
-    
+
     for col in df_Meta.columns:
         df_Meta.loc[0, col] = Meta_Data[col]
 
@@ -1568,7 +1557,7 @@ def write_DEL_base(path_DataBase, DEL_data, Meta_Data):
             df_Meta.set_index(pd.Index([DEL_config_name]))
             df_Meta = df_Meta.set_index(pd.Index([DEL_config_name]))
             df_meta_combined = pd.concat((df_meta_sql, df_Meta), axis=0)
-    
+
             df_meta_combined.to_sql('DEL_Meta', conn, if_exists='replace', index=True)
 
     DEL_data.to_sql(DEL_config_name, conn, if_exists='replace', index=True)
@@ -1597,7 +1586,7 @@ def check_meta_in_valid_db(db_path, Meta):
 
     if meta_exists:
         # check, if calculation is already been run in the database
-        df_Meta_sql = pd.read_sql_query(f"SELECT * FROM {table_name}", conn, index_col ='index')
+        df_Meta_sql = pd.read_sql_query(f"SELECT * FROM {table_name}", conn, index_col='index')
         _, idx_in_meta = add_unique_row(df_Meta, df_Meta_sql)
 
     else:
@@ -1634,6 +1623,7 @@ def median_sample_rate(index) -> pd.Timedelta:
 
     return median_diff
 
+
 def fill_nans_constant(x_vector, mask=None):
     """
     Fills NaN values in x_vector using the last non-NaN value,
@@ -1669,9 +1659,9 @@ def fill_nans_constant(x_vector, mask=None):
                 if last_valid is not None:
                     filled_vector[i] = last_valid
             else:
-                last_valid = filled_vector[i] # Update last valid value
+                last_valid = filled_vector[i]  # Update last valid value
                 if leading_nan:
-                    filled_vector[i-i_leading_nan:i] = last_valid
+                    filled_vector[i - i_leading_nan:i] = last_valid
                     leading_nan = False
 
 
@@ -1680,7 +1670,6 @@ def fill_nans_constant(x_vector, mask=None):
             last_valid = None if np.isnan(filled_vector[i]) else filled_vector[i]
 
     return filled_vector
-
 
 
 def fill_nan_with_linspace(vector):
