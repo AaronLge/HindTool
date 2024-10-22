@@ -1,3 +1,5 @@
+from dill import temp
+
 from libaries import general as gl
 import subprocess
 import os
@@ -213,6 +215,35 @@ def include_Fig(string, FigInfo):
 
     return string_out
 
+def include_MultiFig(string, FigInfo):
+
+    figure_template = ("\\begin{figure}[H] \n "
+                       "\\centering \n "
+                       "\\includegraphics[width=\\textwidth]{?FIGURE_PATH} \n "
+                       "\\caption{ ?CAPTION } \n "
+                       "\\label{fig: ?FIGURE_NAME } \n"
+                       "\\end{figure}")
+
+    temp = []
+
+    for Fig in FigInfo:
+        figure_latex = gl.alias(figure_template,
+                                {"1": "?FIGURE_PATH",
+                                 "2": "?CAPTION",
+                                 "3": "?FIGURE_NAME",
+                                 "4": "?FIGURE_WIDTH"},
+                                {"1": Fig["path"],
+                                 "2": Fig["caption"],
+                                 "3": Fig.name,
+                                 "4": f"{Fig['width']}"})
+
+        temp.append(figure_latex)
+        fig_string = "\n".join(temp)
+
+    lines = find_keyword(string, '?MULTIFIG')
+    string_out, _ = include_str(string, fig_string, line=lines[0], replace=True)
+
+    return string_out
 
 def include_TableFig(string, FigInfo):
     figure_template = ("\\begin{figure}[H] \n "

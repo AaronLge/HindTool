@@ -34,35 +34,34 @@ datetime_start				>		'1979-01-01 07:00:00'							>	str:	startdatetime in the for
 datetime_end				>		'1981-07-01 07:00:00'							>	str:	enddatetime in the format: "YYYY-MM-DD"
 
 *Toggle_Modules*
-calc_VMHS					>		['wind', 'total','swell']									
-calc_HSTP					>		['wind', 'total','swell']							
-calc_VMTP					>		['wind', 'total','swell']								
-calc_RWI					>		['wind', 'total']								
-calc_Tables					>		['wind', 'total']											
-calc_WaveBreak_Steep		>		['wind', 'total']										
-calc_AngleDeviation 		>		['dir_v_m', 'dir_T_mean_Wind', 'v_m']						>	angle_orig, angle_deviation, v_m
-calc_Roseplots				>		True									>	 [[angle, magnitude],[angle, magnitude]]
-calc_ExtremeValues			>		[['dir_T_mean', 'H_max']]									
-#calc_Validation 			>		['wind']											
-calc_SensorEval			>		['v_m','H_s','H_max','T_p','H_s_wind','T_p_wind','H_s_swell','T_p_swell','T_p_swell','WL','WL_tide','v_curr']
-#calc_SensorEval			>		['v_m', 'H_s','H_max']
-calc_Weibull				>		[['dir_v_m', 'v_m']]
-calc_ExtremeConture		>		[['H_s', 'T_p', 'dir_v_m']]
-#
-plot_VMHS					>		['wind', 'swell', 'total']
-plot_HSTP					>		['wind', 'swell', 'total']
-plot_VMTP					>		['wind', 'swell', 'total']
-plot_RWI					>		['wind', 'total']
-plot_BreakSteep			>		['wind', 'total']
+#calc_VMHS					>		['wind', 'total','swell']									
+#calc_HSTP					>		['wind', 'total','swell']							
+#calc_VMTP					>		['wind', 'total','swell']								
+#calc_RWI					>		['wind', 'total']								
+#calc_Tables					>		['swell']											
+#calc_WaveBreak_Steep		>		['wind', 'total']										
+#calc_AngleDeviation 		>		['dir_v_m', 'dir_T_mean_Wind', 'v_m']						>	angle_orig, angle_deviation, v_m
+#calc_Roseplots				>		True									>	 [[angle, magnitude],[angle, magnitude]]
+#calc_ExtremeValues			>		[['dir_T_mean', 'H_max']]									
+##calc_Validation 			>		['wind']											
+#calc_SensorEval			>		True
+#calc_Weibull				>		[['dir_v_m', 'v_m']]
+#calc_ExtremeConture		>		[['H_s', 'T_p', 'dir_v_m']]
+##
+#plot_VMHS					>		['wind', 'swell', 'total']
+#plot_HSTP					>		['wind', 'swell', 'total']
+#plot_VMTP					>		['wind', 'swell', 'total']
+#plot_RWI					>		['wind', 'total']
+#plot_BreakSteep			>		['wind', 'total']
 plot_Tables				>		['wind', 'swell', 'total']
-plot_AngleDeviation		>		True
-plot_Roseplots				>		True
-plot_ExtremeValues			>		True
-plot_Validation 			>		['wind', 'swell']
-plot_SensorEval			>		True
-plot_Weibull				>		True
-plot_condensation_example	>		True
-plot_report_tables			>		True
+#plot_AngleDeviation		>		True
+#plot_Roseplots				>		True
+#plot_ExtremeValues			>		True
+#plot_Validation 			>		['wind', 'swell']
+#plot_SensorEval			>		True
+#plot_Weibull				>		True
+#plot_condensation_example	>		True
+#plot_report_tables			>		True
 plot_as						>		["png"]
 
 dpi_figures					>		500									>	int: resolution (dots per sqinch) of all pdf's
@@ -230,6 +229,9 @@ swell_sea					>		[['dir_T_mean_Swell', 'H_s_swell']]
 wind_sea					>		[['dir_T_mean_Wind', 'H_s_wind']]
 
 currents					>		[['dir_curr', 'v_curr']]
+
+*SensorEval*
+Sensors 					>		['v_m','H_s','H_max','T_p','H_s_wind','T_p_wind','H_s_swell','T_p_swell','T_p_swell','WL','WL_tide','v_curr']
 
 
 *AngleDeviation*

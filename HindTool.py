@@ -1120,10 +1120,10 @@ def main():
         DATA_OUT["Validation"]["swell"] = Calc
 
     # SensorEval
-    if len(INPUT["Toggle_Modules"].get("calc_SensorEval", {})) > 0:
+    if INPUT["Toggle_Modules"].get("calc_SensorEval", {}):
         print("calculating Sensor Evaluation...")
 
-        for colname in INPUT["Toggle_Modules"]["calc_SensorEval"]:
+        for colname in INPUT["SensorEval"]["Sensors"]:
             table_name = 'Hind_combined'
             colname_data = COLNAMES[colname]
 
@@ -1175,7 +1175,7 @@ def main():
     # %% Plot
     figsize_fullpage = [size * 0.39370079 for size in INPUT["Toggle_Modules"].get("writing_box", {})]
     figsize_halfpage = [figsize_fullpage[0], figsize_fullpage[1] / 2]
-
+    figsize_thirdpage = [figsize_fullpage[0], figsize_fullpage[1] / 3]
     if 'wind' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
         print('plotting VMHS wind...')
 
@@ -2294,7 +2294,7 @@ def main():
             i = i + 1
 
         for Tile_single in Tiles_single:
-            FIG = hc_plt.plot_tiled([Tile_single], figsize=figsize_halfpage, grid=[1, 1])
+            FIG = hc_plt.plot_tiled([Tile_single], figsize=figsize_thirdpage, grid=[1, 1])
 
             if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
                 gl.save_figs_as_png(FIG, path_out + f'Roseplots_{Tile_single.name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3012,7 +3012,18 @@ def main():
         COLNAMES_REPORT["Aliase"] = [INPUT["Aliase"][key] if key in INPUT["Aliase"] else float('nan') for key in COLNAMES_REPORT.index]
         COLNAMES_REPORT["Units"] = [INPUT_REPORT["Units"][key] if key in INPUT_REPORT["Units"] else float('nan') for key in COLNAMES_REPORT.index]
 
-        # load figures
+        path_templates = os.path.abspath(INPUT_REPORT["General"]["path_latex_templates"])
+        template_files = [f for f in os.listdir(path_templates) if f.endswith('.txt')]
+        template_paths = [os.path.join(path_templates, f) for f in os.listdir(path_templates) if f.endswith('.txt')]
+        templates_names = [name.removesuffix('.txt') for name in template_files]
+
+        TEMPLATES = {}
+
+        for path, name in zip(template_paths, templates_names):
+            with open(path, 'r', encoding='utf-8') as file:
+                TEMPLATES[name] = file.read()
+
+        #< load figures
         if INPUT_REPORT["General"]["fig_path"] is not None:
             path_figs = os.path.abspath(INPUT_REPORT["General"]["fig_path"])
         else:
@@ -3029,12 +3040,20 @@ def main():
         FIGURES["filename"] = png_files
         FIGURES["width"] = png_width
         FIGURES["path"] = png_paths
-        FIGURES["caption"] = png_names
+
+        FIGURES["caption"] = [name.replace('_', '-') for name in png_names]
         FIGURES.index = png_names
 
+        #constant images
+        FIGURES.loc["VMTP_theory", "filename"] = "VMTP_theory.jpg"
+        FIGURES.loc["VMTP_theory", "path"] = path_templates + "\\VMTP_theory.jpg"
+        FIGURES.loc["VMTP_theory", "caption"] = "Cross correlation for determining peak period over wind speed"
+        FIGURES.loc["VMTP_theory", "width"] = figsize_fullpage[0]
+
+
+        cell_height_tables = 0.7
 
         if INPUT["DataBase"].get("create_report", {}):
-
             # plot databases
             Meta_data = gl.export_df_from_sql(db_path, 'Hind_MetaData')
 
@@ -3055,7 +3074,7 @@ def main():
                 col_labels = ["Parameter", "Value"]
                 FIG = hc_plt.table(data,
                                    collabels=col_labels,
-                                   cell_height=0.7,
+                                   cell_height=cell_height_tables,
                                    figsize=figsize_fullpage,
                                    datatype='str')
 
@@ -3086,7 +3105,7 @@ def main():
             FIG = hc_plt.table(data,
                                collabels=col_labels,
                                figsize=figsize_fullpage,
-                               cell_height=1,
+                               cell_height=cell_height_tables,
                                datatype='str')
 
             if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
@@ -3102,7 +3121,7 @@ def main():
             FIG = hc_plt.table(data,
                                collabels=col_labels,
                                figsize=figsize_fullpage,
-                               cell_height=1,
+                               cell_height=cell_height_tables,
                                datatype='str')
 
             if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
@@ -3111,175 +3130,119 @@ def main():
             if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
                 gl.save_figs_as_pdf([FIG], path_out + 'Plot_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-            # VMHS parameter
-            if INPUT["Toggle_Modules"].get("plot_VMHS", {}):
-                print("   plotting VMHS parameter table")
 
-                columns_table = []
-                col_labels = []
-                row_labels = ['Degree of regression',
-                              'Shape function f(x)',
-                              'Bin number',
-                              'Portion of datapoints evaluated with mean',
-                              'Regression range',
-                              'Evaluated range',
-                              'Applied percentile for condensation',
-                              'Averageing method']
+            columns_table = []
+            col_labels = []
+            row_labels = ['Bin number',
+                          'Method to derive representative value',
+                          'Correction factor on averaged values',
+                          'datapoints evaluated with regression curve',
+                          'Degree of regression curve $n$',
+                          'Shape function f(x)',
+                          'Range of the regression base']
 
-                Input = INPUT["VMHS_wind"]
+            Input = INPUT["VMHS_wind"]
 
-                new_col = [
-                    Input["deg_reg"],
-                    'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-                    Input["N_grid"],
-                    f"{Input['cut_reg']}" + r" \%",
-                    f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
-                    f"[{Input['zone_line'][0]} .. {'max' if Input['zone_line'][1] is None else Input['zone_line'][1]}]",
-                    f"{Input['perc_mean']}" + r" \%",
-                    Input["avrg_method"],
-                           ]
-                columns_table.append(new_col)
-                col_labels.append('Wind Sea')
+            new_col = [Input["N_grid"],
+                       Input["avrg_method"],
+                       Input["average_correction"],
+                       f"{100-Input['cut_reg']}" + "\\%",
+                       Input["deg_reg"],
+                       'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+                       f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
 
-                Input = INPUT["VMHS_swell"]
+            columns_table.append(new_col)
+            col_labels.append('Wind Sea')
 
-                new_col = [
-                    Input["deg_reg"],
-                    'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-                    Input["N_grid"],
-                    f"{Input['cut_reg']}" + r" \%",
-                    f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
-                    f"[{Input['zone_line'][0]} .. {'max' if Input['zone_line'][1] is None else Input['zone_line'][1]}]",
-                    f"{Input['perc_mean']}" + r" \%",
-                    Input["avrg_method"],
-                           ]
-                columns_table.append(new_col)
-                col_labels.append('Swell Sea')
+            Input = INPUT["VMHS_swell"]
+
+            new_col = [Input["N_grid"],
+                       Input["avrg_method"],
+                       Input["average_correction"],
+                       f"{100-Input['cut_reg']}" + "\\%",
+                       Input["deg_reg"],
+                       'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+                       f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
+
+            columns_table.append(new_col)
+            col_labels.append('Swell Sea')
+
+            data = np.array(columns_table)
+            data = data.T
+
+            FIG = hc_plt.table(data,
+                               collabels=col_labels,
+                               rowlabels=row_labels,
+                               row_label_name='Parameters',
+                               figsize=figsize_halfpage,
+                               cell_height=cell_height_tables)
+
+            if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+                gl.save_figs_as_png([FIG], path_out + 'Report_table_VMHS', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+            if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+                gl.save_figs_as_pdf([FIG], path_out + 'Report_table_VMHS', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
 
-                if len(columns_table) > 0:
-                    data = np.array(columns_table)
-                    data = data.T
 
-                    FIG = hc_plt.table(data,
-                                       collabels=col_labels,
-                                       rowlabels=row_labels,
-                                       row_label_name='Parameters',
-                                       figsize=figsize_halfpage,
-                                       cell_height=1)
+            columns_table = []
+            col_labels = []
+            row_labels = ['Selected quantiles',
+                          'Frequency bandwidth for selected correlation',
+                          'Bin number',
+                          'Method to derive representative value',
+                          'datapoints evaluated with regression curve',
+                          'Degree of regression curve $n$',
+                          'Shape function $f(x)$',
+                          'Range of the regression base']
 
-                    if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-                        gl.save_figs_as_png([FIG], path_out + 'Report_table_VMHS', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+            Input = INPUT["HSTP_wind"]
 
-                    if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-                        gl.save_figs_as_pdf([FIG], path_out + 'Report_table_VMHS', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-            # HSTP parameter
-            if INPUT["Toggle_Modules"].get("plot_HSTP", {}):
-                print("   plotting HSTP parameter table")
+            new_col = [f"[{Input['percentiles'][0]}$\%$ .. {Input['percentiles'][1]}$\%$]" if Input['quantile'] else "none",
+                       f"[{Input['quant_up']} .. {Input['quant_low']}]" if Input['quantile'] else "none",
+                       Input["N_grid"],
+                       Input["avrg_method"],
+                       f"{100-Input['cut_reg']}" + " \\%",
+                       Input["deg_reg"],
+                       'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+                       f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
 
-                columns_table = []
-                col_labels = []
-                row_labels = ['Degree of regression',
-                              'Shape function f(x)',
-                              'Bin number',
-                              'Portion of datapoints evaluated with mean',
-                              'Regression range',
-                              'Evaluated range',
-                              'Quantiles for selected correlation',
-                              'Frequency band for selected correlation',
-                              'Applied percentile for condensation',
-                              'Averageing method']
+            columns_table.append(new_col)
+            col_labels.append('Wind Sea')
 
-                Input = INPUT["HSTP_wind"]
+            new_col = [f"[{Input['percentiles'][0]}$\%$ .. {Input['percentiles'][1]}$\%$]" if Input['quantile'] else "none",
+                       f"[{Input['quant_up']} .. {Input['quant_low']}]" if Input['quantile'] else "none",
+                       Input["N_grid"],
+                       Input["avrg_method"],
+                       f"{100 - Input['cut_reg']}" + " \\%",
+                       Input["deg_reg"],
+                       'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+                       f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
+            columns_table.append(new_col)
+            col_labels.append('Swell Sea')
 
-                if 'wind' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
-                    Input = INPUT["HSTP_wind"]
 
-                    new_col = [
-                        Input["deg_reg"],
-                        'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-                        Input["N_grid"],
-                        f"{Input['cut_reg']}" + r" $\%$",
-                        f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
-                        f"[{Input['zone_line'][0]} .. {'max' if Input['zone_line'][1] is None else Input['zone_line'][1]}]",
-                        f"[{Input['percentiles'][0]}$\%$ .. {Input['percentiles'][1]}$\%$]" if Input['quantile'] else "none",
-                        f"[{Input['quant_up']} .. {Input['quant_low']}]" if Input['quantile'] else "none",
-                        f"{Input['perc_mean']}" + r" $\%$",
-                        Input["avrg_method"],
-                    ]
-                    columns_table.append(new_col)
-                    col_labels.append('Wind Sea')
+            data = np.array(columns_table)
+            data = data.T
 
-                if 'swell' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
-                    Input = INPUT["HSTP_swell"]
+            FIG = hc_plt.table(data,
+                               collabels=col_labels,
+                               rowlabels=row_labels,
+                               row_label_name='Parameters',
+                               figsize=figsize_halfpage,
+                               datatype='str',
+                               cell_height=cell_height_tables)
 
-                    new_col = [
-                        Input["deg_reg"],
-                        'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-                        Input["N_grid"],
-                        f"{Input['cut_reg']}" + r" $\%$",
-                        f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
-                        f"[{Input['zone_line'][0]} .. {'max' if Input['zone_line'][1] is None else Input['zone_line'][1]}]",
-                        f"[{Input['percentiles'][0]}$\%$ .. {Input['percentiles'][1]}$\%$]" if Input['quantile'] else "none",
-                        f"[{Input['quant_up']} .. {Input['quant_low']}]" if Input['quantile'] else "none",
-                        f"{Input['perc_mean']}" + r" $\%$",
-                        Input["avrg_method"],
-                    ]
-                    columns_table.append(new_col)
-                    col_labels.append('Swell Sea')
+            if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+                gl.save_figs_as_png([FIG], path_out + 'Report_table_HSTP', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-                if 'total' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
-                    Input = INPUT["HSTP_total"]
-
-                    new_col = [
-                        Input["deg_reg"],
-                        'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-                        Input["N_grid"],
-                        f"{Input['cut_reg']}" + r" $\%$",
-                        f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
-                        f"[{Input['zone_line'][0]} .. {'max' if Input['zone_line'][1] is None else Input['zone_line'][1]}]",
-                        f"[{Input['percentiles'][0]}$\%$ .. {Input['percentiles'][1]}$\%$]" if Input['quantile'] else "none",
-                        f"[{Input['quant_up']} .. {Input['quant_low']}]" if Input['quantile'] else "none",
-                        f"{Input['perc_mean']}" + r" $\%$",
-                        Input["avrg_method"],
-                    ]
-                    columns_table.append(new_col)
-                    col_labels.append('Total Sea')
-
-                if len(columns_table) > 0:
-                    data = np.array(columns_table)
-                    data = data.T
-
-                    FIG = hc_plt.table(data,
-                                       collabels=col_labels,
-                                       rowlabels=row_labels,
-                                       row_label_name='Parameters',
-                                       figsize=figsize_halfpage,
-                                       datatype='str',
-                                       cell_height=1)
-
-                    if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-                        gl.save_figs_as_png([FIG], path_out + 'Report_table_HSTP', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-                    if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-                        gl.save_figs_as_pdf([FIG], path_out + 'Report_table_HSTP', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+            if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+                gl.save_figs_as_pdf([FIG], path_out + 'Report_table_HSTP', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
         # %% Create Latex File
 
             # load templates
-            path_templates = os.path.abspath(INPUT_REPORT["General"]["path_latex_templates"])
-            template_files = [f for f in os.listdir(path_templates) if f.endswith('.txt')]
-            template_paths = [os.path.join(path_templates, f) for f in os.listdir(path_templates) if f.endswith('.txt')]
-            templates_names = [name.removesuffix('.txt') for name in template_files]
-
-            TEMPLATES = {}
-
-            for path, name in zip(template_paths, templates_names):
-                with open(path, 'r', encoding='utf-8') as file:
-                    TEMPLATES[name] = file.read()
-
-
 
             # Crete TEX content
             TEX = {}
@@ -3333,7 +3296,7 @@ def main():
 
             # include sensor ilustrations
             temp_list = []
-            for sensor_key in INPUT["Toggle_Modules"]["calc_SensorEval"]:
+            for sensor_key in INPUT["SensorEval"]["Sensors"]:
                 sensor_alias = COLNAMES_REPORT["Aliase"][sensor_key]
                 FIGURES.loc[f"SensorEval_{sensor_key}_page_1", "caption"] = f'Timeseries and Histogram of Sensor: {sensor_alias}'
                 temp = "\\subsubsection{Sensor: " + f"{sensor_alias}" + "} \n ?FIG" + "\n \\clearpage"
@@ -3342,20 +3305,51 @@ def main():
 
             sensor_illustration = '\n'.join([str for str in temp_list])
 
-            keyword = ltx.find_keyword(TEMPLATES[chapter], "?SENSORPAGES")
+            keyword = ltx.find_keyword(TEX[chapter], "?SENSORPAGES")
             TEX[chapter], _ = ltx.include_str(TEX[chapter], sensor_illustration, keyword[0], replace=True)
 
             # include directional information
             TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Roseplots_wind_page_1"])
             TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Roseplots_wind_sea_page_1"])
             TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Roseplots_swell_sea_page_1"])
-            TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Roseplots_wind_page_1"])
+            TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["angle_deviation_scatter_page_1"])
             TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Roseplots_currents_page_1"])
 
 
+            #Data correlation
+            chapter = "DataCorrelation"
+            TEX[chapter] = TEMPLATES[chapter]
+            TEX[chapter_main], _ = ltx.include_include(TEX[chapter_main], chapter)
+            TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Report_table_VMHS_page_1"])
+            TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Report_table_HSTP_page_1"])
 
-            # else:
-            #    print("   Sensors are not included in Report, please specify Sensors in 'Toggle_Modules' and enable ploting")
+            TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["VMHS_wind_page_3"])
+            TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["VMHS_swell_page_3"])
+            TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc["VMHS_wind_page_1"], FIGURES.loc["VMHS_wind_page_2"]])
+            TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc["VMHS_swell_page_1"], FIGURES.loc["VMHS_swell_page_2"]])
+
+            TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["VMTP_theory"])
+            TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["VMTP_wind_page_3"])
+
+            TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["table_vmhs_wind_page_1"])
+            TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["table_vmtp_wind_page_1"])
+            TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["table_vmhs_swell_page_1"])
+            TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["table_vmtp_swell_page_1"])
+
+            # validation
+            TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc[f"Valid_scatter_wind_{INPUT['Validation_wind']['scatter_configs'][0]}_page_3"])
+            TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc[f"Valid_scatter_swell_{INPUT['Validation_swell']['scatter_configs'][0]}_page_3"])
+
+            TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Valid_line_wind_page_3"])
+            TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Valid_line_swell_page_3"])
+
+            TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc["Valid_line_wind_page_1"], FIGURES.loc["Valid_line_wind_page_2"]])
+            TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc["Valid_line_swell_page_1"], FIGURES.loc["Valid_line_swell_page_2"]])
+
+            TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc[f"Valid_scatter_wind_{INPUT['Validation_wind']['scatter_configs'][0]}_page_1"],
+                                                               FIGURES.loc[f"Valid_scatter_wind_{INPUT['Validation_wind']['scatter_configs'][0]}_page_2"]])
+            TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc[f"Valid_scatter_swell_{INPUT['Validation_swell']['scatter_configs'][0]}_page_1"],
+                                                               FIGURES.loc[f"Valid_scatter_swell_{INPUT['Validation_swell']['scatter_configs'][0]}_page_2"]])
 
             # save TEX files
             for name, tex in TEX.items():
