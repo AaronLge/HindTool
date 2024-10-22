@@ -126,16 +126,22 @@
     \end{tabular}
 \end{table}
 
+\vspace*{1cm}
+
 \begin{centering}
-\vspace*{2cm}
-
-{\LARGE Your Title Here}
-
-\vspace{1.5cm}
-{\large Your Name}
-\vfill
-
-
-\vspace{0.8cm}
-
+\includegraphics[width=0.4\textwidth]{JBO_logo.jpg} \\% Replace with actual image path \\
 \end{centering}
+
+\hspace{3.6cm}
+\begin{minipage}{\textwidth}
+\vspace{2cm}
+
+\fontsize{14}{20}\selectfont \textbf{?Client} \\
+\fontsize{20}{25}\selectfont \textbf{?ProjectTitle} \\
+\\
+\fontsize{18}{25}\selectfont \textbf{?DocumentType} \\
+\textcolor{JBOGreen}{\fontsize{16}{14.4}\selectfont \textit{\textbf{?DocumentTitle}}}
+\end{minipage}
+
+
+

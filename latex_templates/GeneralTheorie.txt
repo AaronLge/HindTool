@@ -18,12 +18,12 @@ The following conventions for coordinate systems directionalities are defined:
 Unless stated otherwise, units are expressed using the SI convention. Sensor units are consistently described in this
 document. 
 
-\subsection[Relevant\ oceanographic\ design conditions]{Relevant oceanographic design conditions}
+\subsection{Relevant oceanographic design conditions}
 An overview of the requirements for the oceanographic conditions in the design of offshore substructures, according to
 the load case descriptions in [N1] and/or [N2] is provided below. It is distinguished between normal conditions and
 extreme conditions.
 
-\subsubsection[Normal\ oceanographic\ conditions]{Normal oceanographic conditions}
+\subsubsection{Normal oceanographic conditions}
 The below normal conditions are relevant:
 
 \begin{itemize}
@@ -49,7 +49,7 @@ The below extreme conditions are relevant:
 \item 3-hourly~significant~wave~height and associated period severe sea state conditions, for 50-year return period,
 evaluated for each wind speed bin
 \end{itemize}
-\subsection[Sea state and wave\ spectrum\ information]{Sea state and wave spectrum information}
+\subsection{Sea state and wave spectrum information}
 Derivations of sea state parameter for normal conditions can be performed for: 
 
 \begin{itemize}

@@ -928,7 +928,7 @@ def alias(input_data, original, alias):
         # Finally, replace placeholders with their actual values
         for placeholder, replacement_value in placeholder_map.items():
             if replacement_value is not None:
-                input_string = input_string.replace(placeholder, replacement_value)
+                input_string = input_string.replace(str(placeholder), str(replacement_value))
 
         return input_string
 

@@ -1,10 +1,10 @@
-\documentclass[a4paper,12pt]{book}
+\documentclass[a4paper,12pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{hyperref}
 \usepackage{array}
 \usepackage{lastpage}
 \usepackage{lipsum}
-\usepackage{multirow}        % Needed for multirow support
+\usepackage{multirow}  
 \usepackage{fancyhdr}
 \usepackage[hmargin=2cm,top=4cm,headheight=65pt,footskip=65pt]{geometry}
 \usepackage{xcolor, colortbl}
@@ -137,7 +137,7 @@
 \thispagestyle{fancy}
 
 \fancypagestyle{titlepage}{
-    \fancyhf{} % Clear existing header/footer
+    \fancyhf{} 
     \fancyfoot[C]{
         \begin{tabular}{m{5cm} m{6cm} m{1.5cm} m{1.5cm} m{0.8cm} }
         \textcolor{JBOGreen}{\fontsize{10}{15}\selectfont \textbf{JBO Rev.}} &
@@ -156,7 +156,6 @@
 
         \end{tabular}
     }
- % Center footer
 }
 
 \begin{document}

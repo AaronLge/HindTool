@@ -7,7 +7,7 @@ Meta information of the time series data sets considered in this document are sp
 
 
 \subsection{Data resampling} 
-The ?DataBasis_resampling  timestep of ?DataBasis_resampling_timestep is chosen to be the timestep for all calculation. Deviating timesteps must be sampled down to be combined with the wave data. For this, the mean of all measurements corresponding to one timestep of wave data is used. In the table below the sampling rates and the resulting numbers of samples are listed.
+The timestep of ?CombinedTimestep is chosen to be the timestep for all calculation. Deviating timesteps must be sampled down to be combined with the wave data. For this, the mean of all measurements corresponding to one timestep of wave data is used. In the table below the sampling rates and the resulting numbers of samples are listed.
 
 ?TABLE
 

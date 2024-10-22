@@ -294,7 +294,7 @@ def main():
         print("calculating VMHS Wind Sea example plot...")
 
         Input = INPUT["VMHS_docu"]
-        table_name = 'Hindcast_combined'
+        table_name = 'Hind_combined'
         column_names = [COLNAMES["dir_v_m"], COLNAMES["v_m"], COLNAMES["H_s_wind"]]
 
         Calc = hc_calc.Calculation()
@@ -343,7 +343,7 @@ def main():
         print("calculating VMHS Swell Sea...")
 
         Input = INPUT["VMHS_swell"]
-        table_name = 'Hindcast_combined'
+        table_name = 'Hind_combined'
         column_names = [COLNAMES["dir_T_mean_Swell"], COLNAMES["v_m"], COLNAMES["H_s_swell"]]
 
         Calc = hc_calc.Calculation()
@@ -389,7 +389,7 @@ def main():
         print("calculating VMHS Total Sea...")
 
         Input = INPUT["VMHS_total"]
-        table_name = 'Hindcast_combined'
+        table_name = 'Hind_combined'
         column_names = [COLNAMES["dir_T_mean"], COLNAMES["v_m"], COLNAMES["H_s"]]
 
         Calc = hc_calc.Calculation()
@@ -436,7 +436,7 @@ def main():
         print("calculating HSTP Wind Sea...")
 
         Input = INPUT["HSTP_wind"]
-        table_name = 'Hindcast_combined'
+        table_name = 'Hind_combined'
         column_names = [COLNAMES["H_s_wind"], COLNAMES["T_p_wind"], COLNAMES["dir_v_m"]]
 
         Calc = hc_calc.Calculation()
@@ -487,7 +487,7 @@ def main():
         print("calculating HSTP Swell Sea...")
 
         Input = INPUT["HSTP_swell"]
-        table_name = 'Hindcast_combined'
+        table_name = 'Hind_combined'
         column_names = [COLNAMES["H_s_swell"], COLNAMES["T_p_swell"], COLNAMES["dir_T_mean_Swell"]]
 
         Calc = hc_calc.Calculation()
@@ -537,7 +537,7 @@ def main():
         print("calculating HSTP total Sea...")
 
         Input = INPUT["HSTP_total"]
-        table_name = 'Hindcast_combined'
+        table_name = 'Hind_combined'
         column_names = [COLNAMES["H_s"], COLNAMES["T_p"], COLNAMES["dir_T_mean"]]
 
         Calc = hc_calc.Calculation()
@@ -586,7 +586,7 @@ def main():
             or ('wind' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
         print("calculating VMTP Wind Sea...")
 
-        table_name = 'Hindcast_combined'
+        table_name = 'Hind_combined'
         column_names = [COLNAMES["T_p_wind"], COLNAMES["v_m"], COLNAMES["dir_v_m"]]
 
         Calc = hc_calc.Calculation()
@@ -601,7 +601,7 @@ def main():
             or ('swell' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
         print("calculating VMTP Swell Sea...")
 
-        table_name = 'Hindcast_combined'
+        table_name = 'Hind_combined'
         column_names = [COLNAMES["T_p_swell"], COLNAMES["v_m"], COLNAMES["dir_T_mean_Swell"]]
 
         Calc = hc_calc.Calculation()
@@ -616,7 +616,7 @@ def main():
             or ('total' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
         print("calculating VMTP total Sea...")
 
-        table_name = 'Hindcast_combined'
+        table_name = 'Hind_combined'
         column_names = [COLNAMES["T_p"], COLNAMES["v_m"], COLNAMES["dir_T_mean"]]
 
         Calc = hc_calc.Calculation()
@@ -711,7 +711,7 @@ def main():
     if 'wind' in INPUT["Toggle_Modules"].get("calc_RWI", {}):
         print("calculating RWI Wind Sea...")
 
-        table_name = 'Hindcast_combined'
+        table_name = 'Hind_combined'
         column_names = [COLNAMES["H_s_wind"], COLNAMES["T_p_wind"], COLNAMES["dir_v_m"]]
 
         Calc = hc_calc.Calculation()
@@ -740,7 +740,7 @@ def main():
     if 'total' in INPUT["Toggle_Modules"].get("calc_RWI", {}):
         print("calculating RWI total Sea...")
 
-        table_name = 'Hindcast_combined'
+        table_name = 'Hind_combined'
         column_names = [COLNAMES["H_s"], COLNAMES["T_p"], COLNAMES["dir_v_m"]]
 
         Calc = hc_calc.Calculation()
@@ -771,7 +771,7 @@ def main():
         print("calculating WaveBreakSteep Wind Sea...")
 
         Input = INPUT["Structure"]
-        table_name = 'Hindcast_combined'
+        table_name = 'Hind_combined'
         column_names = [COLNAMES["dir_v_m"], COLNAMES["H_s_wind"], COLNAMES["T_p_wind"]]
 
         Calc = hc_calc.Calculation()
@@ -803,7 +803,7 @@ def main():
         print("calculating WaveBreakSteep total Sea...")
 
         Input = INPUT["Structure"]
-        table_name = 'Hindcast_combined'
+        table_name = 'Hind_combined'
         column_names = [COLNAMES["dir_v_m"], COLNAMES["H_s"], COLNAMES["T_p"]]
 
         Calc = hc_calc.Calculation()
@@ -836,7 +836,7 @@ def main():
         print("calculating Angle Deviation...")
 
         Input = INPUT["AngleDeviation"]
-        table_name = 'Hindcast_combined'
+        table_name = 'Hind_combined'
         column_names = [COLNAMES[INPUT["Toggle_Modules"]["calc_AngleDeviation"][0]],
                         COLNAMES[INPUT["Toggle_Modules"]["calc_AngleDeviation"][1]],
                         COLNAMES[INPUT["Toggle_Modules"]["calc_AngleDeviation"][2]]]
@@ -879,12 +879,21 @@ def main():
         DATA_OUT["AngleDeviation"] = Calc
 
     # Roseplot
-    if len(INPUT["Toggle_Modules"].get("calc_Roseplots", {})) > 0:
+    if INPUT["Toggle_Modules"].get("calc_Roseplots", {}):
         print("calculating Roseplots...")
         DATA_OUT["Roseplot"] = {}
-        for Roseplot_cols in INPUT["Toggle_Modules"]["calc_Roseplots"]:
-            table_name = 'Hindcast_combined'
-            column_names = [COLNAMES[col] for col in Roseplot_cols]
+
+
+        Roseplot_cols = []
+        Roseplots_names = []
+
+        for col in INPUT["Roseplots"].keys():
+            Roseplot_cols.extend(INPUT["Roseplots"][col])
+            Roseplots_names.append(col)
+
+        for Roseplot_col, Roseplots_name in zip(Roseplot_cols, Roseplots_names):
+            table_name = 'Hind_combined'
+            column_names = [COLNAMES[col] for col in Roseplot_col]
 
             Calc = hc_calc.Calculation()
             df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
@@ -897,7 +906,13 @@ def main():
 
             Calc.result = {"table": temp, "r_bins": bins, "r_max": np.max(df[column_names[1]])}
 
-            DATA_OUT["Roseplot"][f"{Roseplot_cols[0]} over {Roseplot_cols[1]}"] = Calc
+            Calc.name = Roseplots_name
+            if Roseplot_col in INPUT["Roseplots"]["currents"]:
+                Calc.tiling = 'multi'
+            else:
+                Calc.tiling = 'single'
+
+            DATA_OUT["Roseplot"][f"{Roseplot_col[0]} over {Roseplot_col[1]}"] = Calc
 
     # Extreme Values
     if len(INPUT["Toggle_Modules"].get("calc_ExtremeValues", {})) > 0:
@@ -906,7 +921,7 @@ def main():
         DATA_OUT["ExtremeValues"] = {}
         Input = INPUT["ExtremeValues"]
         for cols in INPUT["Toggle_Modules"]["calc_ExtremeValues"]:
-            table_name = 'Hindcast_combined'
+            table_name = 'Hind_combined'
             column_names = [COLNAMES[col] for col in cols]
 
             Calc = hc_calc.Calculation()
@@ -947,7 +962,7 @@ def main():
         print("calculating Extreme Conture Plots...")
         DATA_OUT["ExtremeConturePlots"] = {}
         for cols in INPUT["Toggle_Modules"]["calc_ExtremeConture"]:
-            table_name = 'Hindcast_combined'
+            table_name = 'Hind_combined'
             column_names = [COLNAMES[col] for col in cols]
 
             Calc = hc_calc.Calculation()
@@ -977,7 +992,7 @@ def main():
         print("calculating Validation wind...")
 
         Input = INPUT["Validation_wind"]
-        table_name = 'Hindcast_combined'
+        table_name = 'Hind_combined'
         column_names = [COLNAMES["H_s_wind"], COLNAMES["T_p_wind"], COLNAMES["dir_v_m"], COLNAMES["v_m"]]
 
         Calc = hc_calc.Calculation()
@@ -1039,7 +1054,7 @@ def main():
         print("calculating Validation swell...")
 
         Input = INPUT["Validation_swell"]
-        table_name = 'Hindcast_combined'
+        table_name = 'Hind_combined'
         column_names = [COLNAMES["H_s_swell"], COLNAMES["T_p_swell"], COLNAMES["dir_T_mean_Swell"], COLNAMES["v_m"]]
 
         Calc = hc_calc.Calculation()
@@ -1136,7 +1151,7 @@ def main():
         print("calculating Weibull fit...")
 
         for colnames in INPUT["Toggle_Modules"]["calc_Weibull"]:
-            table_name = 'Hindcast_combined'
+            table_name = 'Hind_combined'
             column_names = [COLNAMES[colnames[0]], COLNAMES[colnames[1]]]
 
             Calc = hc_calc.Calculation()
@@ -2241,10 +2256,12 @@ def main():
                 gl.save_figs_as_pdf(FIG_scatter, path_out + 'angle_deviation_scatter', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
                 gl.save_figs_as_pdf(FIG_Tables, path_out + 'angle_deviation_table', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-    if INPUT["Toggle_Modules"].get("plot_Roseplots", {}) and len(INPUT["Toggle_Modules"].get("calc_Roseplots", {})) > 0:
+    if INPUT["Toggle_Modules"].get("plot_Roseplots", {}) and INPUT["Toggle_Modules"].get("calc_Roseplots", {}):
         print("plotting Roseplots...")
         i = 0
-        Tiles = []
+        Tiles_single = []
+        Tiles_multi  = []
+
         for Roseplot_name, Calc in DATA_OUT["Roseplot"].items():
             titel = f'Roseplot {Calc.basedata["colnames_ini"][1]} over' + "\n" + f'{Calc.basedata["colnames_ini"][0]}'
 
@@ -2266,17 +2283,32 @@ def main():
 
             Tile.add_RoseBar(temp)
 
-            Tiles.append(Tile)
+            if Calc.tiling == 'single':
+                Tile.name = Calc.name
+                Tiles_single.append(Tile)
+
+            if Calc.tiling == 'multi':
+                Tile.name = Calc.name
+                Tiles_multi.append(Tile)
 
             i = i + 1
 
-        FIG = hc_plt.plot_tiled(Tiles, figsize=figsize_fullpage)
+        for Tile_single in Tiles_single:
+            FIG = hc_plt.plot_tiled([Tile_single], figsize=figsize_halfpage, grid=[1, 1])
+
+            if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+                gl.save_figs_as_png(FIG, path_out + f'Roseplots_{Tile_single.name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+            if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+                gl.save_figs_as_pdf(FIG, path_out + f'Roseplots_{Tile_single.name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+        FIG_multi = hc_plt.plot_tiled(Tiles_multi, figsize=figsize_fullpage)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_png(FIG, path_out + 'Roseplots', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+            gl.save_figs_as_png(FIG_multi, path_out + f'Roseplots_currents', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
         if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_pdf(FIG, path_out + 'Roseplots', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+            gl.save_figs_as_pdf(FIG_multi, path_out + f'Roseplots_currents', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
     if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and len(INPUT["Toggle_Modules"].get("calc_ExtremeValues", {})) > 0:
         print("plotting ExtremeValues...")
@@ -2621,7 +2653,7 @@ def main():
                     Meta = Seg.result["meta"]
 
                     df_data = gl.export_df_from_sql(Calc.basedata["dbname"],
-                                                    "Hindcast_combined",
+                                                    "Hind_combined",
                                                     column_names=[Seg.colnames["Hindcast"]["H_s"], Seg.colnames["Hindcast"]["T_p"]],
                                                     indizes=Seg.indizes)
 
@@ -2797,7 +2829,7 @@ def main():
                     Meta = Seg.result["meta"]
 
                     df_data = gl.export_df_from_sql(Calc.basedata["dbname"],
-                                                    "Hindcast_combined",
+                                                    "Hind_combined",
                                                     column_names=[Seg.colnames["Hindcast"]["H_s"], Seg.colnames["Hindcast"]["T_p"]],
                                                     indizes=Seg.indizes)
 
@@ -2980,14 +3012,34 @@ def main():
         COLNAMES_REPORT["Aliase"] = [INPUT["Aliase"][key] if key in INPUT["Aliase"] else float('nan') for key in COLNAMES_REPORT.index]
         COLNAMES_REPORT["Units"] = [INPUT_REPORT["Units"][key] if key in INPUT_REPORT["Units"] else float('nan') for key in COLNAMES_REPORT.index]
 
-        # plot databases
-        if INPUT["Toggle_Modules"].get("plot_report_tables", {}):
+        # load figures
+        if INPUT_REPORT["General"]["fig_path"] is not None:
+            path_figs = os.path.abspath(INPUT_REPORT["General"]["fig_path"])
+        else:
+            path_figs = os.path.abspath(path_out)
+
+        png_files = [f for f in os.listdir(path_figs) if f.endswith('.png')]
+        png_paths = [os.path.join(path_figs, f) for f in os.listdir(path_figs) if f.endswith('.png')]
+        png_names = [name.removesuffix('.png') for name in png_files]
+        png_width = [figsize_fullpage[0] for i in range(len(png_names))]
+
+        png_paths = [string.replace("\\", "/") for string in png_paths]
+
+        FIGURES = pd.DataFrame(columns=["filename", "path", "caption", "width"])
+        FIGURES["filename"] = png_files
+        FIGURES["width"] = png_width
+        FIGURES["path"] = png_paths
+        FIGURES["caption"] = png_names
+        FIGURES.index = png_names
+
+
+        if INPUT["DataBase"].get("create_report", {}):
 
             # plot databases
             Meta_data = gl.export_df_from_sql(db_path, 'Hind_MetaData')
 
             DATABASE = pd.DataFrame(columns=["used", "png_name"], index=Meta_data.index)
-
+            DATABASE.loc[:,"used"] = False
             for dataset_name, dataset_contents in Meta_data.iterrows():
                 meta_para = []
                 meta_value = []
@@ -2998,13 +3050,12 @@ def main():
                         meta_para.append(dataset_para)
                         meta_value.append(dataset_value)
 
-                # plot Plot_names
                 data = np.array([meta_para, meta_value])
                 data = data.T
                 col_labels = ["Parameter", "Value"]
                 FIG = hc_plt.table(data,
                                    collabels=col_labels,
-                                   cell_height=1,
+                                   cell_height=0.7,
                                    figsize=figsize_fullpage,
                                    datatype='str')
 
@@ -3020,13 +3071,13 @@ def main():
             datasorce_cols = gl.export_colnames_from_db(db_path)
             datasorce_keys_raw = [col for col in datasorce_cols.keys() if "Hind_raw" in col]
 
-            used_datasorces = []
             for sensor_key, sensor_name in COLNAMES_REPORT["Sensor_names"].items():
                 for datasorce_key_raw in datasorce_keys_raw:
+                    datasorce_key_clean = datasorce_key_raw.replace('Hind_raw_', '')
                     if sensor_name in datasorce_cols[datasorce_key_raw]:
-                        datasorce_key_clean = datasorce_key_raw.replace('Hind_raw_', '')
                         DATABASE.loc[datasorce_key_clean, "used"] = True
                         COLNAMES_REPORT.loc[sensor_key, "DataSorce"] = datasorce_key_clean
+
 
             # plot sensor names
             data = np.array([COLNAMES_REPORT["Symbols"], COLNAMES_REPORT["Sensor_names"], COLNAMES_REPORT["DataSorce"]])
@@ -3075,56 +3126,36 @@ def main():
                               'Applied percentile for condensation',
                               'Averageing method']
 
-                if 'wind' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
+                Input = INPUT["VMHS_wind"]
 
-                    Input = INPUT["VMHS_wind"]
+                new_col = [
+                    Input["deg_reg"],
+                    'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+                    Input["N_grid"],
+                    f"{Input['cut_reg']}" + r" \%",
+                    f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
+                    f"[{Input['zone_line'][0]} .. {'max' if Input['zone_line'][1] is None else Input['zone_line'][1]}]",
+                    f"{Input['perc_mean']}" + r" \%",
+                    Input["avrg_method"],
+                           ]
+                columns_table.append(new_col)
+                col_labels.append('Wind Sea')
 
-                    new_col = [
-                        Input["deg_reg"],
-                        'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-                        Input["N_grid"],
-                        f"{Input['cut_reg']}" + r" \%",
-                        f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
-                        f"[{Input['zone_line'][0]} .. {'max' if Input['zone_line'][1] is None else Input['zone_line'][1]}]",
-                        f"{Input['perc_mean']}" + r" \%",
-                        Input["avrg_method"],
-                               ]
-                    columns_table.append(new_col)
-                    col_labels.append('Wind Sea')
+                Input = INPUT["VMHS_swell"]
 
-                if 'swell' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
+                new_col = [
+                    Input["deg_reg"],
+                    'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+                    Input["N_grid"],
+                    f"{Input['cut_reg']}" + r" \%",
+                    f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
+                    f"[{Input['zone_line'][0]} .. {'max' if Input['zone_line'][1] is None else Input['zone_line'][1]}]",
+                    f"{Input['perc_mean']}" + r" \%",
+                    Input["avrg_method"],
+                           ]
+                columns_table.append(new_col)
+                col_labels.append('Swell Sea')
 
-                    Input = INPUT["VMHS_swell"]
-
-                    new_col = [
-                        Input["deg_reg"],
-                        'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-                        Input["N_grid"],
-                        f"{Input['cut_reg']}" + r" \%",
-                        f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
-                        f"[{Input['zone_line'][0]} .. {'max' if Input['zone_line'][1] is None else Input['zone_line'][1]}]",
-                        f"{Input['perc_mean']}" + r" \%",
-                        Input["avrg_method"],
-                               ]
-                    columns_table.append(new_col)
-                    col_labels.append('Swell Sea')
-
-                if 'total' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
-
-                    Input = INPUT["VMHS_total"]
-
-                    new_col = [
-                        Input["deg_reg"],
-                        'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-                        Input["N_grid"],
-                        f"{Input['cut_reg']}" + r" %",
-                        f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]",
-                        f"[{Input['zone_line'][0]} .. {'max' if Input['zone_line'][1] is None else Input['zone_line'][1]}]",
-                        f"{Input['perc_mean']}" + r" %",
-                        Input["avrg_method"],
-                               ]
-                    columns_table.append(new_col)
-                    col_labels.append('Total Sea')
 
                 if len(columns_table) > 0:
                     data = np.array(columns_table)
@@ -3235,7 +3266,6 @@ def main():
                         gl.save_figs_as_pdf([FIG], path_out + 'Report_table_HSTP', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
         # %% Create Latex File
-        if INPUT["DataBase"].get("create_report", {}):
 
             # load templates
             path_templates = os.path.abspath(INPUT_REPORT["General"]["path_latex_templates"])
@@ -3249,25 +3279,7 @@ def main():
                 with open(path, 'r', encoding='utf-8') as file:
                     TEMPLATES[name] = file.read()
 
-            # load figures
-            if INPUT_REPORT["General"]["fig_path"] is not None:
-                path_figs = os.path.abspath(INPUT_REPORT["General"]["fig_path"])
-            else:
-                path_figs = os.path.abspath(path_out)
 
-            png_files = [f for f in os.listdir(path_figs) if f.endswith('.png')]
-            png_paths = [os.path.join(path_figs, f) for f in os.listdir(path_figs) if f.endswith('.png')]
-            png_names = [name.removesuffix('.png') for name in png_files]
-            png_width = [figsize_fullpage[0] for i in range(len(png_names))]
-
-            png_paths = [string.replace("\\", "/") for string in png_paths]
-
-            FIGURES = pd.DataFrame(columns=["filename", "path", "caption", "width"])
-            FIGURES["filename"] = png_files
-            FIGURES["width"] = png_width
-            FIGURES["path"] = png_paths
-            FIGURES["caption"] = png_names
-            FIGURES.index = png_names
 
             # Crete TEX content
             TEX = {}
@@ -3288,44 +3300,62 @@ def main():
             TEX[chapter] = ltx.insertLatexVars(TEMPLATES[chapter], INPUT_REPORT["introduction"])
             TEX[chapter_main], last_idx = ltx.include_include(TEX[chapter_main], 'introduction', line=last_idx+1)
 
-            #Sensors
-            if INPUT["Toggle_Modules"].get("plot_SensorEval", {}) and INPUT["Toggle_Modules"].get("plot_SensorEval", {}):
-                print("   including Sensor sheets")
-                chapter = "SensorAnalysis"
-                TEX[chapter_main], _ = ltx.include_include(TEX[chapter_main], chapter)
-
-                # include table
-                TEX[chapter] = ltx.include_TableFig(TEMPLATES[chapter], FIGURES.loc["Sensor_names_page_1"])
-
-                # include sensor ilustrations
-                temp_list = []
-                for sensor_key in INPUT["Toggle_Modules"]["calc_SensorEval"]:
-                    
-                    sensor_alias = COLNAMES_REPORT["Aliase"][sensor_key]
-                    FIGURES.loc[f"SensorEval_{sensor_key}_page_1", "caption"] = f'Timeseries and Histogram of Sensor: {sensor_alias}'
-                    temp = "\\subsubsection{Sensor: " + f"{sensor_alias}" + "} \n ?FIG" + "\n \\clearpage"
-                    temp = ltx.include_Fig(temp, FIGURES.loc[f"SensorEval_{sensor_key}_page_1"])
-                    temp_list.append(temp)
-
-                sensor_illustration = '\n'.join([str for str in temp_list])
-                TEX[chapter] = '\n'.join([TEX[chapter], sensor_illustration])
-            else:
-                print("   Sensors are not included in Report, please specify Sensors in 'Toggle_Modules' and enable ploting")
-
             # Data Basis
-            TEX[chapter_main], last_idx = ltx.include_include(TEX[chapter_main], 'DataBasis', line=last_idx + 1)
-            TEX["DataBasis"] = TEMPLATES["DataBasis"]
-            # replace ?DATABASIS with appropiate number of tables
+            chapter = 'DataBasis'
+            TEX[chapter_main], last_idx = ltx.include_include(TEX[chapter_main], chapter, line=last_idx + 1)
 
+            TEX[chapter] = TEMPLATES[chapter]
+            TEX[chapter] = ltx.insertLatexVars(TEMPLATES[chapter], {"CombinedTimestep": f"{Meta_data.loc['Combined', 'Time Step']} s"})
+            # replace ?DATABASIS with appropiate number of tables
             keyword = ltx.find_keyword(TEMPLATES["DataBasis"], "?DATABASIS")
             Database_dummys = ["?TABLE" for _ in range(len(np.where(DATABASE["used"])[0]))]
             Database_dummys = " \n".join(Database_dummys)
-            TEX["DataBasis"], _ = ltx.include_str(TEX["DataBasis"], Database_dummys, keyword[0], replace=True)
+            TEX[chapter], _ = ltx.include_str(TEX[chapter], Database_dummys, keyword[0], replace=True)
 
+            # include Databasis Tables of used Databasis
             for index, row in DATABASE.iterrows():
                 if row["used"]:
                     key_fig = [index for index in FIGURES.index if FIGURES.loc[index, "filename"] == row["png_name"]][0]
                     TEX["DataBasis"] = ltx.include_TableFig(TEX["DataBasis"], FIGURES.loc[key_fig])
+
+            # General Theorie and Definitions
+            chapter = 'GeneralTheorie'
+            TEX[chapter_main], last_idx = ltx.include_include(TEX[chapter_main], chapter, line=last_idx + 1)
+
+            # Sensors
+            #if INPUT["Toggle_Modules"].get("plot_SensorEval", {}) and INPUT["Toggle_Modules"].get("plot_SensorEval", {}):
+            print("   including Sensor sheets")
+            chapter = "SensorAnalysis"
+            TEX[chapter_main], _ = ltx.include_include(TEX[chapter_main], chapter)
+
+            # include table
+            TEX[chapter] = ltx.include_TableFig(TEMPLATES[chapter], FIGURES.loc["Sensor_names_page_1"])
+
+            # include sensor ilustrations
+            temp_list = []
+            for sensor_key in INPUT["Toggle_Modules"]["calc_SensorEval"]:
+                sensor_alias = COLNAMES_REPORT["Aliase"][sensor_key]
+                FIGURES.loc[f"SensorEval_{sensor_key}_page_1", "caption"] = f'Timeseries and Histogram of Sensor: {sensor_alias}'
+                temp = "\\subsubsection{Sensor: " + f"{sensor_alias}" + "} \n ?FIG" + "\n \\clearpage"
+                temp = ltx.include_Fig(temp, FIGURES.loc[f"SensorEval_{sensor_key}_page_1"])
+                temp_list.append(temp)
+
+            sensor_illustration = '\n'.join([str for str in temp_list])
+
+            keyword = ltx.find_keyword(TEMPLATES[chapter], "?SENSORPAGES")
+            TEX[chapter], _ = ltx.include_str(TEX[chapter], sensor_illustration, keyword[0], replace=True)
+
+            # include directional information
+            TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Roseplots_wind_page_1"])
+            TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Roseplots_wind_sea_page_1"])
+            TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Roseplots_swell_sea_page_1"])
+            TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Roseplots_wind_page_1"])
+            TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Roseplots_currents_page_1"])
+
+
+
+            # else:
+            #    print("   Sensors are not included in Report, please specify Sensors in 'Toggle_Modules' and enable ploting")
 
             # save TEX files
             for name, tex in TEX.items():
