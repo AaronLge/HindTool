@@ -1,0 +1,17 @@
+\section{Data Basis}
+\subsection{Data set overview}
+
+Meta information of the time series data sets considered in this document are specified below in detail. A quality assurance including potential resampling or correction has been conducted. Analysed sensors in the data sets are tabulated in REFERENZ.
+
+?DATABASIS
+
+
+\subsection{Data resampling} 
+The ?DataBasis_resampling  timestep of ?DataBasis_resampling_timestep is chosen to be the timestep for all calculation. Deviating timesteps must be sampled down to be combined with the wave data. For this, the mean of all measurements corresponding to one timestep of wave data is used. In the table below the sampling rates and the resulting numbers of samples are listed.
+
+?TABLE
+
+\subsection{Filtering routines}
+If the separated wind sea component is used extra filtering is necessary. Because of the separation process of wind sea and swell, some components can be zero if there is no separable wind sea component. In this case, the wave period is zero as well, which leads to distortions in the regression curves. Also, the wave direction can’t be determined anymore and is set to 0°, which also distorts the angle misalignment evaluations. For this reason, these sea states are excluded. 
+
+?TABLE

@@ -748,7 +748,7 @@ def plot_rosebar(radial_data, r_bins, angles, r_max=None, plot=None, figsize=Non
     return fig, axis
 
 
-def table(data, **kwargs):
+def table(data,  **kwargs):
     """The table function creates a table with the JBO-Design
 
     Parameters:
@@ -782,9 +782,10 @@ def table(data, **kwargs):
     null = kwargs.get('null', '0')
     heatmap = kwargs.get('heatmap', False)
     cmap_heatmap = kwargs.get('cmap_heatmap', 'Blues')
-    figsize = kwargs.get('figsize', (8.268, 11.693))
+    figsize = kwargs.get('figsize', [8.268, 11.693])
     datatype = kwargs.get('datatype', None)
-
+    cell_height = kwargs.get('cell_height', None)
+    cell_width = kwargs.get('cell_width', None)
 
     try:
         max_data = np.max(data)
@@ -839,6 +840,31 @@ def table(data, **kwargs):
         if row_labels is not None:
             CELLS = np.hstack((row_labels, CELLS))
 
+    if cell_height is not None:
+        if type(cell_height) is float or type(cell_height) is int:
+            figsize[1] = np.size(CELLS, axis=0) * cell_height*0.39370079
+            cell_height_res = [cell_height for _ in CELLS]
+            cell_height_res = [cell / sum(cell_height_res) for cell in cell_height_res]
+
+        if type(cell_height) is list:
+            figsize[1] = sum(cell_height)*0.39370079
+            cell_height_res = cell_height
+            cell_height_res = [cell / sum(cell_height_res) for cell in cell_height_res]
+
+
+    if cell_width is not None:
+        if type(cell_width) is float or type(cell_width) is int:
+            figsize[0] = np.size(CELLS, axis=1) * cell_width*0.39370079
+
+            cell_width_res = [cell_height for _ in CELLS]
+            cell_width_res = [cell/sum(cell_width_res) for cell in cell_width_res]
+
+        if type(cell_width) is list:
+            figsize[0] = sum(cell_width)*0.39370079
+            cell_width_res = cell_width
+            cell_width_res = [cell/sum(cell_width_res) for cell in cell_width_res]
+
+
     # A4 size in inches (landscape)
     fig, ax = plt.subplots(figsize=figsize)
     ax.set_axis_off()
@@ -848,7 +874,18 @@ def table(data, **kwargs):
 
     table.set_fontsize(fontsize)
 
-    table.auto_set_column_width(col=0)
+    if cell_height is not None:
+        for i in range(CELLS.shape[0]):
+            for j in range(CELLS.shape[1]):
+                table[(i, j)].set_height(float(cell_height_res[i]))  # i+1 to skip column header row
+
+    # Iterate over the columns and set cell widths
+    if cell_width is not None:
+        for i in range(CELLS.shape[0]):
+            for j in range(CELLS.shape[1]): # +1 to include the header row
+                table[(i, j)].set_width(float(cell_width_res[j]))
+    else:
+        table.auto_set_column_width(col=0)
 
     def is_convertible_to_float(value):
         try:

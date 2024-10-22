@@ -13,6 +13,8 @@
 \usepackage{lastpage}
 \usepackage{fontspec}
 \setmainfont{Arial}
+\usepackage{caption}
+\usepackage{float}
 % Set up margins
 
 \renewcommand{\headrulewidth}{0pt}

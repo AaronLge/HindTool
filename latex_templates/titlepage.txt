@@ -126,16 +126,16 @@
     \end{tabular}
 \end{table}
 
-\centering
+\begin{centering}
 \vspace*{2cm}
 
 {\LARGE Your Title Here}
 
 \vspace{1.5cm}
 {\large Your Name}
-
 \vfill
 
 
 \vspace{0.8cm}
 
+\end{centering}

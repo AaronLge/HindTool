@@ -2978,17 +2978,23 @@ def main():
         COLNAMES_REPORT["Symbols"] = INPUT_REPORT["Symbols"].values()
         COLNAMES_REPORT["Sensor_names"] = [COLNAMES[key] if key in COLNAMES else float('nan') for key in list(COLNAMES_REPORT.index)]
         COLNAMES_REPORT["Aliase"] = [INPUT["Aliase"][key] if key in INPUT["Aliase"] else float('nan') for key in COLNAMES_REPORT.index]
+        COLNAMES_REPORT["Units"] = [INPUT_REPORT["Units"][key] if key in INPUT_REPORT["Units"] else float('nan') for key in COLNAMES_REPORT.index]
 
+        # plot databases
         if INPUT["Toggle_Modules"].get("plot_report_tables", {}):
 
             # plot databases
             Meta_data = gl.export_df_from_sql(db_path, 'Hind_MetaData')
 
+            DATABASE = pd.DataFrame(columns=["used", "png_name"], index=Meta_data.index)
+
             for dataset_name, dataset_contents in Meta_data.iterrows():
                 meta_para = []
                 meta_value = []
+
                 for dataset_para, dataset_value in dataset_contents.items():
                     if dataset_value is not None:
+
                         meta_para.append(dataset_para)
                         meta_value.append(dataset_value)
 
@@ -2998,8 +3004,11 @@ def main():
                 col_labels = ["Parameter", "Value"]
                 FIG = hc_plt.table(data,
                                    collabels=col_labels,
+                                   cell_height=1,
                                    figsize=figsize_fullpage,
                                    datatype='str')
+
+                DATABASE.loc[dataset_name, "png_name"] = f'DataSorce_{dataset_name}_page_1.png'
 
                 if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
                     gl.save_figs_as_png([FIG], path_out + f'DataSorce_{dataset_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3011,10 +3020,12 @@ def main():
             datasorce_cols = gl.export_colnames_from_db(db_path)
             datasorce_keys_raw = [col for col in datasorce_cols.keys() if "Hind_raw" in col]
 
+            used_datasorces = []
             for sensor_key, sensor_name in COLNAMES_REPORT["Sensor_names"].items():
                 for datasorce_key_raw in datasorce_keys_raw:
                     if sensor_name in datasorce_cols[datasorce_key_raw]:
-                        datasorce_key_clean = datasorce_key_raw.replace('Hind_raw_', '').replace('.csv', '')
+                        datasorce_key_clean = datasorce_key_raw.replace('Hind_raw_', '')
+                        DATABASE.loc[datasorce_key_clean, "used"] = True
                         COLNAMES_REPORT.loc[sensor_key, "DataSorce"] = datasorce_key_clean
 
             # plot sensor names
@@ -3024,6 +3035,7 @@ def main():
             FIG = hc_plt.table(data,
                                collabels=col_labels,
                                figsize=figsize_fullpage,
+                               cell_height=1,
                                datatype='str')
 
             if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
@@ -3039,6 +3051,7 @@ def main():
             FIG = hc_plt.table(data,
                                collabels=col_labels,
                                figsize=figsize_fullpage,
+                               cell_height=1,
                                datatype='str')
 
             if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
@@ -3117,7 +3130,12 @@ def main():
                     data = np.array(columns_table)
                     data = data.T
 
-                    FIG = hc_plt.table(data, collabels=col_labels, rowlabels=row_labels, row_label_name='Parameters', figsize=figsize_halfpage)
+                    FIG = hc_plt.table(data,
+                                       collabels=col_labels,
+                                       rowlabels=row_labels,
+                                       row_label_name='Parameters',
+                                       figsize=figsize_halfpage,
+                                       cell_height=1)
 
                     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
                         gl.save_figs_as_png([FIG], path_out + 'Report_table_VMHS', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3207,7 +3225,8 @@ def main():
                                        rowlabels=row_labels,
                                        row_label_name='Parameters',
                                        figsize=figsize_halfpage,
-                                       datatype='str')
+                                       datatype='str',
+                                       cell_height=1)
 
                     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
                         gl.save_figs_as_png([FIG], path_out + 'Report_table_HSTP', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3218,64 +3237,97 @@ def main():
         # %% Create Latex File
         if INPUT["DataBase"].get("create_report", {}):
 
-            FIGURES = pd.DataFrame(columns=["filename", "path", "caption" ])
+            # load templates
+            path_templates = os.path.abspath(INPUT_REPORT["General"]["path_latex_templates"])
+            template_files = [f for f in os.listdir(path_templates) if f.endswith('.txt')]
+            template_paths = [os.path.join(path_templates, f) for f in os.listdir(path_templates) if f.endswith('.txt')]
+            templates_names = [name.removesuffix('.txt') for name in template_files]
 
+            TEMPLATES = {}
+
+            for path, name in zip(template_paths, templates_names):
+                with open(path, 'r', encoding='utf-8') as file:
+                    TEMPLATES[name] = file.read()
+
+            # load figures
             if INPUT_REPORT["General"]["fig_path"] is not None:
-                path_figs = INPUT_REPORT["General"]["fig_path"]
+                path_figs = os.path.abspath(INPUT_REPORT["General"]["fig_path"])
             else:
-                path_figs = path_out
+                path_figs = os.path.abspath(path_out)
 
             png_files = [f for f in os.listdir(path_figs) if f.endswith('.png')]
             png_paths = [os.path.join(path_figs, f) for f in os.listdir(path_figs) if f.endswith('.png')]
             png_names = [name.removesuffix('.png') for name in png_files]
+            png_width = [figsize_fullpage[0] for i in range(len(png_names))]
 
+            png_paths = [string.replace("\\", "/") for string in png_paths]
+
+            FIGURES = pd.DataFrame(columns=["filename", "path", "caption", "width"])
             FIGURES["filename"] = png_files
+            FIGURES["width"] = png_width
             FIGURES["path"] = png_paths
-
+            FIGURES["caption"] = png_names
             FIGURES.index = png_names
 
             # Crete TEX content
             TEX = {}
-            TEX_Main = ltx.insertLatexVars(INPUT_REPORT["General"]["path_latex_templates"] + "/template_main.txt", INPUT_REPORT["DocumentMeta"])
+
+            # main
+            chapter_main = 'main'
+            TEX[chapter_main] = ltx.insertLatexVars(TEMPLATES[chapter_main], INPUT_REPORT["DocumentMeta"])
 
             # Titlepage
-            TEX["titlepage"] = ltx.insertLatexVars(INPUT_REPORT["General"]["path_latex_templates"] + "/template_titlepage.txt", INPUT_REPORT["DocumentMeta"])
-            TEX_Main, last_idx = ltx.include_include(TEX_Main, 'titlepage')
+            chapter = 'titlepage'
+            TEX[chapter] = ltx.insertLatexVars(TEMPLATES[chapter], INPUT_REPORT["DocumentMeta"])
+            TEX[chapter_main], last_idx = ltx.include_include(TEX[chapter_main], chapter)
 
-            TEX_Main, last_idx = ltx.include_str(TEX_Main, '\\pagestyle{fancy}', last_idx+1)
+            TEX[chapter_main], last_idx = ltx.include_str(TEX[chapter_main], '\\pagestyle{fancy}', last_idx+1)
 
             # Introduction
-            TEX["introduction"] = ltx.insertLatexVars(INPUT_REPORT["General"]["path_latex_templates"] + "/template_introduction.txt", INPUT_REPORT["introduction"])
-            TEX_Main, last_idx = ltx.include_include(TEX_Main, 'introduction', line=last_idx+1)
+            chapter = 'introduction'
+            TEX[chapter] = ltx.insertLatexVars(TEMPLATES[chapter], INPUT_REPORT["introduction"])
+            TEX[chapter_main], last_idx = ltx.include_include(TEX[chapter_main], 'introduction', line=last_idx+1)
 
             #Sensors
             if INPUT["Toggle_Modules"].get("plot_SensorEval", {}) and INPUT["Toggle_Modules"].get("plot_SensorEval", {}):
                 print("   including Sensor sheets")
+                chapter = "SensorAnalysis"
+                TEX[chapter_main], _ = ltx.include_include(TEX[chapter_main], chapter)
 
+                # include table
+                TEX[chapter] = ltx.include_TableFig(TEMPLATES[chapter], FIGURES.loc["Sensor_names_page_1"])
+
+                # include sensor ilustrations
+                temp_list = []
                 for sensor_key in INPUT["Toggle_Modules"]["calc_SensorEval"]:
-
+                    
                     sensor_alias = COLNAMES_REPORT["Aliase"][sensor_key]
+                    FIGURES.loc[f"SensorEval_{sensor_key}_page_1", "caption"] = f'Timeseries and Histogram of Sensor: {sensor_alias}'
+                    temp = "\\subsubsection{Sensor: " + f"{sensor_alias}" + "} \n ?FIG" + "\n \\clearpage"
+                    temp = ltx.include_Fig(temp, FIGURES.loc[f"SensorEval_{sensor_key}_page_1"])
+                    temp_list.append(temp)
 
-                    FIGURES.loc[f"SensorEval_{sensor_key}_page_1", "caption"] = f'Timeseries and Hisogram of Sensor: {sensor_alias}'
-
-                    temp = ltx.insertLatexVars(INPUT_REPORT["General"]["path_latex_templates"] + "/template_sensorsheet.txt",
-                                                        {'sensorName': sensor_alias} )
-
-                    TEX[f"Sensor_{sensor_key}"] = ltx.insertLatexVars(INPUT_REPORT["General"]["path_latex_templates"] + "/template_sensorsheet.txt",
-                                                        {'sensorName': sensor_alias} )
-
-                    TEX[f"Sensor_{sensor_key}"] = ltx.include_Fig(TEX[f"Sensor_{sensor_key}"], FIGURES.loc[f"SensorEval_{sensor_key}_page_1"])
-                    TEX_Main, _ = ltx.include_include(TEX_Main, f'Sensor_{sensor_key}')
+                sensor_illustration = '\n'.join([str for str in temp_list])
+                TEX[chapter] = '\n'.join([TEX[chapter], sensor_illustration])
             else:
                 print("   Sensors are not included in Report, please specify Sensors in 'Toggle_Modules' and enable ploting")
 
+            # Data Basis
+            TEX[chapter_main], last_idx = ltx.include_include(TEX[chapter_main], 'DataBasis', line=last_idx + 1)
+            TEX["DataBasis"] = TEMPLATES["DataBasis"]
+            # replace ?DATABASIS with appropiate number of tables
 
+            keyword = ltx.find_keyword(TEMPLATES["DataBasis"], "?DATABASIS")
+            Database_dummys = ["?TABLE" for _ in range(len(np.where(DATABASE["used"])[0]))]
+            Database_dummys = " \n".join(Database_dummys)
+            TEX["DataBasis"], _ = ltx.include_str(TEX["DataBasis"], Database_dummys, keyword[0], replace=True)
 
+            for index, row in DATABASE.iterrows():
+                if row["used"]:
+                    key_fig = [index for index in FIGURES.index if FIGURES.loc[index, "filename"] == row["png_name"]][0]
+                    TEX["DataBasis"] = ltx.include_TableFig(TEX["DataBasis"], FIGURES.loc[key_fig])
 
             # save TEX files
-            with open(path_report + r'\main.tex', 'w', encoding='utf-8') as file:
-                file.write(TEX_Main)
-
             for name, tex in TEX.items():
                 with open(path_report+r'\\' + name + '.tex', 'w', encoding='utf-8') as file:
                     file.write(tex)

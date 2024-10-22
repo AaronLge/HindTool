@@ -4,25 +4,30 @@ import os
 import shutil
 import pexpect
 
-def insertLatexVars(path_template, Replacements):
 
-    with open(path_template, 'r', encoding='utf-8') as file:
-        lines = file.read()
+def insertLatexVars(string, replacements):
+    """Wrapper for 'gl.alias' function to replace variables in string with replacements.#
+        '?' + replacements.keys() as original
+        replacements.values() as replacements"""
 
-    Dummy_Orig = {Replacement_col: "?" + Replacement_col for Replacement_col in Replacements.keys()}
+    Dummy_Orig = {Replacement_col: "?" + Replacement_col for Replacement_col in replacements.keys()}
 
-    out_string = gl.alias(lines, Dummy_Orig, Replacements)
+    out_string = gl.alias(string, Dummy_Orig, replacements)
 
     return out_string
 
-def find_keyword(str, keyword):
+
+def find_keyword(string, keyword):
+    """finds lines in string in which there is the keyword"""
+
     indizes = []
-    lines = str.split('\n')
+    lines = string.split('\n')
     for i, line in enumerate(lines):
         if keyword in line:
             indizes.append(i)
 
     return indizes
+
 
 def include_include(main, Include, line=None):
     # Read the file content
@@ -31,8 +36,6 @@ def include_include(main, Include, line=None):
     begin_doc_idx = None
     end_doc_idx = None
     last_include_idx = None
-
-
 
     lines = main.split('\n')
 
@@ -68,21 +71,22 @@ def include_include(main, Include, line=None):
     return '\n'.join(lines), insert_idx
 
 
-def include_str(main, string, line):
-
+def include_str(main, string, line, replace=False):
     lines_include = len(string.split('\n'))
 
     # Read the file content
     lines = main.split('\n')
 
     # Insert the string
+    if replace:
+        lines.pop(line)
+
     lines.insert(line, string)
 
-    return '\n'.join(lines), line+lines_include
+    return '\n'.join(lines), line + lines_include
 
 
 def compile_lualatex(tex_file, pdf_path=None, miktex_lualatex_path='C:/temp/MikTex/miktex/bin/x64/lualatex.exe'):
-
     # def run_subprocess():
     #     command = f"{miktex_lualatex_path} {tex_file} -output-directory {txt_path}"
     #     with subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, text=True, cwd=txt_path) as process:
@@ -104,8 +108,6 @@ def compile_lualatex(tex_file, pdf_path=None, miktex_lualatex_path='C:/temp/MikT
     #
     #         except Exception as e:
     #             print(f"An error occurred: {e}")
-
-
 
     """
     Compile a LaTeX document using LuaLaTeX and save the output PDF to a specified location.
@@ -187,38 +189,51 @@ def compile_lualatex(tex_file, pdf_path=None, miktex_lualatex_path='C:/temp/MikT
         print(f"PDF was not created, something went wrong.")
         return output_pdf
 
+
 def include_Fig(string, FigInfo):
-
-    figure_template = ("\\begin{figure}[ht] \n "
-                   "\\centering \n "
-                   "\\includegraphics[width=0.5\\textwidth]{ ?FIGURE_PATH } \n "
-                   "\\caption{ ?CAPTION } \n "
-                   "\\end{figure}")
-
+    figure_template = ("\\begin{figure}[H] \n "
+                       "\\centering \n "
+                       "\\includegraphics[width=\\textwidth]{?FIGURE_PATH} \n "
+                       "\\caption{ ?CAPTION } \n "
+                       "\\label{fig: ?FIGURE_NAME } \n"
+                       "\\end{figure}")
 
     figure_latex = gl.alias(figure_template,
                             {"1": "?FIGURE_PATH",
-                             "2": "?CAPTION"},
+                             "2": "?CAPTION",
+                             "3": "?FIGURE_NAME",
+                             "4": "?FIGURE_WIDTH"},
                             {"1": FigInfo["path"],
-                             "2": FigInfo["caption"]})
+                             "2": FigInfo["caption"],
+                             "3": FigInfo.name,
+                             "4": f"{FigInfo['width']}"})
 
     lines = find_keyword(string, '?FIG')
-    string_out = include_str(string, figure_latex, line=lines[0])
+    string_out, _ = include_str(string, figure_latex, line=lines[0], replace=True)
 
     return string_out
 
 
+def include_TableFig(string, FigInfo):
+    figure_template = ("\\begin{figure}[H] \n "
+                       "\\centering \n "
+                       "\\includegraphics[width=\\textwidth ]{?FIGURE_PATH} \n "
+                       "\\captionsetup{type=table} \n"
+                       "\\caption{ ?CAPTION } \n "
+                       "\\label{tab: ?FIGURE_NAME } \n"
+                       "\\end{figure}")
 
+    figure_latex = gl.alias(figure_template,
+                            {"1": "?FIGURE_PATH",
+                             "2": "?CAPTION",
+                             "3": "?FIGURE_NAME",
+                             "4": "?FIGURE_WIDTH"},
+                            {"1": FigInfo["path"],
+                             "2": FigInfo["caption"],
+                             "3": FigInfo.name,
+                             "4": f"{FigInfo['width']}"})
 
+    lines = find_keyword(string, '?TABLE')
+    string_out, _ = include_str(string, figure_latex, line=lines[0], replace=True)
 
-
-
-
-
-
-
-
-
-
-
-
+    return string_out
