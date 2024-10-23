@@ -38,30 +38,30 @@ datetime_end				>		'1981-07-01 07:00:00'							>	str:	enddatetime in the format:
 #calc_HSTP					>		['wind', 'total','swell']							
 #calc_VMTP					>		['wind', 'total','swell']								
 #calc_RWI					>		['wind', 'total']								
-#calc_Tables					>		['swell']											
+#calc_Tables				>		['swell']											
 #calc_WaveBreak_Steep		>		['wind', 'total']										
 #calc_AngleDeviation 		>		['dir_v_m', 'dir_T_mean_Wind', 'v_m']						>	angle_orig, angle_deviation, v_m
 #calc_Roseplots				>		True									>	 [[angle, magnitude],[angle, magnitude]]
-#calc_ExtremeValues			>		[['dir_T_mean', 'H_max']]									
-##calc_Validation 			>		['wind']											
+calc_ExtremeValues			>		True									
+###calc_Validation 			>		['wind']											
 #calc_SensorEval			>		True
 #calc_Weibull				>		[['dir_v_m', 'v_m']]
 #calc_ExtremeConture		>		[['H_s', 'T_p', 'dir_v_m']]
-##
-#plot_VMHS					>		['wind', 'swell', 'total']
-#plot_HSTP					>		['wind', 'swell', 'total']
-#plot_VMTP					>		['wind', 'swell', 'total']
-#plot_RWI					>		['wind', 'total']
-#plot_BreakSteep			>		['wind', 'total']
-plot_Tables				>		['wind', 'swell', 'total']
-#plot_AngleDeviation		>		True
-#plot_Roseplots				>		True
+#
+plot_VMHS					>		['wind', 'swell', 'total']
+plot_HSTP					>		['wind', 'swell', 'total']
+plot_VMTP					>		['wind', 'swell', 'total']
+plot_RWI					>		['wind', 'total']
+plot_BreakSteep			>		['wind', 'total']
+plot_Tables					>		['wind', 'swell', 'total']
+plot_AngleDeviation		>		True
+plot_Roseplots				>		True
 #plot_ExtremeValues			>		True
-#plot_Validation 			>		['wind', 'swell']
-#plot_SensorEval			>		True
-#plot_Weibull				>		True
-#plot_condensation_example	>		True
-#plot_report_tables			>		True
+plot_Validation 			>		['wind', 'swell']
+plot_SensorEval			>		True
+plot_Weibull				>		True
+plot_condensation_example	>		True
+plot_report_tables			>		True
 plot_as						>		["png"]
 
 dpi_figures					>		500									>	int: resolution (dots per sqinch) of all pdf's
@@ -242,6 +242,10 @@ filter_by					>		["H_s_wind", "T_p_wind"]
 margin						>		[[1, 100], [1, 100]]
 
 *ExtremeValues*
+sensors_Wind				>		['dir_v_m','v_m']
+#sensors_WaterLevel			>		[None,'WL']
+#sensors_WaveHeight			>		['dir_T_mean','H_max']
+
 time_window_offset			>		0.5
 N_itter						>		1000			
 perc_up						>		95	

@@ -129,7 +129,7 @@
 \vspace*{1cm}
 
 \begin{centering}
-\includegraphics[width=0.4\textwidth]{JBO_logo.jpg} \\% Replace with actual image path \\
+\includegraphics[width=0.4\textwidth]{?ClientLogo} \\% Replace with actual image path \\
 \end{centering}
 
 \hspace{3.6cm}

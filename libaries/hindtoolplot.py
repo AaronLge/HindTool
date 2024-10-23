@@ -226,8 +226,8 @@ def plot_tiled(Tiles, **kwargs):
     global_min = kwargs.get('global_min', ['auto', 'auto'])
     fontsize_title = kwargs.get('fontsize_title', 10)
     fontsize_legend = kwargs.get('fontsize_legend', 6)
-    fontsize_label = kwargs.get('fontsize_label', 8)
-    fontsize_ticks = kwargs.get('fontsize_ticks', 6)
+    fontsize_label = kwargs.get('fontsize_label', 10)
+    fontsize_ticks = kwargs.get('fontsize_ticks', 8)
     grid = kwargs.get('grid', [3, 2])
     scatter_max = kwargs.get('scatter_max', 'auto')
     scatter_min = kwargs.get('scatter_min', 'auto')
@@ -945,6 +945,7 @@ def table(data,  **kwargs):
         ax.text(0.5, 1.05 * y_range, titel, horizontalalignment='center', verticalalignment='center')
 
     fig.tight_layout()
+    fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
     plt.close(fig)
     return fig
 
@@ -1299,7 +1300,7 @@ def save_figs_as_png(FIG, filename, **kwargs):
 
     i = 1
     for fig in FIG:
-        fig.savefig(filename + f"_page_{i}.png", dpi=dpi)
+        fig.savefig(filename + f"_page_{i}.png", dpi=dpi, pad_inches=0.01)
         i = i + 1
         plt.close(fig)
     return

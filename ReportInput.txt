@@ -1,6 +1,7 @@
 *General*
 path_latex_templates 		> 		".\latex_templates"	
 fig_path					>		".\example_output"
+#fig_path					>		
 
 *Symbols*
 # master over used symbols, has to contain all Sensors used

@@ -2034,7 +2034,7 @@ def calc_ExtemeValues(x, angles, angle_grid, T_return_single=None, conf_inter_mo
                                freq_samp=freq_samp,
                                N_itter=N_itter)
 
-        temp = Segment(0, angles=None, result=result, colnames={'x': x.name, 'angle': angles.name}, angle_name=None, indizes=list(x.index))
+        temp = Segment(0, angles=None, result=result, colnames={'x': x.name, 'angle':  None}, angle_name=None, indizes=list(x.index))
         Data_Out.append(temp)
 
     else:
