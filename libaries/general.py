@@ -583,6 +583,42 @@ def string_to_latex(string):
     return string
 
 
+import pandas as pd
+
+
+def xlsx2dict(file_path):
+    """
+    Reads an Excel file and returns a dictionary containing each sheet as a DataFrame.
+
+    Each sheet in the Excel file will be stored as a DataFrame in the dictionary,
+    with the sheet name as the key. The first row of each sheet is used as column headers,
+    and the first column is set as the index for each DataFrame.
+
+    Parameters:
+    ----------
+    file_path : str
+        The path to the Excel (.xlsx) file.
+
+    Returns:
+    -------
+    dict
+        A dictionary where each key is a sheet name, and each value is a DataFrame
+        representing the sheet's data, with headers and indices correctly set.
+
+    """
+
+    # Read all sheets into a dictionary with pandas
+    xls = pd.ExcelFile(file_path)
+    sheets_dict = {}
+
+    for sheet_name in xls.sheet_names:
+        # Read each sheet, using the first row as headers and the first column as the index
+        df = pd.read_excel(xls, sheet_name=sheet_name, header=0, index_col=0)
+        sheets_dict[sheet_name] = df
+
+    return sheets_dict
+
+
 def export_df_from_sql(db_file, table_name, column_names=None, timeframe=None, indizes=None):
     """
     Load specified columns or all columns from a table in an SQLite database and return as a pandas DataFrame,
@@ -606,7 +642,7 @@ def export_df_from_sql(db_file, table_name, column_names=None, timeframe=None, i
         cursor = conn.cursor()
 
         # Check if table exists
-        cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}';")
+        cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}' ORDER BY ROWID;")
         if not cursor.fetchone():
             raise ValueError(f"Table '{table_name}' does not exist in the database.")
 
@@ -641,7 +677,7 @@ def export_df_from_sql(db_file, table_name, column_names=None, timeframe=None, i
 
             index_col_name = index_info[0][2]
 
-            cursor.execute(f'SELECT "{index_col_name}" FROM "{table_name}";')
+            cursor.execute(f'SELECT "{index_col_name}" FROM "{table_name}" ORDER BY ROWID;')
             index_col = cursor.fetchall()
 
             index_col = [info[0] for info in index_col]

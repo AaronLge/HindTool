@@ -3,6 +3,10 @@ path_latex_templates 		> 		".\latex_templates"
 fig_path					>		".\example_output"
 #fig_path					>		
 
+*Database_Info*
+db_info_txt					>		'auto'
+
+
 *Symbols*
 # master over used symbols, has to contain all Sensors used
 datetime					>		r"datetime"
@@ -66,3 +70,4 @@ Approval					>		"FOs"
 
 *introduction*
 siteSpecific				>		"The here investigated project site is a generic site in the German North Sea. Monopile substructures are assumed to be derived as substructure type."
+

@@ -3,7 +3,7 @@
 
 
 *DataBase*
-path_DataBase				>		"C:/Users/aaron.lange/Desktop/Projekte/HindcastArchive/Data_waterkant/Waterkant.db"
+path_DataBase				>		"C:/Users/aaron.lange/Desktop/Projekte/HindcastArchive/54.41_5.95_ABP_Mer/54.41_5.95_ABP_Mer.db"
 colnames_preset				>		None
 JBOOST_proj					>		"A:/2024/24A523_Waterkant/JBOOST/JBOOST_Model_Gravity/proj.lua"						
 JBOOST_input				>		"A:/2024/24A523_Waterkant/JBOOST/JBOOST_Model_Gravity/Input JBOOST WAK-DP-A-LILA-MySE18-260-v0.lua"
@@ -20,7 +20,7 @@ d							>		20
 *DataOut*
 path_out					>		'../_Hindcast_out/'								>	str:	path for output-files, it is created if it doesent exist
 dir_name					>		None									>	str or none:	if str, name of the folder created in the path_out (Attention, can overwrite old foulders), if None, name is given, including a timestamp (recommended)
-CSV_out						>		False 									>	bool:	if True, export of all calculated data in "path_out/dirname/csv_data"
+CSV_out						>		True 									>	bool:	if True, export of all calculated data in "path_out/dirname/csv_data"
 
 *AngleSection*
 mode_angle					>		"full"									>	str:	seperation mode, "full": eqal division of the whole circle in "N_angle" parts	'section': equal devision in "N_angle" parts of the size "width_angle"
@@ -37,7 +37,7 @@ datetime_end				>		'1981-07-01 07:00:00'							>	str:	enddatetime in the format:
 #calc_VMHS					>		['wind', 'total','swell']									
 #calc_HSTP					>		['wind', 'total','swell']							
 #calc_VMTP					>		['wind', 'total','swell']								
-#calc_RWI					>		['wind', 'total']								
+calc_RWI					>		['wind']								
 #calc_Tables				>		['swell']											
 #calc_WaveBreak_Steep		>		['wind', 'total']										
 #calc_AngleDeviation 		>		['dir_v_m', 'dir_T_mean_Wind', 'v_m']						>	angle_orig, angle_deviation, v_m
@@ -48,7 +48,7 @@ calc_ExtremeValues			>		True
 #calc_Weibull				>		[['dir_v_m', 'v_m']]
 #calc_ExtremeConture		>		[['H_s', 'T_p', 'dir_v_m']]
 #
-plot_VMHS					>		['wind', 'swell', 'total']
+#plot_VMHS					>		['wind', 'swell', 'total']
 plot_HSTP					>		['wind', 'swell', 'total']
 plot_VMTP					>		['wind', 'swell', 'total']
 plot_RWI					>		['wind', 'total']
@@ -60,7 +60,7 @@ plot_Roseplots				>		True
 plot_Validation 			>		['wind', 'swell']
 plot_SensorEval			>		True
 plot_Weibull				>		True
-plot_condensation_example	>		True
+#plot_condensation_example	>		True
 plot_report_tables			>		True
 plot_as						>		["png"]
 
@@ -231,7 +231,7 @@ wind_sea					>		[['dir_T_mean_Wind', 'H_s_wind']]
 currents					>		[['dir_curr', 'v_curr']]
 
 *SensorEval*
-Sensors 					>		['v_m','H_s','H_max','T_p','H_s_wind','T_p_wind','H_s_swell','T_p_swell','T_p_swell','WL','WL_tide','v_curr']
+Sensors 					>		['v_m','H_s','H_max','T_p','H_s_wind','T_p_wind','H_s_swell','T_p_swell','WL','WL_tide','v_curr']
 
 
 *AngleDeviation*

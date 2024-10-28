@@ -257,7 +257,7 @@ if (('wind' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
     # filter for nans
-    indizes_in = Calc.initilize_filter(None, mode='nans')
+    indizes_in = Calc.initilize_filter(mode='nans')
     df = df.loc[indizes_in]
 
     directional = hc_calc.calc_VMHS(df[COLNAMES["v_m"]], df[COLNAMES["H_s_wind"]], df[COLNAMES["dir_v_m"]], angle_grid_mod,
@@ -303,7 +303,7 @@ if (INPUT["Toggle_Modules"].get("plot_condensation_example", {})):
     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
     # filter for nans
-    indizes_in = Calc.initilize_filter(None, mode='nans')
+    indizes_in = Calc.initilize_filter(mode='nans')
     df = df.loc[indizes_in]
 
     directional = hc_calc.calc_VMHS(df[COLNAMES["v_m"]], df[COLNAMES["H_s_wind"]], df[COLNAMES["dir_v_m"]], angle_grid_mod,
@@ -350,7 +350,7 @@ if (('swell' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
     # filter for nans
-    indizes_in = Calc.initilize_filter(None, mode='nans')
+    indizes_in = Calc.initilize_filter(mode='nans')
     df = df.loc[indizes_in]
 
     directional = hc_calc.calc_VMHS(df[COLNAMES["v_m"]], df[COLNAMES["H_s_swell"]], df[COLNAMES["dir_T_mean_Swell"]], angle_grid_mod,
@@ -396,7 +396,7 @@ if (('total' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
     # filter for nans
-    indizes_in = Calc.initilize_filter(None, mode='nans')
+    indizes_in = Calc.initilize_filter(mode='nans')
     df = df.loc[indizes_in]
 
     directional = hc_calc.calc_VMHS(df[COLNAMES["v_m"]], df[COLNAMES["H_s"]], df[COLNAMES["dir_T_mean"]], angle_grid_mod,
@@ -443,7 +443,7 @@ if (('wind' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
     # filter for nans
-    indizes_in = Calc.initilize_filter(None, mode='nans')
+    indizes_in = Calc.initilize_filter(mode='nans')
     df = df.loc[indizes_in]
 
     omni = hc_calc.calc_HSTP(df[COLNAMES["H_s_wind"]], df[COLNAMES["T_p_wind"]], df[COLNAMES["dir_v_m"]], None,
@@ -494,7 +494,7 @@ if (('swell' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
     # filter for nans
-    indizes_in = Calc.initilize_filter(None, mode='nans')
+    indizes_in = Calc.initilize_filter(mode='nans')
     df = df.loc[indizes_in]
 
     directional = hc_calc.calc_HSTP(df[COLNAMES["H_s_swell"]], df[COLNAMES["T_p_swell"]], df[COLNAMES["dir_T_mean_Swell"]], angle_grid_mod,
@@ -544,7 +544,7 @@ if (('total' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
     # filter for nans
-    indizes_in = Calc.initilize_filter(None, mode='nans')
+    indizes_in = Calc.initilize_filter(mode='nans')
     df = df.loc[indizes_in]
 
     directional = hc_calc.calc_HSTP(df[COLNAMES["H_s"]], df[COLNAMES["T_p"]], df[COLNAMES["dir_T_mean"]], angle_grid_mod,
@@ -718,10 +718,10 @@ if 'wind' in INPUT["Toggle_Modules"].get("calc_RWI", {}):
     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
     # filter for nans
-    indizes_in = Calc.initilize_filter(None, mode='nans')
+    indizes_in = Calc.initilize_filter(mode='nans')
     df = df.loc[indizes_in]
 
-    directional, RWI_max = hc_calc.calc_RWI(df[COLNAMES["H_s_wind"]],
+    directional, _ = hc_calc.calc_RWI(df[COLNAMES["H_s_wind"]],
                                             df[COLNAMES["T_p_wind"]],
                                             df[COLNAMES["dir_v_m"]],
                                             angle_grid_mod,
@@ -733,6 +733,7 @@ if 'wind' in INPUT["Toggle_Modules"].get("calc_RWI", {}):
                                      None,
                                      INPUT["Structure"]["f_0"])
 
+    omni[0].RWI_max = RWI_max
     Calc.result = omni + directional
 
     DATA_OUT["RWI"]["wind"] = Calc
@@ -747,7 +748,7 @@ if 'total' in INPUT["Toggle_Modules"].get("calc_RWI", {}):
     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
     # filter for nans
-    indizes_in = Calc.initilize_filter(None, mode='nans')
+    indizes_in = Calc.initilize_filter(mode='nans')
     df = df.loc[indizes_in]
 
     directional, RWI_max = hc_calc.calc_RWI(df[COLNAMES["H_s"]],
@@ -778,7 +779,7 @@ if 'wind' in INPUT["Toggle_Modules"].get("calc_WaveBreak_Steep", {}):
     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
     # filter for nans
-    indizes_in = Calc.initilize_filter(None, mode='nans')
+    indizes_in = Calc.initilize_filter(mode='nans')
     df = df.loc[indizes_in]
 
     directional = hc_calc.calc_WaveBreak_Steep(df[COLNAMES["H_s_wind"]],
@@ -810,7 +811,7 @@ if 'total' in INPUT["Toggle_Modules"].get("calc_WaveBreak_Steep", {}):
     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
     # filter for nans
-    indizes_in = Calc.initilize_filter(None, mode='nans')
+    indizes_in = Calc.initilize_filter(mode='nans')
     df = df.loc[indizes_in]
 
     directional = hc_calc.calc_WaveBreak_Steep(df[COLNAMES["H_s"]],
@@ -845,7 +846,7 @@ if INPUT["Toggle_Modules"].get("calc_AngleDeviation", {}):
     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
     # filter for nans
-    indizes_in = Calc.initilize_filter(None, mode='nans')
+    indizes_in = Calc.initilize_filter(mode='nans')
     df = df.loc[indizes_in]
 
     if INPUT["AngleDeviation"]["filter_by"] is not None:
@@ -899,7 +900,7 @@ if INPUT["Toggle_Modules"].get("calc_Roseplots", {}):
         df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
         # filter for nans
-        indizes_in = Calc.initilize_filter(None, mode='nans')
+        indizes_in = Calc.initilize_filter(mode='nans')
         df = df.loc[indizes_in]
 
         temp, bins = hc_calc.calc_Roseplot(df[column_names[0]], df[column_names[1]], angle_grid_mod)
@@ -922,7 +923,7 @@ if INPUT["Toggle_Modules"].get("calc_ExtremeValues", {}):
     Input = INPUT["ExtremeValues"]
 
     sensors = [Input[key] for key in Input.keys() if 'sensors' in key]
-    sensor_group_names = [key.replace("sensors_",'') for key in Input.keys() if 'sensors' in key]
+    sensor_group_names = [key.replace("sensors_" ,'') for key in Input.keys() if 'sensors' in key]
     for cols, sensor_group_name in zip(sensors, sensor_group_names):
         table_name = 'Hind_combined'
         column_names = [COLNAMES[col] for col in cols if col is not None]
@@ -975,7 +976,7 @@ if len(INPUT["Toggle_Modules"].get("calc_ExtremeConture", {})) > 0:
         df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
         # filter for nans
-        indizes_in = Calc.initilize_filter(None, mode='nans')
+        indizes_in = Calc.initilize_filter(mode='nans')
         df = df.loc[indizes_in]
 
         out_direc = hc_calc.calc_extreme_contures(df[column_names[0]],
@@ -1040,7 +1041,7 @@ if 'wind' in INPUT["Toggle_Modules"].get("calc_Validation", {}):
                          "sample_rate": gl.median_sample_rate(df.index),
                          "indizes": df.index}
 
-    Calc.initilize_filter(None, mode='nans')
+    Calc.initilize_filter(mode='nans')
 
     print(f"   processing calculated/loaded DEL data and comparing to condensed data in tables")
     result = hc_calc.calc_Validation(df,
@@ -1137,7 +1138,7 @@ if INPUT["Toggle_Modules"].get("calc_SensorEval", {}):
         df = Calc.initilize_from_db(db_path, table_name, [colname_data], timeframe=timeframe)
 
         # filter for nans
-        indizes_in = Calc.initilize_filter(None, mode='nans')
+        indizes_in = Calc.initilize_filter(mode='nans')
         df = df.loc[indizes_in]
 
         #  directional = hc_calc.calc_histogram(df[column_names[0]],
@@ -1164,7 +1165,7 @@ if len(INPUT["Toggle_Modules"].get("calc_Weibull", {})) > 0:
         df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
         # filter for nans
-        indizes_in = Calc.initilize_filter(None, mode='nans')
+        indizes_in = Calc.initilize_filter(mode='nans')
         df = df.loc[indizes_in]
 
         directional = hc_calc.calc_weibull(df[column_names[1]],
@@ -1182,6 +1183,7 @@ if len(INPUT["Toggle_Modules"].get("calc_Weibull", {})) > 0:
 figsize_fullpage = [size * 0.39370079 for size in INPUT["Toggle_Modules"].get("writing_box", {})]
 figsize_halfpage = [figsize_fullpage[0], figsize_fullpage[1] / 2]
 figsize_thirdpage = [figsize_fullpage[0], figsize_fullpage[1] / 3]
+
 if 'wind' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
     print('plotting VMHS wind...')
 
@@ -2695,10 +2697,10 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
             FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
 
             if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-                gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f'Valid_scatter_wind_{config}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+                gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f'Valid_scatter_wind', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
             if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-                gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f'Valid_scatter_wind_{config}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+                gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f'Valid_scatter_wind', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
 if 'swell' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
     print('plotting Validation swell...')
@@ -2870,10 +2872,10 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
             FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
 
             if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-                gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f'Valid_scatter_swell_{config}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+                gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f'Valid_scatter_swell', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
             if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-                gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f'Valid_scatter_swell_{config}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+                gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f'Valid_scatter_swell', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
 if INPUT["Toggle_Modules"].get("plot_SensorEval", {}):
     print("plotting SensorEval...")
@@ -2997,11 +2999,14 @@ if INPUT["Toggle_Modules"].get("plot_Weibull", {}):
 
 # %% plot report tables
 if INPUT["DataBase"].get("create_report", {}):
+
+    # Read Report Input
     try:
         INPUT_REPORT = gl.read_input_txt(INPUT["DataBase"]["Report_Input"])
     except:
         print("please specify Report_Input")
 
+    # Create Report Output
     path_report = os.path.join(path_out, 'report')
     try:
         # Create the new folder
@@ -3017,6 +3022,7 @@ if INPUT["DataBase"].get("create_report", {}):
     COLNAMES_REPORT["Aliase"] = [INPUT["Aliase"][key] if key in INPUT["Aliase"] else float('nan') for key in COLNAMES_REPORT.index]
     COLNAMES_REPORT["Units"] = [INPUT_REPORT["Units"][key] if key in INPUT_REPORT["Units"] else float('nan') for key in COLNAMES_REPORT.index]
 
+    # load latex Templates
     path_templates = os.path.abspath(INPUT_REPORT["General"]["path_latex_templates"])
     template_files = [f for f in os.listdir(path_templates) if f.endswith('.txt')]
     template_paths = [os.path.join(path_templates, f) for f in os.listdir(path_templates) if f.endswith('.txt')]
@@ -3028,7 +3034,7 @@ if INPUT["DataBase"].get("create_report", {}):
         with open(path, 'r', encoding='utf-8') as file:
             TEMPLATES[name] = file.read()
 
-    #< load figures
+    # load figures in Dataframe (from output dir or optional dir)
     if INPUT_REPORT["General"]["fig_path"] is not None:
         path_figs = os.path.abspath(INPUT_REPORT["General"]["fig_path"])
     else:
@@ -3047,8 +3053,7 @@ if INPUT["DataBase"].get("create_report", {}):
     FIGURES["caption"] = [name.replace('_', '-') for name in png_names]
     FIGURES.index = png_names
 
-    #constant images
-
+    #constant images (theory)
     pic = "VMTP_theory"
     FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
     FIGURES.loc[pic, "path"] = path_templates + f"\\{pic}.jpg"
@@ -3065,7 +3070,7 @@ if INPUT["DataBase"].get("create_report", {}):
     FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
     FIGURES.loc[pic, "path"] = path_templates + f"\\{pic}.jpg"
     FIGURES.loc[pic, "caption"] = "Comparison of real and theoretical extreme values"
-    FIGURES.loc[pic, "width"] = figsize_fullpage[0]
+    FIGURES.loc[pic, "width"] = figsize_fullpage[0]/2
 
     pic = "Extreme_TReturn_example"
     FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
@@ -3075,40 +3080,14 @@ if INPUT["DataBase"].get("create_report", {}):
 
     FIGURES.loc[:, "path"] = [string.replace("\\", "/") for string in FIGURES.loc[:, "path"]]
 
-
+    # Plot Tables
     cell_height_tables = 0.7
 
     # plot databases
     Meta_data = gl.export_df_from_sql(db_path, 'Hind_MetaData')
 
     DATABASE = pd.DataFrame(columns=["used", "png_name"], index=Meta_data.index)
-    DATABASE.loc[:,"used"] = False
-    for dataset_name, dataset_contents in Meta_data.iterrows():
-        meta_para = []
-        meta_value = []
-
-        for dataset_para, dataset_value in dataset_contents.items():
-            if dataset_value is not None:
-
-                meta_para.append(dataset_para)
-                meta_value.append(dataset_value)
-
-        data = np.array([meta_para, meta_value])
-        data = data.T
-        col_labels = ["Parameter", "Value"]
-        FIG = hc_plt.table(data,
-                           collabels=col_labels,
-                           cell_height=cell_height_tables,
-                           figsize=figsize_fullpage,
-                           datatype='str')
-
-        DATABASE.loc[dataset_name, "png_name"] = f'DataSorce_{dataset_name}_page_1.png'
-
-        if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_png([FIG], path_out + f'DataSorce_{dataset_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-        if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_pdf([FIG], path_out + f'DataSorce_{dataset_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+    DATABASE.loc[:, "used"] = False
 
     # add datasorce reference
     datasorce_cols = gl.export_colnames_from_db(db_path)
@@ -3121,11 +3100,100 @@ if INPUT["DataBase"].get("create_report", {}):
                 DATABASE.loc[datasorce_key_clean, "used"] = True
                 COLNAMES_REPORT.loc[sensor_key, "DataSorce"] = datasorce_key_clean
 
+    resamling_values = []
+    resampling_colnames = []
+    for dataset_name, dataset_contents in Meta_data.iterrows():
+
+        if DATABASE.loc[dataset_name, "used"] or dataset_name == 'Combined':
+
+            DATABASE.loc[dataset_name, "png_name"] = f'DataSorce_{dataset_name}_page_1.png'
+            DATABASE.loc[dataset_name, "Time Step"] = dataset_contents["Time Step"]
+            DATABASE.loc[dataset_name, "Start Date"] = dataset_contents["Start Date"]
+            DATABASE.loc[dataset_name, "End Date"] = dataset_contents["End Date"]
+            DATABASE.loc[dataset_name, "Number of Samples"] = dataset_contents["Number of samples"]
+
+            resamling_values.append([dataset_contents["Time Step"],
+                                     dataset_contents["Number of samples"],
+                                     pd.to_datetime(dataset_contents["Start Date"]).strftime('%d-%m-%Y'),
+                                     pd.to_datetime(dataset_contents["End Date"]).strftime('%d-%m-%Y')
+                                     ])
+
+            resampling_colnames.append(dataset_name)
+
+            meta_para = []
+            meta_value = []
+
+            for dataset_para, dataset_value in dataset_contents.items():
+                if dataset_value is not None:
+
+                    meta_para.append(dataset_para)
+                    meta_value.append(dataset_value)
+
+            data = np.array([meta_para, meta_value])
+            data = data.T
+            col_labels = ["Parameter", "Value"]
+            FIG = hc_plt.table(data,
+                               collabels=col_labels,
+                               cell_height=cell_height_tables,
+                               figsize=figsize_fullpage,
+                               datatype='str')
+
+            if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+                gl.save_figs_as_png([FIG], path_out + f'DataSorce_{dataset_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+            if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+                gl.save_figs_as_pdf([FIG], path_out + f'DataSorce_{dataset_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    # plot resampling table
+    resamling_rowlabels = ["Timestep [s]", "Number of Samples [-]", "Start Date", "End Date"]
+
+    FIG = hc_plt.table(np.array(resamling_values).T,
+                       collabels=resampling_colnames,
+                       rowlabels=resamling_rowlabels,
+                       row_label_name='Parameter',
+                       figsize=figsize_halfpage,
+                       datatype='str',
+                       cell_height=cell_height_tables)
+
+    if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_png([FIG], path_out + f'DataSorce_ResamplingTable', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_pdf([FIG], path_out + f'DataSorce_ResamplingTable', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    # plot database global parameters
+    if INPUT_REPORT["Database_Info"]["db_info_txt"] == 'auto':
+        db_info_path = os.path.dirname(db_path)
+        db_info_txt = [f for f in os.listdir(db_info_path) if f.endswith('.txt')][0]
+        DBINFO = gl.read_input_txt(db_info_path + '\\' + db_info_txt)
+
+        parameter = ["Metocean Expert", "Global Area", "Water Depth [m]", "Water Depth Reference", "Longitude", "Latitude"]
+        values = [DBINFO["General"]["Metocean_Expert"],
+                  DBINFO["General"]["Global_Area"],
+                  DBINFO["General"]["Global_Depth"],
+                  '-',
+                  f'{DBINFO["General"]["Global_Coordinates"][0]}° E',
+                  f'{DBINFO["General"]["Global_Coordinates"][1]}° N']
+
+        FIG = hc_plt.table(np.array([values]).T,
+                           collabels=['Values'],
+                           rowlabels=parameter,
+                           row_label_name='Parameter',
+                           figsize=figsize_halfpage,
+                           datatype='str',
+                           cell_height=cell_height_tables)
+
+        if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+            gl.save_figs_as_png([FIG], path_out + 'DataSorce_global', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+        if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+            gl.save_figs_as_pdf([FIG], path_out + 'DataSorce_global', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
 
     # plot sensor names
-    data = np.array([COLNAMES_REPORT["Symbols"], COLNAMES_REPORT["Sensor_names"], COLNAMES_REPORT["DataSorce"]])
+    data = np.array([COLNAMES_REPORT["Symbols"], COLNAMES_REPORT["Aliase"], COLNAMES_REPORT["DataSorce"], COLNAMES_REPORT["Units"]], )
     data = data.T
-    col_labels = ["Symbol", "Sensor name", "Data Sorce"]
+    col_labels = ["Symbol", "Description", "Data Sorce", "Unit"]
     FIG = hc_plt.table(data,
                        collabels=col_labels,
                        figsize=figsize_fullpage,
@@ -3139,7 +3207,7 @@ if INPUT["DataBase"].get("create_report", {}):
         gl.save_figs_as_pdf([FIG], path_out + 'Sensor_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
     # plot Plot_names
-    data = np.array([COLNAMES_REPORT["Symbols"], COLNAMES_REPORT["Aliase"]])
+    data = np.array([COLNAMES_REPORT["Symbols"], COLNAMES_REPORT["Sensor_names"]])
     data = data.T
     col_labels = ["Symbol", "Plot name"]
     FIG = hc_plt.table(data,
@@ -3149,10 +3217,10 @@ if INPUT["DataBase"].get("create_report", {}):
                        datatype='str')
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-        gl.save_figs_as_png([FIG], path_out + 'Plot_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+        gl.save_figs_as_png([FIG], path_out + 'Sensor_Original', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
     if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-        gl.save_figs_as_pdf([FIG], path_out + 'Plot_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+        gl.save_figs_as_pdf([FIG], path_out + 'Sensor_Original', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
     # plot vmhs tables
     columns_table = []
@@ -3244,7 +3312,6 @@ if INPUT["DataBase"].get("create_report", {}):
     columns_table.append(new_col)
     col_labels.append('Swell Sea')
 
-
     data = np.array(columns_table)
     data = data.T
 
@@ -3263,17 +3330,20 @@ if INPUT["DataBase"].get("create_report", {}):
         gl.save_figs_as_pdf([FIG], path_out + 'Report_table_HSTP', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
     # plot T_return Tables
-    for Calc_name, Calc in DATA_OUT["ExtremeValues"].items():
+    T_return_xlsx = [f for f in os.listdir(path_figs+"\\csv_data") if "ExtremeValues" in f]
+    T_return_xlsx_path = [path_figs + "\\csv_data\\" + f  for f in T_return_xlsx]
+    T_return_keyword = [f.replace("ExtremeValues_","").replace(".xlsx","") for f in T_return_xlsx]
 
-        for Seg in Calc.result:
+    for xlsx_path, keyword in zip(T_return_xlsx_path, T_return_keyword):
 
-            if Seg.angles is None:
-                T_R_text = Seg.result["T_return_single"]
-                T_R_text.iloc[:, 1:] = gl.significant_digits(T_R_text.values[:, 1:], 3).astype(float)
+                T_return_data = gl.xlsx2dict(xlsx_path)
+
+                T_R_omni = T_return_data["omnidirectional"]
+                T_R_omni.iloc[:, 1:] = gl.significant_digits(T_R_omni.values[:, 1:], 3).astype(float)
                 new_order = ['T_Return', 'down', 'middle', 'up']
-                T_R_text = T_R_text[new_order]
+                T_R_omni = T_R_omni[new_order]
 
-                FIG = hc_plt.table(T_R_text.values,
+                FIG = hc_plt.table(T_R_omni.values,
                                    collabels=['T Return [years]', 'down', 'middle', 'up'],
                                    rowlabels=None,
                                    row_label_name=None,
@@ -3282,13 +3352,32 @@ if INPUT["DataBase"].get("create_report", {}):
                                    cell_height=cell_height_tables)
 
                 if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-                    gl.save_figs_as_png([FIG], path_out + f'T_return_table_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+                    gl.save_figs_as_png([FIG], path_out + f'T_return_table_{keyword}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
                 if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-                    gl.save_figs_as_pdf([FIG], path_out + f'T_return_table_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+                    gl.save_figs_as_pdf([FIG], path_out + f'T_return_table_{keyword}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
+    # plot Extreme Parameter Table
+    for Calc_name, Calc in DATA_OUT["ExtremeValues"].items():
 
-# %% Create Latex File
+        row_labels = ["Number of extreme values", "Samples per year (n)", "Window offset", "Extrapolation method"]
+        Values = [len(Calc.result[0].result["points"]), "1", INPUT["ExtremeValues"]["time_window_offset"], "gumbel"]
+
+        FIG = hc_plt.table(np.array([Values]).T,
+                           collabels=['Values'],
+                           rowlabels=row_labels,
+                           row_label_name='Parameter',
+                           figsize=figsize_halfpage,
+                           datatype='str',
+                           cell_height=cell_height_tables)
+
+        if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+            gl.save_figs_as_png([FIG], path_out + f'Extreme_Parameter_table_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+        if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+            gl.save_figs_as_pdf([FIG], path_out + f'Extreme_Parameter_table_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    # %% Create Latex File
 
     # load templates
 
@@ -3319,6 +3408,9 @@ if INPUT["DataBase"].get("create_report", {}):
 
     TEX[chapter] = TEMPLATES[chapter]
     TEX[chapter] = ltx.insertLatexVars(TEX[chapter], {"CombinedTimestep": f"{Meta_data.loc['Combined', 'Time Step']} s"})
+
+    TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["DataSorce_global_page_1"])
+
     # replace ?DATABASIS with appropiate number of tables
     keyword = ltx.find_keyword(TEX[chapter], "?DATABASIS")
     Database_dummys = ["?TABLE" for _ in range(len(np.where(DATABASE["used"])[0]))]
@@ -3330,6 +3422,8 @@ if INPUT["DataBase"].get("create_report", {}):
         if row["used"]:
             key_fig = [index for index in FIGURES.index if FIGURES.loc[index, "filename"] == row["png_name"]][0]
             TEX["DataBasis"] = ltx.include_TableFig(TEX["DataBasis"], FIGURES.loc[key_fig])
+
+    TEX["DataBasis"] = ltx.include_TableFig(TEX["DataBasis"], FIGURES.loc["DataSorce_ResamplingTable_page_1"])
 
     # General Theorie and Definitions
     chapter = 'GeneralTheorie'
@@ -3361,7 +3455,6 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["angle_deviation_scatter_page_1"])
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Roseplots_currents_page_1"])
 
-
     #Data correlation
     chapter = "DataCorrelation"
     TEX[chapter] = TEMPLATES[chapter]
@@ -3383,8 +3476,8 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["table_vmtp_swell_page_1"])
 
     # validation
-    TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc[f"Valid_scatter_wind_{INPUT['Validation_wind']['scatter_configs'][0]}_page_3"])
-    TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc[f"Valid_scatter_swell_{INPUT['Validation_swell']['scatter_configs'][0]}_page_3"])
+    TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc[f"Valid_scatter_wind_page_3"])
+    TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc[f"Valid_scatter_swell_page_3"])
 
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Valid_line_wind_page_3"])
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Valid_line_swell_page_3"])
@@ -3392,10 +3485,10 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc["Valid_line_wind_page_1"], FIGURES.loc["Valid_line_wind_page_2"]])
     TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc["Valid_line_swell_page_1"], FIGURES.loc["Valid_line_swell_page_2"]])
 
-    TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc[f"Valid_scatter_wind_{INPUT['Validation_wind']['scatter_configs'][0]}_page_1"],
-                                                       FIGURES.loc[f"Valid_scatter_wind_{INPUT['Validation_wind']['scatter_configs'][0]}_page_2"]])
-    TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc[f"Valid_scatter_swell_{INPUT['Validation_swell']['scatter_configs'][0]}_page_1"],
-                                                       FIGURES.loc[f"Valid_scatter_swell_{INPUT['Validation_swell']['scatter_configs'][0]}_page_2"]])
+    TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc[f"Valid_scatter_wind_page_1"],
+                                                       FIGURES.loc[f"Valid_scatter_wind_page_2"]])
+    TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc[f"Valid_scatter_swell_page_1"],
+                                                       FIGURES.loc[f"Valid_scatter_swell_page_2"]])
 
     # Extreme
     chapter = "Extreme"
@@ -3405,6 +3498,46 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Extreme_Timeseries_Example"])
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Extreme_qq_example"])
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Extreme_TReturn_example"])
+
+    for Calc_name, Calc in DATA_OUT["ExtremeValues"].items():
+        Var = Calc.basedata["colnames_ini"][1]
+        Sensor_name = COLNAMES_REPORT.loc[[index for index in COLNAMES_REPORT.index if COLNAMES_REPORT.loc[index, "Sensor_names"] == Var][0], "Aliase"]
+
+        template = "\\subsubsection{Data Evaluation: " + f"{Sensor_name}" + "} \n" + "?FIG \n ?FIG  \n ?TABLE \n ?FIG \n ?TABLE \n ?MULTIFIG \n ?MULTIFIG \n ?MULTIFIG"
+
+        temp = ltx.include_Fig(template, FIGURES.loc[f"Extreme_Timeseries_{Calc_name}_page_3"])
+        temp = ltx.include_Fig(temp, FIGURES.loc[f"Extreme_qq_{Calc_name}_page_3"])
+        temp = ltx.include_TableFig(temp, FIGURES.loc[f"Extreme_Parameter_table_{Calc_name}_page_1"])
+        temp = ltx.include_Fig(temp, FIGURES.loc[f"Extreme_T_return_{Calc_name}_page_3"])
+        temp = ltx.include_TableFig(temp, FIGURES.loc[f"T_return_table_{Calc_name}_page_1"])
+        temp = ltx.include_MultiFig(temp, [FIGURES.loc[f"Extreme_Timeseries_{Calc_name}_page_1"], FIGURES.loc[f"Extreme_Timeseries_{Calc_name}_page_2"]])
+        temp = ltx.include_MultiFig(temp, [FIGURES.loc[f"Extreme_qq_{Calc_name}_page_1"], FIGURES.loc[f"Extreme_qq_{Calc_name}_page_2"]])
+        temp = ltx.include_MultiFig(temp, [FIGURES.loc[f"Extreme_T_return_{Calc_name}_page_1"], FIGURES.loc[f"Extreme_T_return_{Calc_name}_page_2"]])
+
+    index = ltx.find_keyword(TEX[chapter], '?DATAEVALUATION')[0]
+    TEX[chapter], _ = ltx.include_str(TEX[chapter], temp, line=index, replace=True)
+
+    # resonant seastate
+    chapter = "Resonant"
+    TEX[chapter] = TEMPLATES[chapter]
+    TEX[chapter_main], _ = ltx.include_include(TEX[chapter_main], chapter)
+
+    TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["RWI_wind_page_3"])
+
+    TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Valid_scatter_wind_page_3"])
+
+    # table DEL RWI comparison
+
+    TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc[f"RWI_wind_page_1"], FIGURES.loc[f"RWI_wind_page_2"]])
+
+    # resonant seastate
+    chapter = "BreakingWaves"
+    TEX[chapter] = TEMPLATES[chapter]
+    TEX[chapter_main], _ = ltx.include_include(TEX[chapter_main], chapter)
+
+    TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["WaveBreak_wind_page_3"])
+
+    TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc[f"WaveBreak_wind_page_1"], FIGURES.loc[f"WaveBreak_wind_page_2"]])
 
     # save TEX files
     for name, tex in TEX.items():
@@ -3443,7 +3576,8 @@ if INPUT["DataOut"]["CSV_out"]:
                     "flat_angles": lambda x: [seg.angles for seg in x.result],
                     "flat_exclude_omni": lambda x: [seg.result for seg in x.result if segment.angles is not None],
                     "deep_data": lambda x: [seg.result["data"] for seg in x.result],
-                    "deep_coeffs": lambda x: [seg.result["coeffs"] for seg in x.result]}
+                    "deep_coeffs": lambda x: [seg.result["coeffs"] for seg in x.result],
+                    "deep_T_return": lambda x: [seg.result["T_return_single"] for seg in x.result]}
 
     for seastate, calc in DATA_OUT["VMHS"].items():
         print(f"   VMHS {seastate}")
@@ -3545,6 +3679,15 @@ if INPUT["DataOut"]["CSV_out"]:
         data.insert(0, df_combined)
         table_names.insert(0, 'combined')
         gl.save_df_list_to_excel(path_csv + f'/table_vmtp_{seastate}', data, sheet_names=table_names)
+
+    for seastate, calc in DATA_OUT["ExtremeValues"].items():
+        print(f"   Extreme Values {seastate}")
+
+        data = unpack_funcs["deep_T_return"](calc)
+        table_names = unpack_funcs["flat_angles"](calc)
+        table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
+
+        gl.save_df_list_to_excel(path_csv + f'/ExtremeValues_{seastate}', data, sheet_names=table_names)
 
     if DATA_OUT["AngleDeviation"]:
         print("   AngleDeviation")

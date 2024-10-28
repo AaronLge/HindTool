@@ -61,3 +61,9 @@ Furthermore, the expected magnitudes and confidence intervals for any needed ret
 
 
 ?FIG
+
+\clearpage
+
+
+?DATAEVALUATION
+

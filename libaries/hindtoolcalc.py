@@ -83,7 +83,7 @@ class Calculation:
 
         return df
 
-    def initilize_filter(self, colnames, mode='range', ranges=None):
+    def initilize_filter(self, colnames=None, mode='range', ranges=None):
         """filters data specified in "basedata" propterty, has to be initilized by using "initilize_from_db". creats "filt" dictionary, that contains:
          indizes_in: datetime index object, with all indizies still in the filtered list
          indizes_out: datetime index object, with all indizies excluded by filtering
@@ -101,6 +101,8 @@ class Calculation:
         indizes_full = self.basedata["indizes"]
 
         if colnames is None:
+            colnames = self.basedata["colnames_ini"]
+        if colnames is 'all':
             df_filt = gl.export_df_from_sql(self.basedata["dbname"], self.basedata["tablename"])
             colnames = list(df_filt.columns)
         else:
