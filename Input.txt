@@ -3,7 +3,7 @@
 
 
 *DataBase*
-path_DataBase				>		"C:/Users/aaron.lange/Desktop/Projekte/HindcastArchive/54.41_5.95_ABP_Mer/54.41_5.95_ABP_Mer.db"
+path_DataBase				>		"C:/Users/aaron.lange/Desktop/Projekte/HindcastArchive/DEL_TEST/54.41_5.95_ABP_Mer.db"
 colnames_preset				>		None
 JBOOST_proj					>		"A:/2024/24A523_Waterkant/JBOOST/JBOOST_Model_Gravity/proj.lua"						
 JBOOST_input				>		"A:/2024/24A523_Waterkant/JBOOST/JBOOST_Model_Gravity/Input JBOOST WAK-DP-A-LILA-MySE18-260-v0.lua"
@@ -44,7 +44,7 @@ datetime_end				>		'1981-07-01 07:00:00'							>	str:	enddatetime in the format:
 #calc_AngleDeviation 		>		['dir_v_m', 'dir_T_mean_Wind', 'v_m']						>	angle_orig, angle_deviation, v_m
 #calc_Roseplots				>		True									>	 [[angle, magnitude],[angle, magnitude]]
 #calc_ExtremeValues			>		True									
-#calc_Validation 			>		['wind', 'swell']											
+calc_Validation 			>		['wind']											
 #calc_SensorEval				>		True
 #calc_Weibull				>		[['dir_v_m', 'v_m']]
 #calc_ExtremeConture			>		[['H_s', 'T_p', 'dir_v_m']]
@@ -211,14 +211,14 @@ rot_r_label					> 		0										>	float:	roation of r-lables in degree
 
 
 *Validation_wind*
-from_DB						> 		True
+from_DB						> 		False
 table_name					>		"DEL_config_1"							
 nodes_to_load				>		['501']							> bei None: 'all'
 scatter_configs				>		['IDLING node 501']
 
 
 *Validation_swell*
-from_DB						> 		True
+from_DB						> 		False
 table_name					>		"DEL_config_2"
 nodes_to_load				>		['501']
 scatter_configs				>		['IDLING node 501']

@@ -7,6 +7,7 @@ from sqlite3 import Error
 import os
 import shutil
 import chardet
+import hashlib
 
 
 from libaries import general as gl
@@ -2077,21 +2078,98 @@ def update_DEL_db(db_path, Hs, Tp, gamma, proj_path=None, input_path=None, exe_p
     else:
         shutil.copy(input_path, exe_path)
 
-    Var_lua = gl.read_lua_values(JBOOST_proj_path_new, ['seabed_level', 'design_life', 'N_ref', 'SN_slope', 'res_Nodes'])
+    Var_lua = gl.read_lua_values(JBOOST_proj_path_new, ['seabed_level',
+                                                        'design_life',
+                                                        'N_ref',
+                                                        'SN_slope',
+                                                        'res_Nodes',
+                                                        'foundation_superelement',
+                                                        'found_stiff_trans',
+                                                        'found_stiff_rotat',
+                                                        'found_stiff_coupl',
+                                                        'found_mass_trans',
+                                                        'found_mass_rotat',
+                                                        'found_mass_coupl',
+                                                        'shearCorr',
+                                                        'res_NumEF',
+                                                        'hydro_add_mass',
+                                                        'water_density',
+                                                        'water_level',
+                                                        'seabed_level',
+                                                        'growth_density',
+                                                        'frequRange',
+                                                        'frequRangeSolution',
+                                                        'maxEFcalc',
+                                                        'damping_struct',
+                                                        'damping_tower',
+                                                        'damping_aerodyn',
+                                                        'tech_availability',
+                                                        'h_refwindspeed',
+                                                        'h_hub',
+                                                        'height_exp',
+                                                        'TM02_period',
+                                                        'refineScatter',
+                                                        'fullScatter',
+                                                        'WindspecDataBase'
+                                                        ])
 
-    Meta_Curr = {"d": -Var_lua["seabed_level"],
+    # open input and create hash value of input file
+    with open(input_path) as input_file:
+        lines = input_file.read()
+        lines = lines.split('\n')
+        processed_lines = [
+            line.split('--')[0].strip()
+            for line in lines
+            if line.strip() and not line.strip().startswith("local")
+        ]
+        processed_lines = [ line for line in processed_lines if len(line) > 0]
+        combined_string = ''.join(processed_lines)
+        combined_string = combined_string.replace('\t', '')
+        hash_value = hashlib.md5(combined_string.encode()).hexdigest()
+
+    Meta_Curr = {
+                 'input_path': input_path,
+                 'input_hash': hash_value,
+                 "d": -Var_lua["seabed_level"],
                  "design_life": Var_lua["design_life"],
                  "N_ref": Var_lua["N_ref"],
                  "SN_slope": Var_lua["SN_slope"],
                  "Hs": Hs.name,
                  "Tp": Tp.name,
                  "gamma": gamma.name,
-                 'input': input_path}
+                 "foundation_superelement":Var_lua["foundation_superelement"],
+                 "found_stiff_trans": Var_lua["found_stiff_trans"],
+                 "found_stiff_rotat": Var_lua["found_stiff_rotat"],
+                 "found_stiff_coupl": Var_lua["found_stiff_coupl"],
+                 "found_mass_trans": Var_lua["found_mass_trans"],
+                 "found_mass_rotat": Var_lua["found_mass_rotat"],
+                 "found_mass_coupl": Var_lua["found_mass_coupl"],
+                 "shearCorr": Var_lua["shearCorr"],
+                 "res_NumEF": Var_lua["res_NumEF"],
+                 "hydro_add_mass": Var_lua["hydro_add_mass"],
+                 "water_density": Var_lua["water_density"],
+                 "water_level": Var_lua["water_level"],
+                 "seabed_level": Var_lua["seabed_level"],
+                 "growth_density": Var_lua["growth_density"],
+                 "frequRange": Var_lua["frequRange"],
+                 "frequRangeSolution": Var_lua["frequRangeSolution"],
+                 "maxEFcalc": Var_lua["maxEFcalc"],
+                 "damping_struct": Var_lua["damping_struct"],
+                 "damping_tower": Var_lua["damping_tower"],
+                 "damping_aerodyn": Var_lua["damping_aerodyn"],
+                 "tech_availability": Var_lua["tech_availability"],
+                 "h_refwindspeed": Var_lua["h_refwindspeed"],
+                 "h_hub": Var_lua["h_hub"],
+                 "height_exp": Var_lua["height_exp"],
+                 "TM02_period": Var_lua["TM02_period"],
+                 "refineScatter": Var_lua["refineScatter"],
+                 "fullScatter": Var_lua["fullScatter"],
+                 "WindspecDataBase": Var_lua["WindspecDataBase"]}
 
     print(f'   used variables from {proj_path}:')
     print(f"   {gl.write_dict(Var_lua)}")
 
-    table_name = gl.check_meta_in_valid_db(db_path, Meta_Curr)
+    table_name = gl.check_meta_in_valid_db(db_path, Meta_Curr, exclude_columns=['input_path'])
 
     if len(table_name) != 0:
         table_name = table_name[0]

@@ -1430,39 +1430,50 @@ def gumbel_conf_intervall(x_max, beta=None, mu=None, mode='percentile', algorith
 
 
 # Function to check if df1 is in df2, and if so, output the row number of the matching row
-def add_unique_row(df1, df2):
+import pandas as pd
+
+def add_unique_row(df1, df2, exclude_columns=None):
     """
-        Checks if a row from df1 exists in df2. If the row exists, returns the
-        updated df2 and the indices of the matching row(s). If the row does not
-        exist, appends the row from df1 to df2 and returns the updated df2 with
-        an empty list of matching indices.
+    Checks if a row from df1 exists in df2 (excluding specified columns).
+    If the row exists, returns the updated df2 and the indices of the matching row(s).
+    If the row does not exist, appends the row from df1 to df2 and returns the
+    updated df2 with an empty list of matching indices.
 
-        Parameters:
-        df1 (pd.DataFrame): A DataFrame with a single row that will be checked
-                            against df2.
-        df2 (pd.DataFrame): A DataFrame that may contain one or more rows, which
-                            will be compared to the row in df1.
+    Parameters:
+    df1 (pd.DataFrame): A DataFrame with a single row that will be checked
+                        against df2.
+    df2 (pd.DataFrame): A DataFrame that may contain one or more rows, which
+                        will be compared to the row in df1.
+    exclude_columns (list, optional): List of columns to exclude from the
+                                      uniqueness check. Default is None.
 
-        Returns:
-        tuple:
-            pd.DataFrame: The updated DataFrame (df2), either with or without the
-                          new row from df1.
-            list: A list of indices where the row from df1 matches any row in df2.
-                  If no match is found, the list is empty."""
+    Returns:
+    tuple:
+        pd.DataFrame: The updated DataFrame (df2), either with or without the
+                      new row from df1.
+        list: A list of indices where the row from df1 matches any row in df2.
+              If no match is found, the list is empty.
+    """
+    if exclude_columns is None:
+        exclude_columns = []
 
-    # Check for rows in df2 that completely match df1
-    matching_rows = df2[df2.eq(df1.values[0]).all(axis=1)]
+    # Drop excluded columns from both df1 and df2 for comparison
+    df1_comp = df1.drop(columns=exclude_columns, errors='ignore')
+    df2_comp = df2.drop(columns=exclude_columns, errors='ignore')
+
+    # Check for rows in df2 that match the row in df1
+    matching_rows = df2_comp[df2_comp.eq(df1_comp.values[0]).all(axis=1)]
 
     if not matching_rows.empty:
-        # If a match is found, output the row number(s)
+        # If a match is found, get the row indices
         matching_indices = matching_rows.index.tolist()
-
     else:
         # If no match is found, append df1 to df2
         df2 = pd.concat([df2, df1], ignore_index=True)
         matching_indices = []
 
     return df2, matching_indices
+
 
 
 # Validation
@@ -1603,7 +1614,7 @@ def write_DEL_base(path_DataBase, DEL_data, Meta_Data):
     return DEL_config_name
 
 
-def check_meta_in_valid_db(db_path, Meta):
+def check_meta_in_valid_db(db_path, Meta, exclude_columns=None):
     # write meta data in dataframe
     df_Meta = pd.DataFrame(columns=list(Meta.keys()))
 
@@ -1623,7 +1634,7 @@ def check_meta_in_valid_db(db_path, Meta):
     if meta_exists:
         # check, if calculation is already been run in the database
         df_Meta_sql = pd.read_sql_query(f"SELECT * FROM {table_name}", conn, index_col='index')
-        _, idx_in_meta = add_unique_row(df_Meta, df_Meta_sql)
+        _, idx_in_meta = add_unique_row(df_Meta, df_Meta_sql, exclude_columns=exclude_columns)
 
     else:
         idx_in_meta = []

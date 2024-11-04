@@ -3586,7 +3586,7 @@ if INPUT["DataBase"].get("create_report", {}):
 
     # plot T_return Tables
     T_return_xlsx = [f for f in os.listdir(path_figs+"\\csv_data") if "ExtremeValues_T_return" in f]
-    T_return_xlsx_path = [path_figs + "\\csv_data\\" + f  for f in T_return_xlsx]
+    T_return_xlsx_path = [path_figs + "\\csv_data\\" + f for f in T_return_xlsx]
     T_return_keyword = [f.replace("ExtremeValues_T_return_", "").replace(".xlsx", "") for f in T_return_xlsx]
 
     for xlsx_path, keyword in zip(T_return_xlsx_path, T_return_keyword):
