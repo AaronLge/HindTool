@@ -1,4 +1,3 @@
-from dill import temp
 
 from libaries import general as gl
 import subprocess
@@ -88,7 +87,7 @@ def include_str(main, string, line, replace=False):
     return '\n'.join(lines), line + lines_include
 
 
-def compile_lualatex(tex_file, pdf_path=None, miktex_lualatex_path='C:/temp/MikTex/miktex/bin/x64/lualatex.exe'):
+def compile_lualatex(tex_file, pdf_path=None, miktex_lualatex_path='C:/temp/MikTex/miktex/bin/x64/lualatex.exe', biber_path = 'C:/temp/MikTex/miktex/bin/x64/biber.exe'):
     # def run_subprocess():
     #     command = f"{miktex_lualatex_path} {tex_file} -output-directory {txt_path}"
     #     with subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, text=True, cwd=txt_path) as process:
@@ -161,7 +160,7 @@ def compile_lualatex(tex_file, pdf_path=None, miktex_lualatex_path='C:/temp/MikT
         print(f"LuaLaTeX compilation failed (maybe): {e}")
     try:
         subprocess.run(
-            [miktex_lualatex_path, tex_file, '-output-directory', txt_path],
+            [biber_path, Main_name, '-output-directory', txt_path],
             check=True,
             cwd=txt_path,
             stdout=subprocess.PIPE,
@@ -195,9 +194,9 @@ def compile_lualatex(tex_file, pdf_path=None, miktex_lualatex_path='C:/temp/MikT
 def include_Fig(string, FigInfo):
     figure_template = ("\\begin{figure}[H] \n "
                        "\\centering \n "
-                       "\\includegraphics[width=\\textwidth]{?FIGURE_PATH} \n "
-                       "\\caption{ ?CAPTION } \n "
-                       "\\label{fig: ?FIGURE_NAME } \n"
+                       "\\includegraphics[width=?FIGURE_WIDTH\\textwidth]{?FIGURE_PATH} \n "
+                       "\\caption{?CAPTION} \n "
+                       "\\label{fig:?FIGURE_NAME} \n"
                        "\\end{figure}")
 
     figure_latex = gl.alias(figure_template,
@@ -219,9 +218,9 @@ def include_MultiFig(string, FigInfo):
 
     figure_template = ("\\begin{figure}[H] \n "
                        "\\centering \n "
-                       "\\includegraphics[width=\\textwidth]{?FIGURE_PATH} \n "
-                       "\\caption{ ?CAPTION } \n "
-                       "\\label{fig: ?FIGURE_NAME } \n"
+                       "\\includegraphics[width=?FIGURE_WIDTH\\textwidth]{?FIGURE_PATH} \n "
+                       "\\caption{?CAPTION} \n "
+                       "\\label{fig:?FIGURE_NAME} \n"
                        "\\end{figure}")
 
     temp = []
@@ -248,10 +247,10 @@ def include_MultiFig(string, FigInfo):
 def include_TableFig(string, FigInfo):
     figure_template = ("\\begin{figure}[H] \n "
                        "\\centering \n "
-                       "\\includegraphics[width=\\textwidth ]{?FIGURE_PATH} \n "
+                       "\\includegraphics[width=?FIGURE_WIDTH\\textwidth ]{?FIGURE_PATH} \n "
                        "\\captionsetup{type=table} \n"
-                       "\\caption{ ?CAPTION } \n "
-                       "\\label{tab: ?FIGURE_NAME } \n"
+                       "\\caption{?CAPTION} \n "
+                       "\\label{tab:?FIGURE_NAME} \n"
                        "\\end{figure}")
 
     figure_latex = gl.alias(figure_template,

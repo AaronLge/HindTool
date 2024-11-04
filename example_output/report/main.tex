@@ -1,0 +1,177 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{array}
+\usepackage{lastpage}
+\usepackage{lipsum}
+\usepackage{multirow}  
+\usepackage{fancyhdr}
+\usepackage[hmargin=2cm,top=4cm,headheight=65pt,footskip=65pt]{geometry}
+\usepackage{xcolor, colortbl}
+\usepackage{geometry}
+\usepackage{graphicx} 
+\usepackage{lastpage}
+\usepackage{fontspec}
+\setmainfont{Arial}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{parskip}
+\usepackage{amsmath}
+% Set up margins
+
+\renewcommand{\headrulewidth}{0pt}
+\definecolor{JBOGrey}{HTML}{8e8778}  
+\definecolor{JBOGreen}{HTML}{008f85}  
+
+\fancyhead[CE,CO,LE,LO,RE,RO]{} 
+
+\fancyhead[C]{ % Centered header
+    \arrayrulecolor{JBOGrey} 
+    \begin{tabular}{|m{3cm}|m{6cm}|m{4cm}|m{1cm}|m{1cm}|}
+        \hline
+        % Row 1
+        \multirow{3}{*}{
+            \makebox[2.7cm][c]{ % Ensures horizontal centering with specified width
+                \raisebox{0pt}[1.5cm][0pt]{ % Adjust height for vertical centering
+                    \includegraphics[width=3.3cm]{JBO_logo.jpg}
+                }
+            }
+        }  
+        & \multirow{3}{*}{
+            \makebox[167pt][c]{ % Ensures horizontal centering within the multirow
+                \raisebox{0pt}[1cm][0pt]{ % Adjust height for vertical centering
+                    \shortstack{
+                        {\fontsize{11}{16.5}\selectfont Technical Note } \\
+                        {\textcolor{JBOGreen}{\fontsize{10}{15}\selectfont \textit{ Hindcast Evaluation for Monopile \newline Design }}}
+                    }
+                }
+            }
+        }
+        % col 2
+        & \centering 
+            \raisebox{0pt}[0.5cm][0pt]{ % Adjust the vertical space here
+                \shortstack{
+                    {\fontsize{6}{9}\selectfont Employer Number} \\ 
+                    {\fontsize{7}{10.5}\selectfont \textbf{ 01 }}} 
+            }
+        % col 3
+        & \multicolumn{2}{c|}{\centering 
+            \raisebox{0pt}[0.6cm][0pt]{ % Adjust this to match column 2
+                \shortstack{
+                    {\fontsize{6}{9}\selectfont Issued on} \\
+                    {\fontsize{7}{10.5}\selectfont \textbf{ 14.09.2023 }}}}} 
+        \\ 
+        
+        % Row 2
+        \cline{3-5} 
+        % col 1
+        & % skipped because multirow    
+        % col 2
+        & \centering 
+            \raisebox{0pt}[0.6cm][0pt]{ % Adjust this to maintain vertical centering
+                \shortstack{
+                    {\fontsize{6}{9}\selectfont Reference Number} \\
+                    {\fontsize{7}{10.5}\selectfont \textbf{ 99Z999-JBO-TNHDCD-EN-3001 }}}        
+            }
+        % col 3
+        & \multicolumn{2}{c|}{
+            \centering \fontsize{9}{13.5}\selectfont \textbf{Revision}}  \\
+         
+        % Row 3
+        \cline{3-3} 
+        % col 1
+        &  % skipped because multirow    
+        % col 2
+        & \centering 
+            \raisebox{0pt}[0.6cm][0pt]{ % Adjust this to maintain vertical centering
+                \shortstack{
+                    {\fontsize{6}{9}\selectfont Status}  \\
+                    {\fontsize{7}{10.5}\selectfont \textbf{ DRA }}}    
+            }
+        % col 3
+        & \centering  
+            \raisebox{0pt}[0.6cm][0pt]{ % Keep this consistent with other columns
+                \shortstack{
+                    {\fontsize{6}{9}\selectfont JBO} \\
+                    {\fontsize{7}{10.5}\selectfont \textbf{ 01 }}}    
+            }
+        & \centering  
+            \raisebox{0pt}[0.6cm][0pt]{ % Keep this consistent with other columns
+                \shortstack{
+                    {\fontsize{6}{9}\selectfont Employer} \\
+                    {\fontsize{7}{10.5}\selectfont \textbf{ 01 }}}   
+            } &
+        
+        \arrayrulecolor{JBOGreen} 
+        \cline{1-5}
+        \arrayrulecolor{JBOGrey} 
+    \end{tabular}
+
+
+}       
+
+\fancyfoot[CE,CO,LE,LO,RE,RO]{}
+
+\fancyfoot[C]{ % Centered footer
+    \begin{tabular}{|m{1.4cm}|m{12cm}|m{2cm}|}
+        \arrayrulecolor{JBOGreen} 
+        \hline
+        \arrayrulecolor{JBOGrey} 
+        \makebox[1.4cm][c]{ % Ensure horizontal centering for "Chapter:"
+            \raisebox{0pt}[0.4cm][0pt]{ % Adjust height for vertical centering
+                {\fontsize{10}{13.8}\selectfont Chapter:}
+            }
+        }
+        & \makebox[12cm][c]{ % Ensure horizontal centering for chapter title
+            \raisebox{0pt}[0.4cm][0pt]{ % Adjust height for vertical centering
+                {\fontsize{10}{13.8}\selectfont \leftmark}
+            }
+        }
+        & \makebox[2cm][c]{ % Ensure horizontal centering for "Page:"
+            \raisebox{0pt}[0.4cm][0pt]{ % Adjust height for vertical centering
+                {\fontsize{10}{13.8}\selectfont Page: (\thepage/\pageref{LastPage})}
+            }
+        } \\
+        \hline              
+    \end{tabular}
+}
+
+\thispagestyle{fancy}
+
+\fancypagestyle{titlepage}{
+    \fancyhf{} 
+    \fancyfoot[C]{
+        \begin{tabular}{m{5cm} m{6cm} m{1.5cm} m{1.5cm} m{0.8cm} }
+        \textcolor{JBOGreen}{\fontsize{10}{15}\selectfont \textbf{JBO Rev.}} &
+        \textcolor{JBOGreen}{\fontsize{10}{15}\selectfont \textbf{Date}} &
+        \textcolor{JBOGreen}{\fontsize{10}{15}\selectfont \textbf{Author}} &
+        \textcolor{JBOGreen}{\fontsize{10}{15}\selectfont \textbf{QC}} &
+        \textcolor{JBOGreen}{\fontsize{10}{15}\selectfont \textbf{App.}} 
+        \\        
+        \arrayrulecolor{JBOGreen} 
+        \hline
+        \fontsize{10}{15}\selectfont 01 &
+        \fontsize{10}{15}\selectfont 14.09.2023 &
+        \fontsize{10}{15}\selectfont ALa &
+        \fontsize{10}{15}\selectfont FOs &
+        \fontsize{10}{15}\selectfont FOs &
+
+        \end{tabular}
+    }
+}
+
+\begin{document}
+\include{titlepage}
+\pagestyle{fancy}
+
+\include{introduction}
+\include{DataBasis}
+\include{GeneralTheorie}
+\include{SensorAnalysis}
+\include{DataCorrelation}
+\include{Extreme}
+\include{Resonant}
+\include{BreakingWaves}
+
+
+\end{document}

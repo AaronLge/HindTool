@@ -17,9 +17,7 @@ from matplotlib.cm import ScalarMappable
 from matplotlib.colors import Normalize
 import pandas as pd
 
-path = r"C:\\temp\\python_self_crated\\packages"
-sys.path.insert(0, path)
-from allib import general as gl
+from libaries import general as gl
 
 
 # %% classes
@@ -221,6 +219,9 @@ class ErrorBar:
 def plot_tiled(Tiles, **kwargs):
 
     plt.rc('text', usetex=True)
+    plt.rcParams["font.family"] = "sans-serif"  # Set font family to sans-serif
+    plt.rcParams["font.sans-serif"] = ["Arial"]
+
     figsize = kwargs.get('figsize', (8.268, 11.693))
     global_max = kwargs.get('global_max', ['auto', 'auto'])
     global_min = kwargs.get('global_min', ['auto', 'auto'])
@@ -369,8 +370,8 @@ def plot_tiled(Tiles, **kwargs):
                 if isKartasian[i]:
 
                     # JBO-Logo
-                    with matplotlib.cbook.get_sample_data(path + '\\allib\\' + 'JBO_logo.png') as file:
-                        image_bgr = plt.imread(file, format='png')
+
+                    image_bgr = plt.imread("JBO_Logo.png", format='png')
 
                     if Tile.x_norm != 'lin':
                         axis.set_xscale(Tile.x_norm)
@@ -585,8 +586,7 @@ def plot_tiled(Tiles, **kwargs):
                     axis = fig.add_subplot(grid[0], grid[1], i_page+1, polar=True)
 
                     # JBO-Logo    
-                    with matplotlib.cbook.get_sample_data(path + '\\allib\\' + 'JBO_logo.png') as file:
-                        image_bgr = plt.imread(file, format='png')
+                    image_bgr = plt.imread("JBO_Logo.png", format='png')
 
                     axin = axis.inset_axes([0.2, 0.6, 0.6, 0.4], zorder=-1)
                     axin.imshow(image_bgr, zorder=-1)
@@ -659,8 +659,8 @@ def plot_rosebar(radial_data, r_bins, angles, r_max=None, plot=None, figsize=Non
 
         fig, axis = plt.subplots(1, 1, figsize=figsize, polar=True)
         # JBO-Logo
-        with matplotlib.cbook.get_sample_data(path + '\\allib\\' + 'JBO_logo.png') as file:
-            image_bgr = plt.imread(file, format='png')
+
+        image_bgr = plt.imread("JBO_Logo.png", format='png')
 
         axin = axis.inset_axes([0.2, 0.6, 0.6, 0.4], zorder=-1)
         axin.imshow(image_bgr, zorder=-1)
@@ -769,6 +769,10 @@ def table(data,  **kwargs):
     Figure
     """
 
+    plt.rc('text', usetex=True)
+    plt.rcParams["font.family"] = "sans-serif"  # Set font family to sans-serif
+    plt.rcParams["font.sans-serif"] = ["Arial"]
+
     col_labels = kwargs.get('collabels', None)
     row_labels = kwargs.get('rowlabels', None)
     auto_width = kwargs.get('auto_width', True)
@@ -786,6 +790,7 @@ def table(data,  **kwargs):
     datatype = kwargs.get('datatype', None)
     cell_height = kwargs.get('cell_height', None)
     cell_width = kwargs.get('cell_width', None)
+    cell_width_unit = kwargs.get('cell_width_unit', 'relative')
 
     try:
         max_data = np.max(data)
@@ -851,7 +856,6 @@ def table(data,  **kwargs):
             cell_height_res = cell_height
             cell_height_res = [cell / sum(cell_height_res) for cell in cell_height_res]
 
-
     if cell_width is not None:
         if type(cell_width) is float or type(cell_width) is int:
             figsize[0] = np.size(CELLS, axis=1) * cell_width*0.39370079
@@ -860,14 +864,15 @@ def table(data,  **kwargs):
             cell_width_res = [cell/sum(cell_width_res) for cell in cell_width_res]
 
         if type(cell_width) is list:
-            figsize[0] = sum(cell_width)*0.39370079
+            if cell_width_unit == 'cm':
+                figsize[0] = sum(cell_width)*0.39370079
             cell_width_res = cell_width
-            cell_width_res = [cell/sum(cell_width_res) for cell in cell_width_res]
-
+            cell_width_res = [cell/sum(cell_width) for cell in cell_width]
 
     # A4 size in inches (landscape)
     fig, ax = plt.subplots(figsize=figsize)
-    ax.set_axis_off()
+    #ax.set_axis_off()
+
     table = ax.table(cellText=CELLS, bbox=[0, 0, 1, 1])
 
     table.auto_set_font_size(False)
@@ -940,12 +945,19 @@ def table(data,  **kwargs):
             cell.set_facecolor('#008f85')  # Blue background color
 
     if titel is not None:
-        plt.rc('text', usetex=True)
-        y_range = ax.get_ylim()[1]
-        ax.text(0.5, 1.05 * y_range, titel, horizontalalignment='center', verticalalignment='center')
+        lines = len(titel.splitlines())
+        text_height_points = lines * fontsize * 1.1
+        _, text_height_data = points_to_data(fig, ax, 0, text_height_points)
+
+        ax.text(0.5, 1+text_height_data, titel, verticalalignment='center', horizontalalignment='center')
 
     fig.tight_layout()
-    fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
+
+    if titel is not None:
+        fig.subplots_adjust(left=0, right=1, bottom=0)
+    else:
+        fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
+
     plt.close(fig)
     return fig
 
@@ -1073,6 +1085,45 @@ def get_yyaxis(ax, side='right', color=None):
 
     return side_ax
 
+
+def points_to_data(fig, ax, x_pt, y_pt):
+    """
+    Convert a position specified in points to data coordinates in a Matplotlib figure.
+
+    Parameters:
+    -----------
+    fig : matplotlib.figure.Figure
+        The figure containing the plot, used to determine DPI and figure size in inches.
+    ax : matplotlib.axes.Axes
+        The axis object where the text will be placed, used to get the current data limits.
+    x_pt : float
+        The x-coordinate in points (1/72 of an inch).
+    y_pt : float
+        The y-coordinate in points (1/72 of an inch).
+
+    Returns:
+    --------
+    tuple (float, float)
+        A tuple (x_data, y_data) giving the position in data coordinates.
+
+    Notes:
+    ------
+    This function allows positioning of elements in points by converting
+    the specified point position into the equivalent data coordinates of the axis.
+    This is useful for adding elements at precise typographic offsets,
+    irrespective of axis scaling.
+    """
+    dpi = fig.dpi
+    fig_width, fig_height = fig.get_size_inches()
+    x_inch = x_pt / 72
+    y_inch = y_pt / 72
+    x_min, x_max = ax.get_xlim()
+    y_min, y_max = ax.get_ylim()
+    x_range = x_max - x_min
+    y_range = y_max - y_min
+    x_data = x_min + (x_inch / fig_width) * x_range
+    y_data = y_min + (y_inch / fig_height) * y_range
+    return x_data, y_data
 
 def update_axis_colors_ticksize_axlabels(
     ax,

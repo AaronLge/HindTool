@@ -239,7 +239,7 @@ DATA_OUT["Validation"] = {}
 DATA_OUT["SensorEval"] = {}
 DATA_OUT["Weibull"] = {}
 DATA_OUT["ExtremeConture"] = {}
-
+DATA_OUT["ExtremeValues"] = {}
 # VMHS
 if (('wind' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
         or ('wind' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
@@ -591,7 +591,7 @@ if (('wind' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
 
     Calc = hc_calc.Calculation()
     Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
-
+    Calc.initilize_filter(mode='nans')
 
     Calc.result = hc_calc.calc_VMTP(DATA_OUT["VMHS"]["wind"].result, DATA_OUT["HSTP"]["wind"].result, fill_range=False)
     DATA_OUT["VMTP"]["wind"] = Calc
@@ -606,6 +606,7 @@ if (('swell' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
 
     Calc = hc_calc.Calculation()
     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
+    Calc.initilize_filter(mode='nans')
 
 
     Calc.result = hc_calc.calc_VMTP(DATA_OUT["VMHS"]["swell"].result, DATA_OUT["HSTP"]["swell"].result, vm_points=df[COLNAMES["v_m"]], fill_range=True)
@@ -727,13 +728,12 @@ if 'wind' in INPUT["Toggle_Modules"].get("calc_RWI", {}):
                                             angle_grid_mod,
                                             INPUT["Structure"]["f_0"])
 
-    omni, RWI_max = hc_calc.calc_RWI(df[COLNAMES["H_s_wind"]],
+    omni, _ = hc_calc.calc_RWI(df[COLNAMES["H_s_wind"]],
                                      df[COLNAMES["T_p_wind"]],
                                      df[COLNAMES["dir_v_m"]],
                                      None,
                                      INPUT["Structure"]["f_0"])
 
-    omni[0].RWI_max = RWI_max
     Calc.result = omni + directional
 
     DATA_OUT["RWI"]["wind"] = Calc
@@ -919,7 +919,6 @@ if INPUT["Toggle_Modules"].get("calc_Roseplots", {}):
 if INPUT["Toggle_Modules"].get("calc_ExtremeValues", {}):
     print("calculating ExtremeValues...")
 
-    DATA_OUT["ExtremeValues"] = {}
     Input = INPUT["ExtremeValues"]
 
     sensors = [Input[key] for key in Input.keys() if 'sensors' in key]
@@ -1041,7 +1040,7 @@ if 'wind' in INPUT["Toggle_Modules"].get("calc_Validation", {}):
                          "sample_rate": gl.median_sample_rate(df.index),
                          "indizes": df.index}
 
-    Calc.initilize_filter(mode='nans')
+    Calc.initilize_filter(mode='nans', colnames='all')
 
     print(f"   processing calculated/loaded DEL data and comparing to condensed data in tables")
     result = hc_calc.calc_Validation(df,
@@ -1090,18 +1089,7 @@ if 'swell' in INPUT["Toggle_Modules"].get("calc_Validation", {}):
     else:
         print(f"   loading from database: {db_path} in table {Input['table_name']} for current nodes and timeframe")
 
-        df = gl.export_df_from_sql(db_path, Input['table_name'], timeframe=timeframe)
-
-        indizes_in = df.index.intersection(df_data.index)
-        indizes_in_2 = df_data.index.intersection(df.index)
-
-        if len(df.index.difference(df_data.index)) != 0:
-            print(f"   loaded data from DEL table and from Hindcast table have different indizes, "
-                  f"{len(df.index.difference(df_data.index))} points dropped from DEL data, {len(df_data.index.difference(df.index))} dropped from Hincast data")
-
-        df = df.loc[indizes_in]
-        df_data = df_data.loc[indizes_in]
-
+        df = gl.export_df_from_sql(db_path, Input['table_name'], timeframe=timeframe, indizes=df_data.index)
         df = gl.filter_df_cols_by_keywords(df, Input['nodes_to_load'])
 
         Calc.basedata = {"dbname": db_path,
@@ -1109,8 +1097,10 @@ if 'swell' in INPUT["Toggle_Modules"].get("calc_Validation", {}):
                          "colnames_ini": df.keys,
                          "db_timeframe": [df.index[0], df.index[1]],
                          "N_rows": len(df),
-                         "sample_rate": df.index[1] - df.index[0],
+                         "sample_rate": gl.median_sample_rate(df.index),
                          "indizes": df.index}
+
+    Calc.initilize_filter(mode='nans', colnames='all')
 
     print(f"   processing calculated/loaded DEL data and comparing to condensed data in tables")
     result = hc_calc.calc_Validation(df,
@@ -1181,8 +1171,12 @@ if len(INPUT["Toggle_Modules"].get("calc_Weibull", {})) > 0:
         DATA_OUT["Weibull"][f"{colnames[1]} over {colnames[0]}"] = Calc
 # %% Plot
 figsize_fullpage = [size * 0.39370079 for size in INPUT["Toggle_Modules"].get("writing_box", {})]
-figsize_halfpage = [figsize_fullpage[0], figsize_fullpage[1] / 2]
+figsize_halfpage = [figsize_fullpage[0], figsize_fullpage[1] / 2.5]
+
 figsize_thirdpage = [figsize_fullpage[0], figsize_fullpage[1] / 3]
+figsize_thirdpage = [figsize_fullpage[0], figsize_fullpage[1] / 3]
+figsize_twothirdpage = [figsize_fullpage[0], figsize_fullpage[1] / 1.5 ]
+figsize_halfpage_halfpage = [figsize_fullpage[0]/2, figsize_fullpage[1] / 2.5 ]
 
 if 'wind' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
     print('plotting VMHS wind...')
@@ -2302,7 +2296,7 @@ if INPUT["Toggle_Modules"].get("plot_Roseplots", {}) and INPUT["Toggle_Modules"]
         i = i + 1
 
     for Tile_single in Tiles_single:
-        FIG = hc_plt.plot_tiled([Tile_single], figsize=figsize_thirdpage, grid=[1, 1])
+        FIG = hc_plt.plot_tiled([Tile_single], figsize=figsize_halfpage_halfpage, grid=[1, 1])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG, path_out + f'Roseplots_{Tile_single.name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2613,7 +2607,7 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
             if Seg.angles is not None:
                 Textbox_DEL = hc_plt.Textbox(Textbox_data,
                                              fontsize=7,
-                                             corner1=[0.4, 1],
+                                             corner1=[0.3, 1],
                                              corner2=[1, 0.4],
                                              colors=colors_data,
                                              orientation_h='left',
@@ -2931,7 +2925,7 @@ if INPUT["Toggle_Modules"].get("plot_SensorEval", {}):
 
         # FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2])
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], grid=[2, 1], figsize=figsize_halfpage)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], grid=[2, 1], figsize=figsize_twothirdpage)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_omni, path_out + f'SensorEval_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2997,6 +2991,225 @@ if INPUT["Toggle_Modules"].get("plot_Weibull", {}):
             gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f'Weibull_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
 
+# %% Data Out
+if INPUT["DataOut"]["CSV_out"]:
+    print("saving CSV Data...")
+
+    path_csv = os.path.join(path_out, 'csv_data')
+    Coeffs_string = ("Regression Coefficients \n"
+                     "order: [c_0, c_1, ..., c_deg]\n "
+                     "with: y(x) = c_0 + c_1 * x + ... + c_deg * x^deg \n \n")
+    try:
+        # Create the new folder
+        os.makedirs(path_csv, exist_ok=True)  # exist_ok=True prevents an error if the folder already exists
+        print(f"Folder created successfully at: {path_csv}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+    unpack_funcs = {"flat_data": lambda x: [seg.result for seg in x.result],
+                    "flat_angles": lambda x: [seg.angles for seg in x.result],
+                    "flat_angles_exclude_omni": lambda x: [seg.angles for seg in x.result if seg.angles is not None],
+                    "flat_exclude_omni": lambda x: [seg.result for seg in x.result if seg.angles is not None],
+                    "deep_data": lambda x: [seg.result["data"] for seg in x.result],
+                    "deep_coeffs": lambda x: [seg.result["coeffs"] for seg in x.result],
+                    "deep_T_return": lambda x: [seg.result["T_return_single"] for seg in x.result],
+                    "deep_ExtremeValues": lambda x: [seg.result["points"] for seg in x.result]}
+
+    for seastate, calc in DATA_OUT["VMHS"].items():
+        print(f"   VMHS {seastate}")
+        data = unpack_funcs["deep_data"](calc)
+        coeffs = unpack_funcs["deep_coeffs"](calc)
+        table_names = unpack_funcs["flat_angles"](calc)
+        table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
+
+        Coeffs = {table_name: coeff for table_name, coeff in zip(table_names, coeffs)}
+
+        Coeffs_string += f"VMHS {seastate} \n \n"
+        Coeffs_string += gl.write_dict(Coeffs) + "\n \n"
+
+        gl.save_df_list_to_excel(path_csv + f'/VMHS_{seastate}', data, sheet_names=table_names)
+
+    for seastate, calc in DATA_OUT["HSTP"].items():
+        print(f"   HSTP {seastate}")
+        data = unpack_funcs["deep_data"](calc)
+        coeffs = unpack_funcs["deep_coeffs"](calc)
+        table_names = unpack_funcs["flat_angles"](calc)
+        table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
+
+        Coeffs = {table_name: coeff for table_name, coeff in zip(table_names, coeffs)}
+
+        Coeffs_string += f"HSTP {seastate} \n \n"
+        Coeffs_string += gl.write_dict(Coeffs) + "\n \n"
+
+        gl.save_df_list_to_excel(path_csv + f'/HSTP_{seastate}', data, sheet_names=table_names)
+
+    for seastate, calc in DATA_OUT["VMTP"].items():
+        print(f"   VMTP {seastate}")
+        data = unpack_funcs["deep_data"](calc)
+        table_names = unpack_funcs["flat_angles"](calc)
+        table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
+
+        gl.save_df_list_to_excel(path_csv + f'/VMTP_{seastate}', data, sheet_names=table_names)
+
+    if INPUT["DataOut"]["CSV_deep"]:
+        for seastate, calc in DATA_OUT["RWI"].items():
+            print(f"   RWI {seastate}")
+
+            df = calc.load_from_db(colnames_ini=True)
+            data = unpack_funcs["flat_data"](calc)
+
+            for i, segment in enumerate(calc.result):
+                df_temp = df.loc[segment.indizes]
+
+                data[i] = pd.concat((data[i], df_temp), axis=1)
+
+            table_names = unpack_funcs["flat_angles"](calc)
+            table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
+
+            gl.save_df_list_to_excel(path_csv + f'/RWI_{seastate}', data, sheet_names=table_names)
+
+        for seastate, calc in DATA_OUT["WaveBreak_Steep"].items():
+            print(f"   WaveBreak_Steep {seastate}")
+
+            data = unpack_funcs["flat_data"](calc)
+            table_names = unpack_funcs["flat_angles"](calc)
+            table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
+
+            gl.save_df_list_to_excel(path_csv + f'/WaveBreak_Steep_{seastate}', data, sheet_names=table_names)
+
+    for seastate, calc in DATA_OUT["table_vmhs"].items():
+        print(f"   table_vmhs {seastate}")
+
+        data = unpack_funcs["flat_data"](calc)
+        table_names = unpack_funcs["flat_angles"](calc)
+        table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
+
+        # combined
+        combined = []
+        for table in data:
+            combined.append(table["value"])
+
+        combined = np.array(combined).T
+
+        df_combined = pd.DataFrame(combined, columns=table_names, index=data[0]["vm_edges"])
+
+        data.insert(0, df_combined)
+        table_names.insert(0, 'combined')
+        gl.save_df_list_to_excel(path_csv + f'/table_vmhs_{seastate}', data, sheet_names=table_names)
+
+    for seastate, calc in DATA_OUT["table_vmtp"].items():
+        print(f"   table_vmtp {seastate}")
+
+        data = unpack_funcs["flat_data"](calc)
+        table_names = unpack_funcs["flat_angles"](calc)
+        table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
+
+        # combined
+        combined = []
+        for table in data:
+            combined.append(table["value"])
+
+        combined = np.array(combined).T
+
+        df_combined = pd.DataFrame(combined, columns=table_names, index=data[0]["vm_edges"])
+
+        data.insert(0, df_combined)
+        table_names.insert(0, 'combined')
+        gl.save_df_list_to_excel(path_csv + f'/table_vmtp_{seastate}', data, sheet_names=table_names)
+
+    for seastate, calc in DATA_OUT["ExtremeValues"].items():
+        print(f"   Extreme Values {seastate}")
+
+        T_return = unpack_funcs["deep_T_return"](calc)
+        points = unpack_funcs["deep_ExtremeValues"](calc)
+        table_names = unpack_funcs["flat_angles"](calc)
+        table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
+
+        gl.save_df_list_to_excel(path_csv + f'/ExtremeValues_T_return_{seastate}', T_return, sheet_names=table_names)
+        gl.save_df_list_to_excel(path_csv + f'/ExtremeValues_points_{seastate}', points, sheet_names=table_names)
+
+    if DATA_OUT["AngleDeviation"]:
+        print("   AngleDeviation")
+
+        calc = DATA_OUT["AngleDeviation"]
+        data = unpack_funcs["flat_exclude_omni"](calc)
+        table_names = unpack_funcs["flat_angles_exclude_omni"](calc)
+        table_names = table_names
+        table_names = [f"{name[0]} to {name[1]}" for name in table_names]
+        gl.save_df_list_to_excel(path_csv + r'//AngleDeviation', data, sheet_names=table_names)
+
+    for seastate, calc in DATA_OUT["Validation"].items():
+        print(f"   Validation {seastate}")
+
+        unpac_func_hindcast_vm_vise = lambda x: [df.result["hindcast"]["vm_vise"] for df in x.result]
+        unpac_func_condensed_vm_vise = lambda x: [df.result["condensed"]["vm_vise"] for df in x.result]
+        unpac_func_condensed_added = lambda x: [df.result["condensed"]["added"] for df in x.result]
+        unpac_func_hindcast_added = lambda x: [df.result["hindcast"]["added"] for df in x.result]
+
+        data_hindcast_vm_vise = unpac_func_hindcast_vm_vise(calc)
+        data_condensed_vm_vise = unpac_func_condensed_vm_vise(calc)
+        data_condensed_added = unpac_func_condensed_added(calc)
+        data_hindcast_added = unpac_func_hindcast_added(calc)
+
+        table_names = unpack_funcs["flat_angles"](calc)
+        table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
+
+        table_hindcast_added_combined = [list(table.values[0]) for table in data_hindcast_added]
+        table_hindcast_added_combined = pd.DataFrame(table_hindcast_added_combined, columns=data_hindcast_added[0].columns)
+        table_hindcast_added_combined["angles"] = table_names
+
+        table_condensed_added_combined = [list(table.values[0]) for table in data_condensed_added]
+        table_condensed_added_combined = pd.DataFrame(table_condensed_added_combined, columns=data_condensed_added[0].columns)
+        table_condensed_added_combined["angles"] = table_names
+
+        table_wind_added = [table_hindcast_added_combined, table_condensed_added_combined]
+
+        gl.save_df_list_to_excel(path_csv + f'/Validation_{seastate}_hindcast_vm_vise', data_hindcast_vm_vise, sheet_names=table_names)
+        gl.save_df_list_to_excel(path_csv + f'/Validation_{seastate}_condensed_vm_vise', data_condensed_vm_vise, sheet_names=table_names)
+        gl.save_df_list_to_excel(path_csv + f'/Validation_{seastate}_added', table_wind_added, sheet_names=["hindcast", "condensed"])
+
+    if len(Coeffs_string) > 0:
+        with open(path_csv + "/Coeffs.txt", "w") as text_file:
+            text_file.write(Coeffs_string)
+
+    if 'wind' in DATA_OUT["RWI"] and 'wind' in DATA_OUT["Validation"]:
+        print("    Resonance Comparison")
+
+        RWI_data = DATA_OUT["RWI"]['wind'].result[0].result
+        RWI_max = RWI_data[0].max()
+        max_index = RWI_data[0].idxmax()
+
+        Seastate_RWI = DATA_OUT["RWI"]['wind'].load_from_db(indizes=[max_index], colnames_ini=True)
+
+        df_DEL = DATA_OUT["Validation"]["wind"].load_from_db()
+        DEL_data = df_DEL[INPUT["Validation_wind"]["scatter_configs"][0]]
+
+        DEL_max = DEL_data.max()
+        max_index = DEL_data.idxmax()
+
+        Seastate_DEL_max = DATA_OUT["RWI"]['wind'].load_from_db(indizes=[max_index], colnames_ini=True)
+
+        marg = 0.2
+        f_0 = INPUT["Structure"]["f_0"]
+        T_0_range = [(1-marg)/f_0, (1+marg)/f_0]
+
+        Table_Resonance = pd.DataFrame(columns=list(Seastate_DEL_max.columns) + ["Magnitude"])
+        Table_Resonance.loc['RWI',:] = list(Seastate_RWI.values[0]) + [RWI_max]
+        Table_Resonance.loc['DEL',:] = list(Seastate_DEL_max.values[0]) + [DEL_max]
+
+        # if (Seastate_DEL_max[COLNAMES["T_p_wind"]].iloc[0] < T_0_range[0]) or (Seastate_DEL_max[COLNAMES["T_p_wind"]].iloc[0] > T_0_range[1]):
+        #     RWI_seastates = DATA_OUT["RWI"]['wind'].load_from_db(colnames_ini=True)
+        #
+        #     RWI_data_filt = gl.filter_dataframe(RWI_seastates, [COLNAMES["T_p_wind"]], [T_0_range[0]], [T_0_range[1]])
+        #     DEL_max_range = DEL_data.loc[RWI_data_filt.index].max()
+        #     max_index_range = DEL_data.loc[RWI_data_filt.index].idxmax()
+        #     Seastate_DEL_max = DATA_OUT["RWI"]['wind'].load_from_db(indizes=[max_index_range], colnames_ini=True)
+        #     Table_Resonance.loc[f'DEL ($T_p$: {T_0_range[0]:.2f} to {T_0_range[1]:.2f})',:] = list(Seastate_DEL_max.values[0]) + [DEL_max_range]
+
+        gl.save_df_list_to_excel(path_csv + f'/Resonance_Compare', [Table_Resonance])
+
+
+
 # %% plot report tables
 if INPUT["DataBase"].get("create_report", {}):
 
@@ -3043,7 +3256,7 @@ if INPUT["DataBase"].get("create_report", {}):
     png_files = [f for f in os.listdir(path_figs) if f.endswith('.png')]
     png_paths = [os.path.join(path_figs, f) for f in os.listdir(path_figs) if f.endswith('.png')]
     png_names = [name.removesuffix('.png') for name in png_files]
-    png_width = [figsize_fullpage[0] for i in range(len(png_names))]
+    png_width = [0.5 if 'Roseplots' in png_name else 1 for png_name in png_names]
 
     FIGURES = pd.DataFrame(columns=["filename", "path", "caption", "width"])
     FIGURES["filename"] = png_files
@@ -3051,6 +3264,10 @@ if INPUT["DataBase"].get("create_report", {}):
     FIGURES["path"] = png_paths
 
     FIGURES["caption"] = [name.replace('_', '-') for name in png_names]
+
+    #FIGURES.loc["Revision_Table_page_1","caption"] = "Revisions"
+
+    # figure captions
     FIGURES.index = png_names
 
     #constant images (theory)
@@ -3058,25 +3275,31 @@ if INPUT["DataBase"].get("create_report", {}):
     FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
     FIGURES.loc[pic, "path"] = path_templates + f"\\{pic}.jpg"
     FIGURES.loc[pic, "caption"] = "Cross correlation for determining peak period over wind speed"
-    FIGURES.loc[pic, "width"] = figsize_fullpage[0]
+    FIGURES.loc[pic, "width"] = 1
 
     pic = "Extreme_Timeseries_Example"
     FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
     FIGURES.loc[pic, "path"] = path_templates + f"\\{pic}.jpg"
     FIGURES.loc[pic, "caption"] = "Exemplary time series indicating extreme values on yearly separation"
-    FIGURES.loc[pic, "width"] = figsize_fullpage[0]
+    FIGURES.loc[pic, "width"] = 1
 
     pic = "Extreme_qq_example"
     FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
     FIGURES.loc[pic, "path"] = path_templates + f"\\{pic}.jpg"
     FIGURES.loc[pic, "caption"] = "Comparison of real and theoretical extreme values"
-    FIGURES.loc[pic, "width"] = figsize_fullpage[0]/2
+    FIGURES.loc[pic, "width"] = 0.5
 
     pic = "Extreme_TReturn_example"
     FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
     FIGURES.loc[pic, "path"] = path_templates + f"\\{pic}.jpg"
     FIGURES.loc[pic, "caption"] = "Extrapolation of return periods with standard deviation"
-    FIGURES.loc[pic, "width"] = figsize_fullpage[0]
+    FIGURES.loc[pic, "width"] = 1
+
+    pic = "Status_table"
+    FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
+    FIGURES.loc[pic, "path"] = path_templates + f"\\{pic}.jpg"
+    FIGURES.loc[pic, "caption"] = "Status Abbreviations"
+    FIGURES.loc[pic, "width"] = 0.4
 
     FIGURES.loc[:, "path"] = [string.replace("\\", "/") for string in FIGURES.loc[:, "path"]]
 
@@ -3189,7 +3412,6 @@ if INPUT["DataBase"].get("create_report", {}):
         if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_pdf([FIG], path_out + 'DataSorce_global', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-
     # plot sensor names
     data = np.array([COLNAMES_REPORT["Symbols"], COLNAMES_REPORT["Aliase"], COLNAMES_REPORT["DataSorce"], COLNAMES_REPORT["Units"]], )
     data = data.T
@@ -3198,7 +3420,8 @@ if INPUT["DataBase"].get("create_report", {}):
                        collabels=col_labels,
                        figsize=figsize_fullpage,
                        cell_height=cell_height_tables,
-                       datatype='str')
+                       datatype='str',
+                       cell_width=[1, 3, 1, 1])
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_png([FIG], path_out + 'Sensor_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3275,6 +3498,38 @@ if INPUT["DataBase"].get("create_report", {}):
     if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_pdf([FIG], path_out + 'Report_table_VMHS', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
+    # example VMHS parameter
+    columns_table = []
+    col_labels = []
+    Input = INPUT["VMHS_docu"]
+
+    new_col = [Input["N_grid"],
+               Input["avrg_method"],
+               Input["average_correction"],
+               f"{100-Input['cut_reg']}" + "\\%",
+               Input["deg_reg"],
+               'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+               f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
+
+    columns_table.append(new_col)
+    col_labels.append('Wind Sea')
+
+    data = np.array(columns_table)
+    data = data.T
+
+    FIG = hc_plt.table(data,
+                       collabels=col_labels,
+                       rowlabels=row_labels,
+                       row_label_name='Parameters',
+                       figsize=figsize_halfpage,
+                       cell_height=cell_height_tables)
+
+    if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_png([FIG], path_out + 'Report_table_VMHS_example', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_pdf([FIG], path_out + 'Report_table_VMHS_example', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
     # plot hstp tables
     columns_table = []
     col_labels = []
@@ -3289,7 +3544,7 @@ if INPUT["DataBase"].get("create_report", {}):
 
     Input = INPUT["HSTP_wind"]
 
-    new_col = [f"[{Input['percentiles'][0]}$\%$ .. {Input['percentiles'][1]}$\%$]" if Input['quantile'] else "none",
+    new_col = [f"[{Input['percentiles'][0]}\\% .. {Input['percentiles'][1]}\\%]" if Input['quantile'] else "none",
                f"[{Input['quant_up']} .. {Input['quant_low']}]" if Input['quantile'] else "none",
                Input["N_grid"],
                Input["avrg_method"],
@@ -3301,7 +3556,7 @@ if INPUT["DataBase"].get("create_report", {}):
     columns_table.append(new_col)
     col_labels.append('Wind Sea')
 
-    new_col = [f"[{Input['percentiles'][0]}$\%$ .. {Input['percentiles'][1]}$\%$]" if Input['quantile'] else "none",
+    new_col = [f"[{Input['percentiles'][0]}\\% .. {Input['percentiles'][1]}\\%]" if Input['quantile'] else "none",
                f"[{Input['quant_up']} .. {Input['quant_low']}]" if Input['quantile'] else "none",
                Input["N_grid"],
                Input["avrg_method"],
@@ -3330,9 +3585,9 @@ if INPUT["DataBase"].get("create_report", {}):
         gl.save_figs_as_pdf([FIG], path_out + 'Report_table_HSTP', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
     # plot T_return Tables
-    T_return_xlsx = [f for f in os.listdir(path_figs+"\\csv_data") if "ExtremeValues" in f]
+    T_return_xlsx = [f for f in os.listdir(path_figs+"\\csv_data") if "ExtremeValues_T_return" in f]
     T_return_xlsx_path = [path_figs + "\\csv_data\\" + f  for f in T_return_xlsx]
-    T_return_keyword = [f.replace("ExtremeValues_","").replace(".xlsx","") for f in T_return_xlsx]
+    T_return_keyword = [f.replace("ExtremeValues_T_return_", "").replace(".xlsx", "") for f in T_return_xlsx]
 
     for xlsx_path, keyword in zip(T_return_xlsx_path, T_return_keyword):
 
@@ -3358,10 +3613,16 @@ if INPUT["DataBase"].get("create_report", {}):
                     gl.save_figs_as_pdf([FIG], path_out + f'T_return_table_{keyword}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
     # plot Extreme Parameter Table
-    for Calc_name, Calc in DATA_OUT["ExtremeValues"].items():
+    points_xlsx = [f for f in os.listdir(path_figs+"\\csv_data") if "ExtremeValues_points_" in f]
+    points_xlsx_path = [path_figs + "\\csv_data\\" + f  for f in points_xlsx]
+    points_keyword = [f.replace("ExtremeValues_points_", "").replace(".xlsx", "") for f in points_xlsx]
 
+    for xlsx_path, keyword in zip(points_xlsx_path, points_keyword):
+
+        data = gl.xlsx2dict(xlsx_path)
+        data_omni = data["omnidirectional"]
         row_labels = ["Number of extreme values", "Samples per year (n)", "Window offset", "Extrapolation method"]
-        Values = [len(Calc.result[0].result["points"]), "1", INPUT["ExtremeValues"]["time_window_offset"], "gumbel"]
+        Values = [len(data_omni), "1", INPUT["ExtremeValues"]["time_window_offset"], "gumbel"]
 
         FIG = hc_plt.table(np.array([Values]).T,
                            collabels=['Values'],
@@ -3372,10 +3633,62 @@ if INPUT["DataBase"].get("create_report", {}):
                            cell_height=cell_height_tables)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_png([FIG], path_out + f'Extreme_Parameter_table_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+            gl.save_figs_as_png([FIG], path_out + f'Extreme_Parameter_table_{keyword}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
         if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_pdf([FIG], path_out + f'Extreme_Parameter_table_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+            gl.save_figs_as_pdf([FIG], path_out + f'Extreme_Parameter_table_{keyword}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+
+    # plot resonance compare tables
+    resonance_xlsx = [f for f in os.listdir(path_figs + "\\csv_data") if "Resonance_Compare" in f]
+    resonance_xlsx_path = [path_figs + "\\csv_data\\" + f  for f in resonance_xlsx]
+
+    data = gl.xlsx2dict(resonance_xlsx_path[0])
+    data = data[list(data.keys())[0]]
+    col_labels = [COLNAMES_REPORT.loc["H_s_wind","Symbols"] + " " + COLNAMES_REPORT.loc["H_s_wind","Units"],
+                  COLNAMES_REPORT.loc["T_p_wind","Symbols"] + " " + COLNAMES_REPORT.loc["T_p_wind","Units"],
+                  COLNAMES_REPORT.loc["dir_v_m", "Symbols"] + " " + COLNAMES_REPORT.loc["dir_v_m", "Units"],
+                  "Magnitude" + "[$\\sqrt{m^2 / Hz}$] or [Nm]"]
+
+    row_labels = list(data.index)
+    Values = data.values
+
+    FIG = hc_plt.table(Values,
+                       collabels=col_labels,
+                       rowlabels=row_labels,
+                       row_label_name='Method',
+                       figsize=figsize_halfpage,
+                       datatype='str',
+                       cell_height=cell_height_tables,
+                       formater='.3f',
+                       cell_width=[2,1,1,1,2])
+
+    if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_png([FIG], path_out + f'Resonance_compare', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_pdf([FIG], path_out + f'Resonance_compare', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    #Revision Table
+    col_labels = ["Rev. JBO", "Rev. Employer", "Date", "Description"]
+
+    Revisions = [INPUT_REPORT["RevisionTable"][rev] for rev in INPUT_REPORT["RevisionTable"].keys()]
+
+    FIG = hc_plt.table(Revisions,
+                       collabels=col_labels,
+                       rowlabels=None,
+                       row_label_name='Parameters',
+                       figsize=figsize_fullpage,
+                       cell_height=0.7,
+                       cell_width=[1, 1, 2, 3])
+
+    if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_png([FIG], path_out + f'Revision_Table', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_pdf([FIG], path_out + f'Revision_Table', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    # DEL RWI vergleich
 
     # %% Create Latex File
 
@@ -3388,6 +3701,18 @@ if INPUT["DataBase"].get("create_report", {}):
     chapter_main = 'main'
     TEX[chapter_main] = ltx.insertLatexVars(TEMPLATES[chapter_main], INPUT_REPORT["DocumentMeta"])
 
+    if INPUT_REPORT["Biblografy"]["BIBDatasets"] == 'auto':
+
+        INPUT_REPORT["Biblografy"]["BIBDatasets"] = os.path.abspath(db_path) + "/datasets.bib"
+
+    TEX[chapter_main] = ltx.insertLatexVars(TEX[chapter_main], INPUT_REPORT["Biblografy"])
+
+    # load acronyms
+    with open(INPUT_REPORT["General"]["acronym_path"], 'r') as f:
+        acros = f.read()
+
+    TEX[chapter_main] = ltx.insertLatexVars(TEX[chapter_main], {"ACRONYMS": acros})
+
     # Titlepage
     chapter = 'titlepage'
 
@@ -3397,10 +3722,13 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter_main], last_idx = ltx.include_str(TEX[chapter_main], '\\pagestyle{fancy}', last_idx+1)
 
     # Introduction
-    chapter = 'introduction'
-    TEX[chapter_main], last_idx = ltx.include_include(TEX[chapter_main], 'introduction', line=last_idx+1)
+    chapter = 'Introduction'
+    TEX[chapter] = TEMPLATES[chapter]
+    TEX[chapter_main], last_idx = ltx.include_include(TEX[chapter_main], chapter, line=last_idx+1)
+    TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Revision_Table_page_1"])
+    TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Status_table"])
 
-    TEX[chapter] = ltx.insertLatexVars(TEMPLATES[chapter], INPUT_REPORT["introduction"])
+    TEX[chapter] = ltx.insertLatexVars(TEX[chapter] , INPUT_REPORT[chapter])
 
     # Data Basis
     chapter = 'DataBasis'
@@ -3421,12 +3749,16 @@ if INPUT["DataBase"].get("create_report", {}):
     for index, row in DATABASE.iterrows():
         if row["used"]:
             key_fig = [index for index in FIGURES.index if FIGURES.loc[index, "filename"] == row["png_name"]][0]
+            database = key_fig.replace("DataSorce_","").replace("_page_1", "")
+
+            FIGURES.loc[key_fig, "caption"] = f'"{database}" Data Set ' + "\\cite{"+f"{database}" +"}"
             TEX["DataBasis"] = ltx.include_TableFig(TEX["DataBasis"], FIGURES.loc[key_fig])
 
     TEX["DataBasis"] = ltx.include_TableFig(TEX["DataBasis"], FIGURES.loc["DataSorce_ResamplingTable_page_1"])
 
     # General Theorie and Definitions
     chapter = 'GeneralTheorie'
+    TEX[chapter] = TEMPLATES[chapter]
     TEX[chapter_main], last_idx = ltx.include_include(TEX[chapter_main], chapter, line=last_idx + 1)
 
     # Sensors
@@ -3467,6 +3799,12 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc["VMHS_wind_page_1"], FIGURES.loc["VMHS_wind_page_2"]])
     TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc["VMHS_swell_page_1"], FIGURES.loc["VMHS_swell_page_2"]])
 
+    TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["HSTP_wind_page_3"])
+    TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["HSTP_swell_page_3"])
+    TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc["HSTP_wind_page_1"], FIGURES.loc["HSTP_wind_page_2"]])
+    TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc["HSTP_swell_page_1"], FIGURES.loc["HSTP_swell_page_2"]])
+
+
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["VMTP_theory"])
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["VMTP_wind_page_3"])
 
@@ -3499,20 +3837,23 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Extreme_qq_example"])
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Extreme_TReturn_example"])
 
-    for Calc_name, Calc in DATA_OUT["ExtremeValues"].items():
-        Var = Calc.basedata["colnames_ini"][1]
-        Sensor_name = COLNAMES_REPORT.loc[[index for index in COLNAMES_REPORT.index if COLNAMES_REPORT.loc[index, "Sensor_names"] == Var][0], "Aliase"]
+    sensors = [INPUT["ExtremeValues"][key] for key in INPUT["ExtremeValues"].keys() if 'sensors' in key]
+    sensor_group_names = [key.replace("sensors_", '') for key in INPUT["ExtremeValues"].keys() if 'sensors' in key]
 
-        template = "\\subsubsection{Data Evaluation: " + f"{Sensor_name}" + "} \n" + "?FIG \n ?FIG  \n ?TABLE \n ?FIG \n ?TABLE \n ?MULTIFIG \n ?MULTIFIG \n ?MULTIFIG"
+    for sensor, sensor_group_name in zip(sensors, sensor_group_names):
 
-        temp = ltx.include_Fig(template, FIGURES.loc[f"Extreme_Timeseries_{Calc_name}_page_3"])
-        temp = ltx.include_Fig(temp, FIGURES.loc[f"Extreme_qq_{Calc_name}_page_3"])
-        temp = ltx.include_TableFig(temp, FIGURES.loc[f"Extreme_Parameter_table_{Calc_name}_page_1"])
-        temp = ltx.include_Fig(temp, FIGURES.loc[f"Extreme_T_return_{Calc_name}_page_3"])
-        temp = ltx.include_TableFig(temp, FIGURES.loc[f"T_return_table_{Calc_name}_page_1"])
-        temp = ltx.include_MultiFig(temp, [FIGURES.loc[f"Extreme_Timeseries_{Calc_name}_page_1"], FIGURES.loc[f"Extreme_Timeseries_{Calc_name}_page_2"]])
-        temp = ltx.include_MultiFig(temp, [FIGURES.loc[f"Extreme_qq_{Calc_name}_page_1"], FIGURES.loc[f"Extreme_qq_{Calc_name}_page_2"]])
-        temp = ltx.include_MultiFig(temp, [FIGURES.loc[f"Extreme_T_return_{Calc_name}_page_1"], FIGURES.loc[f"Extreme_T_return_{Calc_name}_page_2"]])
+        sensor_name = COLNAMES_REPORT.loc[sensor[1], "Aliase"]
+
+        template = "\\subsubsection{Data Evaluation: " + f"{sensor_name}" + "} \n" + "?FIG \n ?FIG  \n ?TABLE \n ?FIG \n ?TABLE \n ?MULTIFIG \n ?MULTIFIG \n ?MULTIFIG"
+
+        temp = ltx.include_Fig(template, FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_3"])
+        temp = ltx.include_Fig(temp, FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_3"])
+        temp = ltx.include_TableFig(temp, FIGURES.loc[f"Extreme_Parameter_table_{sensor_group_name}_page_1"])
+        temp = ltx.include_Fig(temp, FIGURES.loc[f"Extreme_T_return_{sensor_group_name}_page_3"])
+        temp = ltx.include_TableFig(temp, FIGURES.loc[f"T_return_table_{sensor_group_name}_page_1"])
+        temp = ltx.include_MultiFig(temp, [FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_1"], FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_2"]])
+        temp = ltx.include_MultiFig(temp, [FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_1"], FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_2"]])
+        temp = ltx.include_MultiFig(temp, [FIGURES.loc[f"Extreme_T_return_{sensor_group_name}_page_1"], FIGURES.loc[f"Extreme_T_return_{sensor_group_name}_page_2"]])
 
     index = ltx.find_keyword(TEX[chapter], '?DATAEVALUATION')[0]
     TEX[chapter], _ = ltx.include_str(TEX[chapter], temp, line=index, replace=True)
@@ -3526,18 +3867,45 @@ if INPUT["DataBase"].get("create_report", {}):
 
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Valid_scatter_wind_page_3"])
 
-    # table DEL RWI comparison
+    TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Resonance_compare_page_1"])
 
     TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc[f"RWI_wind_page_1"], FIGURES.loc[f"RWI_wind_page_2"]])
 
     # resonant seastate
     chapter = "BreakingWaves"
     TEX[chapter] = TEMPLATES[chapter]
-    TEX[chapter_main], _ = ltx.include_include(TEX[chapter_main], chapter)
+    TEX[chapter_main], last_idx = ltx.include_include(TEX[chapter_main], chapter)
 
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["WaveBreak_wind_page_3"])
 
     TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc[f"WaveBreak_wind_page_1"], FIGURES.loc[f"WaveBreak_wind_page_2"]])
+
+    # list of figures
+    TEX[chapter_main], last_idx = ltx.include_str(TEX[chapter_main], '\\listoffigures', last_idx+1)
+    TEX[chapter_main], last_idx = ltx.include_str(TEX[chapter_main], '\\listoftables \\newpage', last_idx+1)
+
+    # Appendix
+    chapter = "Annex"
+    TEX[chapter] = TEMPLATES[chapter]
+    TEX[chapter_main], _  = ltx.include_include(TEX[chapter_main], chapter, line = last_idx +1 )
+    TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["VMHS_example_page_1"])
+    TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Report_table_VMHS_example_page_1"])
+    TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Sensor_Original_page_1"])
+
+    TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc[f"angle_deviation_table_page_1"],
+                                                       FIGURES.loc[f"angle_deviation_table_page_1"],
+                                                       FIGURES.loc[f"angle_deviation_table_page_2"],
+                                                       FIGURES.loc[f"angle_deviation_table_page_3"],
+                                                       FIGURES.loc[f"angle_deviation_table_page_4"],
+                                                       FIGURES.loc[f"angle_deviation_table_page_5"],
+                                                       FIGURES.loc[f"angle_deviation_table_page_6"],
+                                                       FIGURES.loc[f"angle_deviation_table_page_7"],
+                                                       FIGURES.loc[f"angle_deviation_table_page_8"],
+                                                       FIGURES.loc[f"angle_deviation_table_page_9"],
+                                                       FIGURES.loc[f"angle_deviation_table_page_10"],
+                                                       FIGURES.loc[f"angle_deviation_table_page_11"],
+                                                       FIGURES.loc[f"angle_deviation_table_page_12"],
+                                                       ])
 
     # save TEX files
     for name, tex in TEX.items():
@@ -3555,183 +3923,6 @@ if INPUT["DataBase"].get("create_report", {}):
         webbrowser.open_new(output_pdf)
     else:
         print(f"The file {output_pdf} does not exist.")
-
-
-# %% Data Out
-if INPUT["DataOut"]["CSV_out"]:
-    print("saving CSV Data...")
-
-    path_csv = os.path.join(path_out, 'csv_data')
-    Coeffs_string = ("Regression Coefficients \n"
-                     "order: [c_0, c_1, ..., c_deg]\n "
-                     "with: y(x) = c_0 + c_1 * x + ... + c_deg * x^deg \n \n")
-    try:
-        # Create the new folder
-        os.makedirs(path_csv, exist_ok=True)  # exist_ok=True prevents an error if the folder already exists
-        print(f"Folder created successfully at: {path_csv}")
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-    unpack_funcs = {"flat_data": lambda x: [seg.result for seg in x.result],
-                    "flat_angles": lambda x: [seg.angles for seg in x.result],
-                    "flat_exclude_omni": lambda x: [seg.result for seg in x.result if segment.angles is not None],
-                    "deep_data": lambda x: [seg.result["data"] for seg in x.result],
-                    "deep_coeffs": lambda x: [seg.result["coeffs"] for seg in x.result],
-                    "deep_T_return": lambda x: [seg.result["T_return_single"] for seg in x.result]}
-
-    for seastate, calc in DATA_OUT["VMHS"].items():
-        print(f"   VMHS {seastate}")
-        data = unpack_funcs["deep_data"](calc)
-        coeffs = unpack_funcs["deep_coeffs"](calc)
-        table_names = unpack_funcs["flat_angles"](calc)
-        table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
-
-        Coeffs = {table_name: coeff for table_name, coeff in zip(table_names, coeffs)}
-
-        Coeffs_string += f"VMHS {seastate} \n \n"
-        Coeffs_string += gl.write_dict(Coeffs) + "\n \n"
-
-        gl.save_df_list_to_excel(path_csv + f'/VMHS_{seastate}', data, sheet_names=table_names)
-
-    for seastate, calc in DATA_OUT["HSTP"].items():
-        print(f"   HSTP {seastate}")
-        data = unpack_funcs["deep_data"](calc)
-        coeffs = unpack_funcs["deep_coeffs"](calc)
-        table_names = unpack_funcs["flat_angles"](calc)
-        table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
-
-        Coeffs = {table_name: coeff for table_name, coeff in zip(table_names, coeffs)}
-
-        Coeffs_string += f"HSTP {seastate} \n \n"
-        Coeffs_string += gl.write_dict(Coeffs) + "\n \n"
-
-        gl.save_df_list_to_excel(path_csv + f'/HSTP_{seastate}', data, sheet_names=table_names)
-
-    for seastate, calc in DATA_OUT["VMTP"].items():
-        print(f"   VMTP {seastate}")
-        data = unpack_funcs["deep_data"](calc)
-        table_names = unpack_funcs["flat_angles"](calc)
-        table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
-
-        gl.save_df_list_to_excel(path_csv + f'/VMTP_{seastate}', data, sheet_names=table_names)
-
-    for seastate, calc in DATA_OUT["RWI"].items():
-        print(f"   RWI {seastate}")
-
-        df = calc.load_from_db(colnames_ini=True)
-        data = unpack_funcs["flat_data"](calc)
-
-        for i, segment in enumerate(calc.result):
-            df_temp = df.loc[segment.indizes]
-
-            data[i] = pd.concat((data[i], df_temp), axis=1)
-
-        table_names = unpack_funcs["flat_angles"](calc)
-        table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
-
-        gl.save_df_list_to_excel(path_csv + f'/RWI_{seastate}', data, sheet_names=table_names)
-
-    for seastate, calc in DATA_OUT["WaveBreak_Steep"].items():
-        print(f"   WaveBreak_Steep {seastate}")
-
-        data = unpack_funcs["flat_data"](calc)
-        table_names = unpack_funcs["flat_angles"](calc)
-        table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
-
-        gl.save_df_list_to_excel(path_csv + f'/WaveBreak_Steep_{seastate}', data, sheet_names=table_names)
-
-    for seastate, calc in DATA_OUT["table_vmhs"].items():
-        print(f"   table_vmhs {seastate}")
-
-        data = unpack_funcs["flat_data"](calc)
-        table_names = unpack_funcs["flat_angles"](calc)
-        table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
-
-        # combined
-        combined = []
-        for table in data:
-            combined.append(table["value"])
-
-        combined = np.array(combined).T
-
-        df_combined = pd.DataFrame(combined, columns=table_names, index=data[0]["vm_edges"])
-
-        data.insert(0, df_combined)
-        table_names.insert(0, 'combined')
-        gl.save_df_list_to_excel(path_csv + f'/table_vmhs_{seastate}', data, sheet_names=table_names)
-
-    for seastate, calc in DATA_OUT["table_vmtp"].items():
-        print(f"   table_vmtp {seastate}")
-
-        data = unpack_funcs["flat_data"](calc)
-        table_names = unpack_funcs["flat_angles"](calc)
-        table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
-
-        # combined
-        combined = []
-        for table in data:
-            combined.append(table["value"])
-
-        combined = np.array(combined).T
-
-        df_combined = pd.DataFrame(combined, columns=table_names, index=data[0]["vm_edges"])
-
-        data.insert(0, df_combined)
-        table_names.insert(0, 'combined')
-        gl.save_df_list_to_excel(path_csv + f'/table_vmtp_{seastate}', data, sheet_names=table_names)
-
-    for seastate, calc in DATA_OUT["ExtremeValues"].items():
-        print(f"   Extreme Values {seastate}")
-
-        data = unpack_funcs["deep_T_return"](calc)
-        table_names = unpack_funcs["flat_angles"](calc)
-        table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
-
-        gl.save_df_list_to_excel(path_csv + f'/ExtremeValues_{seastate}', data, sheet_names=table_names)
-
-    if DATA_OUT["AngleDeviation"]:
-        print("   AngleDeviation")
-
-        calc = DATA_OUT["AngleDeviation"]
-        data = unpack_funcs["flat_exclude_omni"](calc)
-        table_names = unpack_funcs["flat_angles"](calc)
-        table_names = table_names
-        table_names = [f"{name[0]} to {name[1]}" for name in table_names]
-        gl.save_df_list_to_excel(path_csv + r'//AngleDeviation', data, sheet_names=table_names)
-
-    for seastate, calc in DATA_OUT["Validation"].items():
-        print(f"   Validation {seastate}")
-
-        unpac_func_hindcast_vm_vise = lambda x: [df.result["hindcast"]["vm_vise"] for df in x.result]
-        unpac_func_condensed_vm_vise = lambda x: [df.result["condensed"]["vm_vise"] for df in x.result]
-        unpac_func_condensed_added = lambda x: [df.result["condensed"]["added"] for df in x.result]
-        unpac_func_hindcast_added = lambda x: [df.result["hindcast"]["added"] for df in x.result]
-
-        data_hindcast_vm_vise = unpac_func_hindcast_vm_vise(calc)
-        data_condensed_vm_vise = unpac_func_condensed_vm_vise(calc)
-        data_condensed_added = unpac_func_condensed_added(calc)
-        data_hindcast_added = unpac_func_hindcast_added(calc)
-
-        table_names = unpack_funcs["flat_angles"](calc)
-        table_names = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in table_names]
-
-        table_hindcast_added_combined = [list(table.values[0]) for table in data_hindcast_added]
-        table_hindcast_added_combined = pd.DataFrame(table_hindcast_added_combined, columns=data_hindcast_added[0].columns)
-        table_hindcast_added_combined["angles"] = table_names
-
-        table_condensed_added_combined = [list(table.values[0]) for table in data_condensed_added]
-        table_condensed_added_combined = pd.DataFrame(table_condensed_added_combined, columns=data_condensed_added[0].columns)
-        table_condensed_added_combined["angles"] = table_names
-
-        table_wind_added = [table_hindcast_added_combined, table_condensed_added_combined]
-
-        gl.save_df_list_to_excel(path_csv + f'/Validation_{seastate}_hindcast_vm_vise', data_hindcast_vm_vise, sheet_names=table_names)
-        gl.save_df_list_to_excel(path_csv + f'/Validation_{seastate}_condensed_vm_vise', data_condensed_vm_vise, sheet_names=table_names)
-        gl.save_df_list_to_excel(path_csv + f'/Validation_{seastate}_added', table_wind_added, sheet_names=["hindcast", "condensed"])
-
-    if len(Coeffs_string) > 0:
-        with open(path_csv + "/Coeffs.txt", "w") as text_file:
-            text_file.write(Coeffs_string)
 
 # %% MAIN - Save Infolog
 print("saving Log...")

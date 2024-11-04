@@ -8,10 +8,10 @@ As monopiles are sensitive to wave excitation, a methodology shall be applied to
 \begin{itemize}
   \item Quasi-static contribution: Wave loads on individual members do have a quasi-static effect, i.e. the wave loads result in internal member forces. Quasi-static fatigue loads can be assumed to be proportional to $\mathrm{H}_{\mathrm{s}}{ }^{\lambda}$, where $\lambda$ is 1 if the wave loading is inertia dominated and 2 if the wave loading is drag dominated [L2].
   \item Energy conservation: In order to maintain the wave energy of the measured/modelled sea states it is considered that $E \sim \mathrm{H}_{\mathrm{s}}{ }^{2}$.
-  \item Dynamic contribution: In addition to the (local) quasi-static contribution, global dynamic excitation occurs. For monopiles this is the dominant effect. For stiff structures, such as jackets, this effect may be negligible. The most probable peak periods will be applied in the expected bandwidth of the first natural frequency ( $50 \%$-quantile), while the periods above and below this defined range are chosen to be on the slightly conservative side by means of different quantiles. See also section Fehler! Verweisquelle konnte nicht gefunden werden..
+  \item Dynamic contribution: In addition to the (local) quasi-static contribution, global dynamic excitation occurs. For monopiles this is the dominant effect. For stiff structures, such as jackets, this effect may be negligible. The most probable peak periods will be applied in the expected bandwidth of the first natural frequency ( $50 \%$-quantile), while the periods above and below this defined range are chosen to be on the slightly conservative side by means of different quantiles. See also .
 \end{itemize}
 
-Weighting of the underlying hindcast data, provided in REF, can hence be performed in two stages:
+Weighting of the underlying hindcast data can hence be performed in two stages:
 
 \begin{itemize}
   \item An equivalent $H_{S}$ is found based on quasi-static and energy-conserving considerations.
@@ -24,7 +24,6 @@ For each directional sector, the corresponding ordinate values $(y)$ over the ab
 
 Initially, the hindcast datapoints are sorted into several bins (see "bin number" in REF and REF). All bins have the same width in $x$. For each bin, a $y$ value is then calculated. This value can be determined by various methods: the arithmetic mean, the median or another quantile, or - in the case of $H_{S}$ - by the weighting approach specified in Eq. 6-2. The chosen method is indicated in "method to derive representative value" in Table 6-1 and Table 6-2. The derived values can subsequently be corrected ("correction factor on averaged values" in Table 6-1). This correction is applied by adjusting the $H_{S}$ values if the DEL comparison between the condensation method and the hindcast data yields unsatisfactory results. This comparison is detailed in section Fehler! Verweisquelle konnte nicht gefunden werden.. The final $y$ values for each bin are referred to as the representative value of each bin.
 
-?TABLE
 
 For higher wind speeds and wave heights, the number of datapoints in the hindcast data set decreases. This can lead to representative values for higher bins fluctuating. To mitigate this, a regression analysis is performed. The results from the regression analysis are then used for the higher bins instead of the representative values. The parameter "proportion of datapoints evaluated with regression curve" (Table 6-1 and Table 6-2) specifies how many points of the hindcast set are considered using the regression analysis results rather than the representative values of the bins. The regression analysis is based on a polynomial function of degree $n$ (defined in Table 6-1 and Table 6-2):
 
@@ -64,6 +63,30 @@ omnidirectional\\
 
 ?MULTIFIG
 
+\subsection{Peak period over significant wave height}
+
+The equivalent peak period $T_P$ vs. significant wave height $H_S$ hindcast data is condensed as follows. Three quantiles for the peak periods are derived from directional hindcast data (H_S  vs. T_P) for each H_S bin:
+
+\begin{itemize}	
+	\item 50%-quantile: represents the best estimate (BE) of occurring peak periods vs. H_S
+	\item 33%-quantile: represents the lower third and hence a lower estimate (LE) of occurring peak periods vs. H_S
+	\item 66%-quantile: represents the upper third and hence an upper estimate (UE) of occurring peak periods vs. H_S
+\end{itemize}
+
+
+The assignment of the quantile functions to the respective periods is dependent on the expected 1st natural period bandwidth of the global configuration ($f_low$ and $f_up$) of the first global bending mode $f_0$.
+Using this approach, peak periods outside the period bandwidth are chosen closer to the first bending mode period (slightly conservative), while the best estimate fit is applied in the specified bandwidth.
+
+?TABLE
+
+The result for the omnidirectional wind sea case is shown in Figure 4 6, and for omnidirectional swell in Figure 4 7. 
+
+?FIG 
+?FIG 
+
+?MULTIFIG
+
+?MULTIFIG
 
 \subsubsection{Peak period over wind speed }
 The cross correlation of the $T_{P}$ data to the $v_{m}$ data is needed, as it forms a sea state with corresponding $H_{S}$ data in the respective $v_{m}$-bin and directional sector. A direct correlation following from a representative value and a regression curve follows no underlying physical connection. Therefore the $v_{m}\left(T_{P}\right)$ relation is derived using the determined correlations $H_{s}\left(v_{m}\right)$ and $T_{P}\left(H_{S}\right)$.
@@ -74,7 +97,7 @@ For this, the function $H_{s}\left(v_{m}\right)$ (REF, left) is inverted to $v_{
 ?FIG
 
 \subsubsection{Summary tables of normal sea state conditions}
-For the final condensation of the sea state-parameters the $H_s$ and $T_p$ values are determined using the $H_s(V_s)$ and $T_p(V_m)$ correlations. Therefore, the small-gridded functions are used to interpolate the data on the desired v_m- grid. The values are only calculated in the $v_m$ - range with data given. Bins inside the evaluated limits with zero occurrence probabilities are greyed out. The results are displayed in the tables (REF).
+For the final condensation of the sea state-parameters the $H_s$ and $T_p$ values are determined using the $H_s(V_s)$ and $T_p(V_m)$ correlations. Therefore, the small-gridded functions are used to interpolate the data on the desired $v_m$ - grid. The values are only calculated in the $v_m$ - range with data given. Bins inside the evaluated limits with zero occurrence probabilities are greyed out. The results are displayed in the tables (REF).
 
 ?TABLE
 ?TABLE

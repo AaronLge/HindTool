@@ -1,0 +1,15 @@
+
+\section{Resonance sea state }
+
+Dynamic sea state resonance shall be analysed especially for low frequent wind turbine configurations. The identification of the sea state that creates highest excitation loads can be performed in two ways.\\
+a) Dynamic fatigue loads are proportional to $\sqrt{S_{\zeta \zeta}\left(\omega_{0}\right)}$, where $S_{\zeta \zeta\left(\omega_{0}\right)}$ is the spectral energy of the wave spectrum at first eigenfrequency Fehler! Verweisquelle konnte nicht gefunden werden.. This can be derived from frequency domain calculations for a narrow band response, which is a good approximation in case dynamic excitation is significant. It is denoted as Resonant Wave Intensity (RWI).\\
+
+?FIG 
+b) Assessment of frequency domain DEL of the bending moment at mudline for idling conditions using modal superposition.\\
+
+?FIG
+
+A comparison of the most Severe Seastates is shown in table REF. ERKLÄRUNG BEI ABWEICHUNG??
+?TABLE 
+
+?MULTIFIG

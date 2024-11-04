@@ -2,9 +2,15 @@
 path_latex_templates 		> 		".\latex_templates"	
 fig_path					>		".\example_output"
 #fig_path					>		
+acronym_path				>		"C:/Users/aaron.lange/Desktop/Projekte/Report_Automation/Acronyms.txt"
 
 *Database_Info*
 db_info_txt					>		'auto'
+
+*Biblografy*
+BIBDatasets                 >		"C:/Users/aaron.lange/Desktop/Projekte/HindcastArchive/54.41_5.95_ABP_Mer/datasets.bib"
+BIBLiteratur				>		"C:/Users/aaron.lange/Desktop/Projekte/Report_Automation/Literature.bib"
+BIBGuidelines				>		"C:/Users/aaron.lange/Desktop/Projekte/Report_Automation/TechnicalGuidelines.bib"
 
 
 *Symbols*
@@ -68,6 +74,12 @@ DocumentAuthor				>		"ALa"
 QualityCheck				>		"FOs"
 Approval					>		"FOs"
 
-*introduction*
+
+
+*RevisionTable*
+Rev_1						>		["01", "01", "30.10.2024", "First Release"]
+
+
+*Introduction*
 siteSpecific				>		"The here investigated project site is a generic site in the German North Sea. Monopile substructures are assumed to be derived as substructure type."
 

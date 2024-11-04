@@ -187,12 +187,12 @@ class Calculation:
                 titles.append(header)
         return titles
 
-    def load_from_db(self, column_names=None, applie_filt=True, colnames_ini=False, **kwargs):
+    def load_from_db(self, column_names=None, applie_filt=True, colnames_ini=False, indizes=None,**kwargs):
         """wrapper for export_df_from_sql in general lib, takes db_name and tablename from Calculation information, applies filter if it is there"""
         if colnames_ini:
             column_names = self.basedata["colnames_ini"]
 
-        df = gl.export_df_from_sql(self.basedata["dbname"], self.basedata["tablename"], column_names=column_names)
+        df = gl.export_df_from_sql(self.basedata["dbname"], self.basedata["tablename"], column_names=column_names, indizes=indizes)
 
         if (self.filt is None) or not applie_filt:
             df = df[df.index.isin(self.basedata["indizes"])]

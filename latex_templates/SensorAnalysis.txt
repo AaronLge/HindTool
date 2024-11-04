@@ -1,5 +1,5 @@
 \section{Sensor analysis}
-An overview of the applied sensors is provided in REFERNECE. For each sensor the histogram and the global time series is provided in this chapter.
+An overview of the applied sensors is provided in \ref{tab:Sensor_names_page_1}. For each sensor the histogram and the global time series is provided in this chapter.
 
 \subsection{Sensor overview}
 
