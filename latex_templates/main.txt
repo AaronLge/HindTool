@@ -7,6 +7,7 @@
 \usepackage{lipsum}
 \usepackage{multirow}  
 \usepackage{fancyhdr}
+\usepackage[htt]{hyphenat}
 \usepackage[hmargin=2cm,top=4cm,headheight=65pt,footskip=65pt]{geometry}
 \usepackage{xcolor, colortbl}
 \usepackage{geometry}
@@ -22,9 +23,15 @@
 \usepackage[english]{babel}
 \usepackage[
 backend=biber,
-style=alphabetic,
+style=numeric,
 sorting=ynt
 ]{biblatex}
+
+\usepackage{amsmath} % Ensure this package is included
+\numberwithin{equation}{section}
+\numberwithin{table}{section}
+\numberwithin{figure}{section}
+
 \addbibresource{?BIBDatasets}
 \addbibresource{?BIBLiteratur}
 \addbibresource{?BIBGuidelines}

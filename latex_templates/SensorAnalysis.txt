@@ -1,5 +1,6 @@
-\section{Sensor analysis}
-An overview of the applied sensors is provided in \ref{tab:Sensor_names_page_1}. For each sensor the histogram and the global time series is provided in this chapter.
+\section{Sensor analysis} \label{sec:Sensor_Analysis}
+
+An overview of the applied sensors is provided in Table \ref{tab:Sensor_names_page_1}. For each sensor the histogram and the global time series is provided in this chapter.
 
 \subsection{Sensor overview}
 
@@ -34,10 +35,10 @@ The occurrence probability of the wind direction and wave direction is considere
 
 ?FIG
 
-For the assignment of probabilities to the load situations in the design load case table, the data set is evaluated for each wind speed bin (delta = 1 m/s), wind direction and wave direction, both with a sector width of 30° (see Appendix). 
+For the assignment of probabilities to the load situations in the design load case table, the data set is evaluated for each wind speed bin ($\Delta v = 1 [m/s]$), wind direction and wave direction, both with a sector width of 30° (see Appendix). 
 
+\clearpage 
 
-\clearpage
 \subsubsection{Current direction and current speed occurrence}
 
 ?FIG 

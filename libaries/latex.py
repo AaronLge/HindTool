@@ -247,21 +247,40 @@ def include_MultiFig(string, FigInfo):
 def include_TableFig(string, FigInfo):
     figure_template = ("\\begin{figure}[H] \n "
                        "\\centering \n "
-                       "\\includegraphics[width=?FIGURE_WIDTH\\textwidth ]{?FIGURE_PATH} \n "
                        "\\captionsetup{type=table} \n"
                        "\\caption{?CAPTION} \n "
+                       "\\includegraphics[width=?FIGURE_WIDTH\\textwidth ]{?FIGURE_PATH} \n "
                        "\\label{tab:?FIGURE_NAME} \n"
                        "\\end{figure}")
 
-    figure_latex = gl.alias(figure_template,
-                            {"1": "?FIGURE_PATH",
-                             "2": "?CAPTION",
-                             "3": "?FIGURE_NAME",
-                             "4": "?FIGURE_WIDTH"},
-                            {"1": FigInfo["path"],
-                             "2": FigInfo["caption"],
-                             "3": FigInfo.name,
-                             "4": f"{FigInfo['width']}"})
+    figure_template_no_cap = ("\\begin{figure}[H] \n "
+                       "\\centering \n "
+                       "\\includegraphics[width=?FIGURE_WIDTH\\textwidth ]{?FIGURE_PATH} \n "
+                       "\\label{tab:?FIGURE_NAME} \n"
+                       "\\end{figure}")
+
+
+    if FigInfo["caption"] is None:
+
+        figure_latex = gl.alias(figure_template_no_cap,
+                                {"1": "?FIGURE_PATH",
+                                 "3": "?FIGURE_NAME",
+                                 "4": "?FIGURE_WIDTH"},
+                                {"1": FigInfo["path"],
+                                 "3": FigInfo.name,
+                                 "4": f"{FigInfo['width']}"})
+    else:
+
+        figure_latex = gl.alias(figure_template,
+                                {"1": "?FIGURE_PATH",
+                                 "2": "?CAPTION",
+                                 "3": "?FIGURE_NAME",
+                                 "4": "?FIGURE_WIDTH"},
+                                {"1": FigInfo["path"],
+                                 "2": FigInfo["caption"],
+                                 "3": FigInfo.name,
+                                 "4": f"{FigInfo['width']}"})
+
 
     lines = find_keyword(string, '?TABLE')
     string_out, _ = include_str(string, figure_latex, line=lines[0], replace=True)

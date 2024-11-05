@@ -66,7 +66,7 @@ the wave-propagation directions of both sea states which may differ. Afterwards 
 sea states, given in three-dimensional coordinate systems, are superposed.\\
 
 
-Where a wave spectrum will be considerd for normal and extreme conditinos (ESS, NSS, SSS), the irregular sea states are
+Where a wave spectrum will be considerd for normal and extreme conditinos (\ac{ESS}, \ac{NSS}, \ac{SSS}), the irregular sea states are
 described according to the JONSWAP spectrum definitions in \cite{DNV-ST_0437}:
 
 \begin{equation}

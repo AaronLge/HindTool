@@ -1,11 +1,11 @@
-\section{Breaking waves}
-In accordance to [N3], wave breaking (or wave slamming) as a consequence of steep irregular sea states shall be considered in the design of offshore substructures. As criteria, the exceedance of 0.04 by the ratio of significant wave height $H_{S}$ and wave length $\lambda$ is given.
+\subsection{Breaking waves}
+In accordance to \cite{DNV_RP_C205}, wave breaking (or wave slamming) as a consequence of steep irregular sea states shall be considered in the design of offshore substructures. As criteria, the exceedance of 0.04 by the ratio of significant wave height $H_{s}$ and wave length $\lambda$ is given.
 
 \begin{align}
 H_{S} / L\left(T_{p}\right)>0.04
 \end{align}
 
-The wave length $L$ is given by the linear dispersion relationship based on the peak period $T_{p}$ of the sea state.\\
+The wave length $L$ is given by the linear dispersion relationship based on the peak period $T_{p}$ of the sea state. The results can be found in Figure \ref{fig:WaveBreak_wind_page_3}, \ref{fig:WaveBreak_wind_page_1} and \ref{fig:WaveBreak_wind_page_2}.\\
 
 ?FIG
 

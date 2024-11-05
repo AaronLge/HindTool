@@ -127,7 +127,7 @@ timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 
 if args.o is None:
     if INPUT['DataOut']['dir_name'] is None:
-        path_out = os.path.abspath(INPUT['DataOut']['path_out']) + '\\HindCast_' + timestamp + '/'
+        path_out = os.path.abspath(INPUT['DataOut']['path_out']) + '\\HindCast_' + timestamp + '\\'
     else:
         path_out = INPUT['SELECT']['path_out'] + \
                    INPUT['SELECT']['dir_name'] + '/'
@@ -3013,7 +3013,9 @@ if INPUT["DataOut"]["CSV_out"]:
                     "deep_data": lambda x: [seg.result["data"] for seg in x.result],
                     "deep_coeffs": lambda x: [seg.result["coeffs"] for seg in x.result],
                     "deep_T_return": lambda x: [seg.result["T_return_single"] for seg in x.result],
-                    "deep_ExtremeValues": lambda x: [seg.result["points"] for seg in x.result]}
+                    "deep_ExtremeValues": lambda x: [seg.result["points"] for seg in x.result],
+                    "weibull": lambda x: [seg.result["weibull_params"] for seg in x.result],
+                    "indizes": lambda x: [len(seg.indizes) for seg in x.result]}
 
     for seastate, calc in DATA_OUT["VMHS"].items():
         print(f"   VMHS {seastate}")
@@ -3168,6 +3170,22 @@ if INPUT["DataOut"]["CSV_out"]:
         gl.save_df_list_to_excel(path_csv + f'/Validation_{seastate}_condensed_vm_vise', data_condensed_vm_vise, sheet_names=table_names)
         gl.save_df_list_to_excel(path_csv + f'/Validation_{seastate}_added', table_wind_added, sheet_names=["hindcast", "condensed"])
 
+    for calc_name, calc in DATA_OUT["Weibull"].items():
+
+        data = unpack_funcs["weibull"](calc)
+        angles = unpack_funcs["flat_angles"](calc)
+        angles = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in angles]
+
+        indizes = unpack_funcs["indizes"](calc)
+        occurence = [ind/max(indizes)*100 for ind in indizes]
+        values = [list(dict.values()) + [round(occ,1)] for dict, occ in zip(data,occurence) ]
+
+        table_weibull = pd.DataFrame(columns=["k", "loc", "a", "mean", "std", "occurence"], index=angles, data=values)
+
+        gl.save_df_list_to_excel(path_csv + f'/Weibull', [table_weibull])
+
+
+
     if len(Coeffs_string) > 0:
         with open(path_csv + "/Coeffs.txt", "w") as text_file:
             text_file.write(Coeffs_string)
@@ -3220,7 +3238,7 @@ if INPUT["DataBase"].get("create_report", {}):
         print("please specify Report_Input")
 
     # Create Report Output
-    path_report = os.path.join(path_out, 'report')
+    path_report = path_out + "report"
     try:
         # Create the new folder
         os.makedirs(path_report, exist_ok=True)  # exist_ok=True prevents an error if the folder already exists
@@ -3258,50 +3276,7 @@ if INPUT["DataBase"].get("create_report", {}):
     png_names = [name.removesuffix('.png') for name in png_files]
     png_width = [0.5 if 'Roseplots' in png_name else 1 for png_name in png_names]
 
-    FIGURES = pd.DataFrame(columns=["filename", "path", "caption", "width"])
-    FIGURES["filename"] = png_files
-    FIGURES["width"] = png_width
-    FIGURES["path"] = png_paths
 
-    FIGURES["caption"] = [name.replace('_', '-') for name in png_names]
-
-    #FIGURES.loc["Revision_Table_page_1","caption"] = "Revisions"
-
-    # figure captions
-    FIGURES.index = png_names
-
-    #constant images (theory)
-    pic = "VMTP_theory"
-    FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
-    FIGURES.loc[pic, "path"] = path_templates + f"\\{pic}.jpg"
-    FIGURES.loc[pic, "caption"] = "Cross correlation for determining peak period over wind speed"
-    FIGURES.loc[pic, "width"] = 1
-
-    pic = "Extreme_Timeseries_Example"
-    FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
-    FIGURES.loc[pic, "path"] = path_templates + f"\\{pic}.jpg"
-    FIGURES.loc[pic, "caption"] = "Exemplary time series indicating extreme values on yearly separation"
-    FIGURES.loc[pic, "width"] = 1
-
-    pic = "Extreme_qq_example"
-    FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
-    FIGURES.loc[pic, "path"] = path_templates + f"\\{pic}.jpg"
-    FIGURES.loc[pic, "caption"] = "Comparison of real and theoretical extreme values"
-    FIGURES.loc[pic, "width"] = 0.5
-
-    pic = "Extreme_TReturn_example"
-    FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
-    FIGURES.loc[pic, "path"] = path_templates + f"\\{pic}.jpg"
-    FIGURES.loc[pic, "caption"] = "Extrapolation of return periods with standard deviation"
-    FIGURES.loc[pic, "width"] = 1
-
-    pic = "Status_table"
-    FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
-    FIGURES.loc[pic, "path"] = path_templates + f"\\{pic}.jpg"
-    FIGURES.loc[pic, "caption"] = "Status Abbreviations"
-    FIGURES.loc[pic, "width"] = 0.4
-
-    FIGURES.loc[:, "path"] = [string.replace("\\", "/") for string in FIGURES.loc[:, "path"]]
 
     # Plot Tables
     cell_height_tables = 0.7
@@ -3637,8 +3612,6 @@ if INPUT["DataBase"].get("create_report", {}):
 
         if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_pdf([FIG], path_out + f'Extreme_Parameter_table_{keyword}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-
     # plot resonance compare tables
     resonance_xlsx = [f for f in os.listdir(path_figs + "\\csv_data") if "Resonance_Compare" in f]
     resonance_xlsx_path = [path_figs + "\\csv_data\\" + f  for f in resonance_xlsx]
@@ -3688,10 +3661,136 @@ if INPUT["DataBase"].get("create_report", {}):
     if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_pdf([FIG], path_out + f'Revision_Table', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-    # DEL RWI vergleich
+    # Weibull parameters
+    data = gl.xlsx2dict(path_figs + "\\csv_data\\Weibull.xlsx")["Sheet1"]
 
-    # %% Create Latex File
+    FIG = hc_plt.table(data.values,
+                       collabels=["k", "loc", "a",	"mean",	"std",	"occurence [\%]"],
+                       rowlabels=data.index,
+                       row_label_name='directional set [deg]',
+                       figsize=figsize_fullpage,
+                       cell_height=0.7,
+                       formater=".3f")
 
+    if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_png([FIG], path_out + f'Weibull_table', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_pdf([FIG], path_out + f'Weibull_table', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    FIGURES = pd.DataFrame(columns=["filename", "path", "caption", "width"])
+    FIGURES["filename"] = png_files
+    FIGURES["width"] = png_width
+    FIGURES["path"] = png_paths
+
+    FIGURES["caption"] = [name.replace('_', '-') for name in png_names]
+
+    # figure captions
+    FIGURES.index = png_names
+
+    FIGURES.loc["Roseplots_currents_page_1", "width"] = 1
+
+    # captions
+    FIGURES.loc["DataSorce_global_page_1", "caption"] = "General databasis parameters"
+    FIGURES.loc["Sensor_names_page_1", "caption"] = "Sensor overview"
+    FIGURES.loc["Roseplots_wind_page_1", "caption"] = "Roseplot windspeed"
+    FIGURES.loc["Roseplots_wind_sea_page_1", "caption"] = "Roseplot wind sea"
+    FIGURES.loc["Roseplots_swell_sea_page_1", "caption"] = "Roseplot swell sea"
+    FIGURES.loc["angle_deviation_scatter_page_1", "caption"] = "Angle Missaligment"
+    FIGURES.loc["Roseplots_currents_page_1", "caption"] = "Roseplot currents"
+    FIGURES.loc["Report_table_VMHS_page_1", "caption"] = "Condensation parameter wind speed versus significant wave height"
+    FIGURES.loc["Report_table_HSTP_page_1", "caption"] = "Condensation parameter significant wave height versus peak period"
+    FIGURES.loc["VMHS_wind_page_3", "caption"] = "Condensation of significant wave height over wind speed, wind sea, omnidirectional"
+    FIGURES.loc["VMHS_swell_page_3", "caption"] = "Condensation of significant wave height over wind speed, swell sea, omnidirectional"
+    FIGURES.loc["VMHS_wind_page_1", "caption"] = "Condensation of significant wave height over wind speed, wind sea, directional distribution A"
+    FIGURES.loc["VMHS_wind_page_2", "caption"] = "Condensation of significant wave height over wind speed, wind sea, directional distribution B"
+    FIGURES.loc["VMHS_swell_page_1", "caption"] = "Condensation of significant wave height over wind speed, swell sea, directional distribution A"
+    FIGURES.loc["VMHS_swell_page_2", "caption"] = "Condensation of significant wave height over wind speed, swell sea, directional distribution B"
+    FIGURES.loc["HSTP_wind_page_3", "caption"] = "Condensation of peak wave period over significant wave height, wind sea, omnidirectional"
+    FIGURES.loc["HSTP_swell_page_3", "caption"] = "Condensation of peak wave period over significant wave height, swell sea, omnidirectional"
+    FIGURES.loc["HSTP_wind_page_1", "caption"] = "Condensation of peak wave period over significant wave height, wind sea, directional distribution A"
+    FIGURES.loc["HSTP_wind_page_2", "caption"] = "Condensation of peak wave period over significant wave height, wind sea, directional distribution B"
+    FIGURES.loc["HSTP_swell_page_1", "caption"] = "Condensation of peak wave period over significant wave height, swell sea, directional distribution A"
+    FIGURES.loc["HSTP_swell_page_2", "caption"] = "Condensation of peak wave period over significant wave height, swell sea, directional distribution B"
+    FIGURES.loc["table_vmhs_wind_page_1", "caption"] = "Condensed significant wave height data, directional distribution, wind sea"
+    FIGURES.loc["table_vmhs_swell_page_1", "caption"] = "Condensed significant wave height data, directional distribution, swell sea"
+    FIGURES.loc["table_vmtp_wind_page_1", "caption"] = "Condensed peak wave period data, directional distribution, wind sea"
+    FIGURES.loc["table_vmtp_swell_page_1", "caption"] = "Condensed peak wave period data, directional distribution, swell sea"
+    FIGURES.loc["VMTP_wind_page_3", "caption"] = "Condensation of peak wave period over wind speed, wind sea, omnidirectional"
+    FIGURES.loc["Valid_scatter_wind_page_3", "caption"] = "Bending DEL for each sea state in hindcast data set, wind sea, omnidirectional"
+    FIGURES.loc["Valid_scatter_swell_page_3", "caption"] = "Bending DEL for each sea state in hindcast data set, swell sea, omnidirectional"
+    FIGURES.loc["Valid_line_wind_page_3", "caption"] = "Validation of condensation, wind sea, omnidirectional"
+    FIGURES.loc["Valid_line_swell_page_3", "caption"] = "Validation of condensation, swell sea, omnidirectional"
+    FIGURES.loc["Valid_line_wind_page_1", "caption"] = "Validation of condensation, wind sea, directional distribution A"
+    FIGURES.loc["Valid_line_wind_page_2", "caption"] = "Validation of condensation, wind sea, directional distribution B"
+    FIGURES.loc["Valid_line_swell_page_1", "caption"] = "Validation of condensation, swell sea, directional distribution A"
+    FIGURES.loc["Valid_line_swell_page_2", "caption"] = "Validation of condensation, swell sea, directional distribution B"
+    FIGURES.loc["Valid_scatter_wind_page_1", "caption"] = "Bending DEL for each sea state in hindcast data set, wind sea, directional distribution A"
+    FIGURES.loc["Valid_scatter_wind_page_2", "caption"] = "Bending DEL for each sea state in hindcast data set, wind sea, directional distribution B"
+    FIGURES.loc["Valid_scatter_swell_page_1", "caption"] = "Bending DEL for each sea state in hindcast data set, swell sea, directional distribution A"
+    FIGURES.loc["Valid_scatter_swell_page_2", "caption"] = "Bending DEL for each sea state in hindcast data set, swell sea, directional distribution B"
+    FIGURES.loc["RWI_wind_page_3", "caption"] = "Resonance Wave Intensity (RWI), wind sea, omnidirectional"
+    FIGURES.loc["RWI_wind_page_1", "caption"] = "Resonance Wave Intensity (RWI), wind sea, directional distribution A"
+    FIGURES.loc["RWI_wind_page_2", "caption"] = "Resonance Wave Intensity (RWI), wind sea, directional distribution B"
+    FIGURES.loc["Resonance_compare_page_1", "caption"] = "Comparison of most severe seastate detemined by RWI and DEL"
+    FIGURES.loc["WaveBreak_wind_page_3", "caption"] = "Sea states with breaking waves, wind sea, omnidirectional"
+    FIGURES.loc["WaveBreak_wind_page_1", "caption"] = "Sea states with breaking waves, wind sea, directional distribution A"
+    FIGURES.loc["WaveBreak_wind_page_2", "caption"] = "Sea states with breaking waves, wind sea, directional distribution B"
+    FIGURES.loc["Weibull_v_m over dir_v_m_page_3", "caption"] = "Weibull fit, omnidirectional"
+    FIGURES.loc["Weibull_v_m over dir_v_m_page_1", "caption"] = "Weibull fit, directional distribution A"
+    FIGURES.loc["Weibull_v_m over dir_v_m_page_2", "caption"] = "Weibull fit, directional distribution B"
+    FIGURES.loc["Weibull_table_page_1", "caption"] = "Weibull fit, parameters"
+    FIGURES.loc["VMHS_example_page_1", "caption"] = "Example of condensation of significant wave height over wind speed, wind sea, omnidirectional"
+    FIGURES.loc["Report_table_VMHS_example_page_1", "caption"] = "Condensation parameter wind speed versus significant wave height for the example"
+    FIGURES.loc["Sensor_Original_page_1", "caption"] = "Sensor names in databasis"
+    FIGURES.loc["angle_deviation_table_page_1", "caption"] = "Angle deviation Section 1"
+    FIGURES.loc["angle_deviation_table_page_2", "caption"] = "Angle deviation Section 2"
+    FIGURES.loc["angle_deviation_table_page_3", "caption"] = "Angle deviation Section 3"
+    FIGURES.loc["angle_deviation_table_page_4", "caption"] = "Angle deviation Section 4"
+    FIGURES.loc["angle_deviation_table_page_5", "caption"] = "Angle deviation Section 5"
+    FIGURES.loc["angle_deviation_table_page_6", "caption"] = "Angle deviation Section 6"
+    FIGURES.loc["angle_deviation_table_page_7", "caption"] = "Angle deviation Section 7"
+    FIGURES.loc["angle_deviation_table_page_8", "caption"] = "Angle deviation Section 8"
+    FIGURES.loc["angle_deviation_table_page_9", "caption"] = "Angle deviation Section 9"
+    FIGURES.loc["angle_deviation_table_page_10", "caption"] = "Angle deviation Section 10"
+    FIGURES.loc["angle_deviation_table_page_11", "caption"] = "Angle deviation Section 11"
+    FIGURES.loc["angle_deviation_table_page_12", "caption"] = "Angle deviation Section 12"
+    FIGURES.loc["Revision_Table_page_1", "caption"] = None
+
+    # constant images (theory)
+    pic = "VMTP_theory"
+    FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
+    FIGURES.loc[pic, "path"] = path_templates + f"\\{pic}.jpg"
+    FIGURES.loc[pic, "caption"] = "Cross correlation for determining peak period over wind speed"
+    FIGURES.loc[pic, "width"] = 0.8
+
+    pic = "Extreme_Timeseries_Example"
+    FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
+    FIGURES.loc[pic, "path"] = path_templates + f"\\{pic}.jpg"
+    FIGURES.loc[pic, "caption"] = "Exemplary time series indicating extreme values on yearly separation"
+    FIGURES.loc[pic, "width"] = 1
+
+    pic = "Extreme_qq_example"
+    FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
+    FIGURES.loc[pic, "path"] = path_templates + f"\\{pic}.jpg"
+    FIGURES.loc[pic, "caption"] = "Comparison of real and theoretical extreme values"
+    FIGURES.loc[pic, "width"] = 0.5
+
+    pic = "Extreme_TReturn_example"
+    FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
+    FIGURES.loc[pic, "path"] = path_templates + f"\\{pic}.jpg"
+    FIGURES.loc[pic, "caption"] = "Extrapolation of return periods with standard deviation"
+    FIGURES.loc[pic, "width"] = 1
+
+    pic = "Status_table"
+    FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
+    FIGURES.loc[pic, "path"] = path_templates + f"\\{pic}.jpg"
+    FIGURES.loc[pic, "caption"] = None
+    FIGURES.loc[pic, "width"] = 0.4
+
+    FIGURES.loc[:, "path"] = [string.replace("\\", "/") for string in FIGURES.loc[:, "path"]]
+
+    FIGURES.loc[:, "path"] = [string.replace("\\", "/") for string in FIGURES.loc[:, "path"]]
     # load templates
 
     # Crete TEX content
@@ -3828,6 +3927,16 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc[f"Valid_scatter_swell_page_1"],
                                                        FIGURES.loc[f"Valid_scatter_swell_page_2"]])
 
+    # Normal Conditons
+    chapter = "NormalConditions"
+    TEX[chapter] = TEMPLATES[chapter]
+    TEX[chapter_main], _ = ltx.include_include(TEX[chapter_main], chapter)
+
+    TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc[f"Weibull_v_m over dir_v_m_page_3"])
+    TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Weibull_table_page_1"])
+    TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc["Weibull_v_m over dir_v_m_page_1"], FIGURES.loc["Weibull_v_m over dir_v_m_page_2"]])
+
+
     # Extreme
     chapter = "Extreme"
     TEX[chapter] = TEMPLATES[chapter]
@@ -3845,6 +3954,21 @@ if INPUT["DataBase"].get("create_report", {}):
         sensor_name = COLNAMES_REPORT.loc[sensor[1], "Aliase"]
 
         template = "\\subsubsection{Data Evaluation: " + f"{sensor_name}" + "} \n" + "?FIG \n ?FIG  \n ?TABLE \n ?FIG \n ?TABLE \n ?MULTIFIG \n ?MULTIFIG \n ?MULTIFIG"
+
+        FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_3", "caption"] = f"Extreme Values of {sensor_group_name}, omnidirectional"
+        FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_3", "caption"] = f"Comparison of real and theoretical extreme values of {sensor_group_name}, omnidirectional"
+        FIGURES.loc[f"Extreme_Parameter_table_{sensor_group_name}_page_1", "caption"] = f"Parameters of extreme value extrapolation of {sensor_group_name}"
+        FIGURES.loc[[f"Extreme_T_return_{sensor_group_name}_page_3"], "caption"] = f"Return periods of extreme values of {sensor_group_name} with extrapolation, omnidirectional"
+        FIGURES.loc[f"T_return_table_{sensor_group_name}_page_1", "caption"] = f"Return periods of {sensor_group_name}"
+
+        FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_1", "caption"] = f"Extreme Values of {sensor_group_name}, directional distribution A"
+        FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_2", "caption"] = f"Extreme Values of {sensor_group_name}, directional distribution B"
+
+        FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_1", "caption"] = f"Comparison of real and theoretical extreme values of {sensor_group_name}, directional distribution A"
+        FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_2", "caption"] = f"Comparison of real and theoretical extreme values of {sensor_group_name}, directional distribution B"
+
+        FIGURES.loc[[f"Extreme_T_return_{sensor_group_name}_page_1"], "caption"] = f"Return periods of extreme values of {sensor_group_name} with extrapolation, , directional distribution A"
+        FIGURES.loc[[f"Extreme_T_return_{sensor_group_name}_page_2"], "caption"] = f"Return periods of extreme values of {sensor_group_name} with extrapolation, , directional distribution B"
 
         temp = ltx.include_Fig(template, FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_3"])
         temp = ltx.include_Fig(temp, FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_3"])
@@ -3871,7 +3995,7 @@ if INPUT["DataBase"].get("create_report", {}):
 
     TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc[f"RWI_wind_page_1"], FIGURES.loc[f"RWI_wind_page_2"]])
 
-    # resonant seastate
+    # BreakingWaves
     chapter = "BreakingWaves"
     TEX[chapter] = TEMPLATES[chapter]
     TEX[chapter_main], last_idx = ltx.include_include(TEX[chapter_main], chapter)
@@ -3916,7 +4040,10 @@ if INPUT["DataBase"].get("create_report", {}):
     print("   compiling Latex File, please press enter a couple of times...")
     shutil.copy('./latex_templates/JBO_logo.jpg', path_report+r'\\'+'JBO_logo.jpg')
 
-    output_pdf = ltx.compile_lualatex(path_report + r'\main.tex')
+
+    path_main = path_report + '\\main.tex'
+    path_main = path_main.replace("\\", "/")
+    output_pdf = ltx.compile_lualatex(path_main)
 
     if os.path.exists(output_pdf):
         # Open the PDF file in the default web browser (Edge)

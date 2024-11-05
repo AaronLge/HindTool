@@ -3,7 +3,7 @@
 
 
 *DataBase*
-path_DataBase				>		"C:/Users/aaron.lange/Desktop/Projekte/HindcastArchive/54.41_5.95_ABP_Mer/54.41_5.95_ABP_Mer.db"
+path_DataBase				>		"C:/Users/aaron.lange/Desktop/Projekte/HindcastArchive/2_54.41_5.95_ABP_Mer/54.41_5.95_ABP_Mer.db"
 colnames_preset				>		None
 JBOOST_proj					>		"A:/2024/24A523_Waterkant/JBOOST/JBOOST_Model_Gravity/proj.lua"						
 JBOOST_input				>		"A:/2024/24A523_Waterkant/JBOOST/JBOOST_Model_Gravity/Input JBOOST WAK-DP-A-LILA-MySE18-260-v0.lua"
@@ -30,7 +30,7 @@ width_angle					>		15										>	int:	width of angle slice, only used when mode_
 angle_start					>		-15										>	int:	starting angle 
 
 *Filter*
-timeframe					>		True									>	bool:	if True, choose timeframe specified below
+timeframe					>		False									>	bool:	if True, choose timeframe specified below
 datetime_start				>		'1979-01-01 07:00:00'							>	str:	startdatetime in the format: "YYYY-MM-DD"
 datetime_end				>		'1981-07-01 07:00:00'							>	str:	enddatetime in the format: "YYYY-MM-DD"
 

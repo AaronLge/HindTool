@@ -5,7 +5,7 @@ Here the underlying databasis is analysed. General information is shown in table
 
 \subsection{Data set overview}
 
-Meta information of the time series data sets considered in this document are specified below in detail. A quality assurance including potential resampling or correction has been conducted. Analysed sensors in the data sets are tabulated in REFERENZ.
+Meta information of the time series data sets considered in this document are specified below in detail. A quality assurance including potential resampling or correction has been conducted. Analysed sensors in the data sets are tabulated in section \ref{sec:Sensor_Analysis}. \\
 
 ?DATABASIS
 
