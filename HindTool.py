@@ -129,8 +129,8 @@ if args.o is None:
     if INPUT['DataOut']['dir_name'] is None:
         path_out = os.path.abspath(INPUT['DataOut']['path_out']) + '\\HindCast_' + timestamp + '\\'
     else:
-        path_out = INPUT['SELECT']['path_out'] + \
-                   INPUT['SELECT']['dir_name'] + '/'
+        path_out = os.path.abspath(INPUT['DataOut']['path_out']) + '\\' + INPUT['DataOut']['dir_name'] + '\\'
+
 else:
     path_out = os.path.abspath(args.o) + '/'
 
@@ -446,6 +446,10 @@ if (('wind' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
     indizes_in = Calc.initilize_filter(mode='nans')
     df = df.loc[indizes_in]
 
+    if Input["quantile_relative"] is not None:
+        Input["quant_up"] = INPUT["Structure"]["f_0"] - INPUT["Structure"]["f_0"] * Input["quantile_relative"]/100
+        Input["quant_low"] = INPUT["Structure"]["f_0"] + INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
+
     omni = hc_calc.calc_HSTP(df[COLNAMES["H_s_wind"]], df[COLNAMES["T_p_wind"]], df[COLNAMES["dir_v_m"]], None,
                              N_grid=Input["N_grid"],
                              deg_reg=Input["deg_reg"],
@@ -497,6 +501,10 @@ if (('swell' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
     indizes_in = Calc.initilize_filter(mode='nans')
     df = df.loc[indizes_in]
 
+    if Input["quantile_relative"] is not None:
+        Input["quant_up"] = INPUT["Structure"]["f_0"] - INPUT["Structure"]["f_0"] * Input["quantile_relative"]/100
+        Input["quant_low"] = INPUT["Structure"]["f_0"] + INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
+
     directional = hc_calc.calc_HSTP(df[COLNAMES["H_s_swell"]], df[COLNAMES["T_p_swell"]], df[COLNAMES["dir_T_mean_Swell"]], angle_grid_mod,
                                     N_grid=Input["N_grid"],
                                     deg_reg=Input["deg_reg"],
@@ -546,6 +554,10 @@ if (('total' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
     # filter for nans
     indizes_in = Calc.initilize_filter(mode='nans')
     df = df.loc[indizes_in]
+
+    if Input["quantile_relative"] is not None:
+        Input["quant_up"] = INPUT["Structure"]["f_0"] - INPUT["Structure"]["f_0"] * Input["quantile_relative"]/100
+        Input["quant_low"] = INPUT["Structure"]["f_0"] + INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
 
     directional = hc_calc.calc_HSTP(df[COLNAMES["H_s"]], df[COLNAMES["T_p"]], df[COLNAMES["dir_T_mean"]], angle_grid_mod,
                                     N_grid=Input["N_grid"],
