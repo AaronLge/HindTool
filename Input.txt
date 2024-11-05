@@ -160,6 +160,7 @@ zone_reg 					>		[0, None]								>	list:	range included for calculating the reg
 zone_line					> 		[0, None]								>	zone:	zone, in which the regression (or mean) plot is shown (or displayed in the tables), if [.. , None]  the upper limit is the maximal found value, excuding values under n_bin (from the current angle-section)
 bin_min						>		0										>	int:	mininmal number of Datapoints in one bin to include the bin in any calculation
 percentiles					>		[33,66]									>	list:	percentiles to display, 50% not necessary, covered by mean, any number of percentiles possible
+quantile_relative			>		5										>	realative offset
 quantile					>		True									>	bool:	if True: plot "quantile" line, is expectiong quant_low, quant_up and two percentiles, over and under mean
 quant_low					>		0.15582									>	float:	lower (Period) limit (higher frequency value) of resonance frequency band, if None: not plotted
 quant_up					>		0.14098									>	float:	upper (Period) limit (lower frequency value) of resonance frequency band, if None: not plotted
@@ -178,6 +179,7 @@ zone_line					> 		[0, None]								>	zone:	zone, in which the regression (or mea
 bin_min						>		0										>	int:	mininmal number of Datapoints in one bin to include the bin in any calculation
 percentiles					>		[]									>	list:	percentiles to display, 50% not necessary, covered by mean, any number of percentiles possible
 quantile					>		False									>	bool:	if True: plot "quantile" line, is expectiong quant_low, quant_up and two percentiles, over and under mean
+quantile_relative			>		None										>	realative offset
 quant_low					>		0.1647									>	float:	lower (Period) limit (higher frequency value) of resonance frequency band, if None: not plotted
 quant_up					>		0.1647									>	float:	upper (Period) limit (lower frequency value) of resonance frequency band, if None: not plotted
 avrg_method					>		"median"							>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
@@ -194,6 +196,7 @@ zone_line					> 		[0, None]								>	zone:	zone, in which the regression (or mea
 bin_min						>		0										>	int:	mininmal number of Datapoints in one bin to include the bin in any calculation
 percentiles					>		[]									>	list:	percentiles to display, 50% not necessary, covered by mean, any number of percentiles possible
 quantile					>		False									>	bool:	if True: plot "quantile" line, is expectiong quant_low, quant_up and two percentiles, over and under mean
+quantile_relative			>		None										>	realative offset
 quant_low					>		0.1647									>	float:	lower (Period) limit (higher frequency value) of resonance frequency band, if None: not plotted
 quant_up					>		0.1647									>	float:	upper (Period) limit (lower frequency value) of resonance frequency band, if None: not plotted
 avrg_method					>		"median"							>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
