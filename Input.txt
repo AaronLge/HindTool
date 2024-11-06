@@ -36,7 +36,7 @@ datetime_end				>		'1981-07-01 07:00:00'							>	str:	enddatetime in the format:
 
 *Toggle_Modules*
 #calc_VMHS					>		['wind', 'total','swell']									
-calc_HSTP					>		['wind', 'total','swell']							
+#calc_HSTP					>		['wind', 'total','swell']							
 #calc_VMTP					>		['wind', 'total','swell']								
 #calc_RWI					>		['wind']								
 #calc_Tables					>		['wind', 'swell']											
@@ -247,8 +247,8 @@ margin						>		[[1, 100], [1, 100]]
 
 *ExtremeValues*
 sensors_Wind				>		['dir_v_m','v_m']
-#sensors_WaterLevel			>		[None,'WL']
-sensors_WaveHeight			>		['dir_T_mean','H_max']
+#sensors_Water_level			>		[None,'WL']
+sensors_Wave_height			>		['dir_T_mean','H_max']
 
 time_window_offset			>		0.5
 N_itter						>		1000			

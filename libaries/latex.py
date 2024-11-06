@@ -182,6 +182,19 @@ def compile_lualatex(tex_file, pdf_path=None, miktex_lualatex_path='C:/temp/MikT
     except subprocess.CalledProcessError as e:
         print(f"LuaLaTeX compilation failed (maybe): {e}")
 
+    try:
+        subprocess.run(
+            [miktex_lualatex_path, tex_file, '-output-directory', txt_path],
+            check=True,
+            cwd=txt_path,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        #run_subprocess()
+
+    except subprocess.CalledProcessError as e:
+        print(f"LuaLaTeX compilation failed (maybe): {e}")
+
     # Step 3: Verify if the output PDF was created
     if os.path.exists(output_pdf):
         print(f"PDF successfully created at: {output_pdf}")
@@ -193,9 +206,8 @@ def compile_lualatex(tex_file, pdf_path=None, miktex_lualatex_path='C:/temp/MikT
 
 def include_Fig(string, FigInfo):
     figure_template = ("\\begin{figure}[H] \n "
-                       "\\centering \n "
                        "\\includegraphics[width=?FIGURE_WIDTH\\textwidth]{?FIGURE_PATH} \n "
-                       "\\caption{?CAPTION} \n "
+                       "\\caption{ textit{?CAPTION}} \n "
                        "\\label{fig:?FIGURE_NAME} \n"
                        "\\end{figure}")
 
@@ -217,9 +229,8 @@ def include_Fig(string, FigInfo):
 def include_MultiFig(string, FigInfo):
 
     figure_template = ("\\begin{figure}[H] \n "
-                       "\\centering \n "
                        "\\includegraphics[width=?FIGURE_WIDTH\\textwidth]{?FIGURE_PATH} \n "
-                       "\\caption{?CAPTION} \n "
+                       "\\caption{ textit{?CAPTION}} \n "
                        "\\label{fig:?FIGURE_NAME} \n"
                        "\\end{figure}")
 
@@ -246,15 +257,13 @@ def include_MultiFig(string, FigInfo):
 
 def include_TableFig(string, FigInfo):
     figure_template = ("\\begin{figure}[H] \n "
-                       "\\centering \n "
                        "\\captionsetup{type=table} \n"
-                       "\\caption{?CAPTION} \n "
+                       "\\caption{ textit{?CAPTION}} \n "
                        "\\includegraphics[width=?FIGURE_WIDTH\\textwidth ]{?FIGURE_PATH} \n "
                        "\\label{tab:?FIGURE_NAME} \n"
                        "\\end{figure}")
 
     figure_template_no_cap = ("\\begin{figure}[H] \n "
-                       "\\centering \n "
                        "\\includegraphics[width=?FIGURE_WIDTH\\textwidth ]{?FIGURE_PATH} \n "
                        "\\label{tab:?FIGURE_NAME} \n"
                        "\\end{figure}")

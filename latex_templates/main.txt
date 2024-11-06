@@ -8,7 +8,7 @@
 \usepackage{multirow}  
 \usepackage{fancyhdr}
 \usepackage[htt]{hyphenat}
-\usepackage[hmargin=2cm,top=4cm,headheight=65pt,footskip=65pt]{geometry}
+\usepackage[hmargin=2cm,top=5cm,headheight=65pt,footskip=65pt]{geometry}
 \usepackage{xcolor, colortbl}
 \usepackage{geometry}
 \usepackage{graphicx} 
@@ -19,18 +19,48 @@
 \usepackage{float}
 \usepackage{parskip}
 \usepackage{amsmath}
+\usepackage{csquotes}
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 \usepackage[
 backend=biber,
 style=numeric,
-sorting=ynt
+sorting=none
 ]{biblatex}
 
 \usepackage{amsmath} % Ensure this package is included
 \numberwithin{equation}{section}
 \numberwithin{table}{section}
 \numberwithin{figure}{section}
+
+
+\DeclareDatamodelEntrytypes{standard}
+\DeclareDatamodelEntryfields[standard]{type,number}
+\DeclareBibliographyDriver{standard}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \usebibmacro{author}%
+  \setunit{\labelnamepunct}\newblock
+  \usebibmacro{title}%
+  \newunit\newblock
+  \printfield{number}%
+  \setunit{\addspace}\newblock
+  \printfield[parens]{type}%
+  \newunit\newblock
+  \usebibmacro{location+date}%
+  \newunit\newblock
+  \iftoggle{bbx:url}
+    {\usebibmacro{url+urldate}}
+    {}%
+  \newunit\newblock
+  \usebibmacro{addendum+pubstate}%
+  \setunit{\bibpagerefpunct}\newblock
+  \usebibmacro{pageref}%
+  \newunit\newblock
+  \usebibmacro{related}%
+  \usebibmacro{finentry}}
+
+\DeclareFieldFormat{labelnumber}{R#1}
 
 \addbibresource{?BIBDatasets}
 \addbibresource{?BIBLiteratur}
@@ -61,8 +91,8 @@ sorting=ynt
             \makebox[167pt][c]{ % Ensures horizontal centering within the multirow
                 \raisebox{0pt}[1cm][0pt]{ % Adjust height for vertical centering
                     \shortstack{
-                        {\fontsize{11}{16.5}\selectfont ?DocumentType } \\
-                        {\textcolor{JBOGreen}{\fontsize{10}{15}\selectfont \textit{ ?DocumentTitle }}}
+                        {\fontsize{11}{20}\selectfont ?DocumentType } \\
+                        {\textcolor{JBOGreen}{\fontsize{10}{20}\selectfont \textit{ ?DocumentTitle }}}
                     }
                 }
             }
@@ -213,4 +243,4 @@ sorting=ynt
 
 
 
-\end{document}
+\end{document}asedffc

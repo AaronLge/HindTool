@@ -16,6 +16,7 @@ import sys
 from matplotlib.cm import ScalarMappable
 from matplotlib.colors import Normalize
 import pandas as pd
+from matplotlib import rcParams
 
 from libaries import general as gl
 
@@ -218,9 +219,12 @@ class ErrorBar:
 
 def plot_tiled(Tiles, **kwargs):
 
-    plt.rc('text', usetex=True)
-    plt.rcParams["font.family"] = "sans-serif"  # Set font family to sans-serif
-    plt.rcParams["font.sans-serif"] = ["Arial"]
+    rcParams['font.family'] = 'sans-serif'
+    rcParams['font.sans-serif'] = 'Arial'
+
+    # If you want to use LaTeX for rendering text and set the font to Arial
+    rcParams['text.usetex'] = True
+    rcParams['text.latex.preamble'] = r'\usepackage{fontspec}\setmainfont{Arial}'
 
     figsize = kwargs.get('figsize', (8.268, 11.693))
     global_max = kwargs.get('global_max', ['auto', 'auto'])
@@ -232,6 +236,11 @@ def plot_tiled(Tiles, **kwargs):
     grid = kwargs.get('grid', [3, 2])
     scatter_max = kwargs.get('scatter_max', 'auto')
     scatter_min = kwargs.get('scatter_min', 'auto')
+    use_pgf = kwargs.get('use_pgf', False)
+
+    if use_pgf:
+        matplotlib.use('pgf')
+        rcParams['text.latex.preamble'] = r'\usepackage{fontspec}\setmainfont{Arial}'
 
     FIG = []
     i = 0
@@ -632,7 +641,7 @@ def plot_tiled(Tiles, **kwargs):
     return FIG
 
 
-def plot_rosebar(radial_data, r_bins, angles, r_max=None, plot=None, figsize=None, cmap='cool', radial_mode='summed', radial_datatype='percent', cbar_label=None, cbar=True):
+def plot_rosebar(radial_data, r_bins, angles, r_max=None, plot=None, figsize=None, cmap='cool', radial_mode='summed', radial_datatype='percent', cbar_label=None, cbar=True, use_pgf=False):
     """plots roseplot to handels given in plot = [fig, ax], if in standalone mode, creates a new figure and figsize is required
 
     inputs:
@@ -654,6 +663,17 @@ def plot_rosebar(radial_data, r_bins, angles, r_max=None, plot=None, figsize=Non
     returns:
     fig, ax
     """
+
+    if use_pgf:
+        matplotlib.use('pgf')
+        rcParams['text.latex.preamble'] = r'\usepackage{fontspec}\setmainfont{Arial}'
+
+    rcParams['font.family'] = 'sans-serif'
+    rcParams['font.sans-serif'] = 'Arial'
+
+    # If you want to use LaTeX for rendering text and set the font to Arial
+    rcParams['text.usetex'] = True
+
 
     if plot is None:
 
@@ -769,10 +789,6 @@ def table(data,  **kwargs):
     Figure
     """
 
-    plt.rc('text', usetex=True)
-    plt.rcParams["font.family"] = "sans-serif"  # Set font family to sans-serif
-    plt.rcParams["font.sans-serif"] = ["Arial"]
-
     col_labels = kwargs.get('collabels', None)
     row_labels = kwargs.get('rowlabels', None)
     auto_width = kwargs.get('auto_width', True)
@@ -791,6 +807,18 @@ def table(data,  **kwargs):
     cell_height = kwargs.get('cell_height', None)
     cell_width = kwargs.get('cell_width', None)
     cell_width_unit = kwargs.get('cell_width_unit', 'relative')
+    use_pgf = kwargs.get('use_pgf', False)
+
+    if use_pgf:
+        matplotlib.use('pgf')
+        rcParams['text.latex.preamble'] = r'\usepackage{fontspec}\setmainfont{Arial}'
+
+    rcParams['text.usetex'] = True
+    rcParams['font.family'] = 'sans-serif'
+    rcParams['font.sans-serif'] = 'Arial'
+
+    # If you want to use LaTeX for rendering text and set the font to Arial
+
 
     try:
         max_data = np.max(data)
@@ -978,7 +1006,12 @@ def plot_dataframe(data, header=True, plot=None, corner1=(0.1, 0.9), corner2=(0.
     Returns:
     - ax: The Matplotlib axis with the data plotted on it.
     """
+    rcParams['font.family'] = 'sans-serif'
+    rcParams['font.sans-serif'] = 'Arial'
 
+    # If you want to use LaTeX for rendering text and set the font to Arial
+    rcParams['text.usetex'] = True
+    rcParams['text.latex.preamble'] = r'\usepackage{fontspec}\setmainfont{Arial}'
     if plot is None:
         fig, ax = plt.subplots()
     else:

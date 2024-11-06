@@ -19,6 +19,7 @@ from libaries import hindtoolcalc as hc_calc
 from libaries import hindtoolplot as hc_plt
 from libaries import latex as ltx
 
+
 # %% FUNCTIONS - General
 
 def modify_lua_variables(file_path, variables):
@@ -123,7 +124,6 @@ print(f"reading Inputfile ({path_in})...")
 
 INPUT = gl.read_input_txt(path_in)
 timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-
 
 if args.o is None:
     if INPUT['DataOut']['dir_name'] is None:
@@ -447,7 +447,7 @@ if (('wind' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
     df = df.loc[indizes_in]
 
     if Input["quantile_relative"] is not None:
-        Input["quant_up"] = INPUT["Structure"]["f_0"] - INPUT["Structure"]["f_0"] * Input["quantile_relative"]/100
+        Input["quant_up"] = INPUT["Structure"]["f_0"] - INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
         Input["quant_low"] = INPUT["Structure"]["f_0"] + INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
 
     omni = hc_calc.calc_HSTP(df[COLNAMES["H_s_wind"]], df[COLNAMES["T_p_wind"]], df[COLNAMES["dir_v_m"]], None,
@@ -502,7 +502,7 @@ if (('swell' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
     df = df.loc[indizes_in]
 
     if Input["quantile_relative"] is not None:
-        Input["quant_up"] = INPUT["Structure"]["f_0"] - INPUT["Structure"]["f_0"] * Input["quantile_relative"]/100
+        Input["quant_up"] = INPUT["Structure"]["f_0"] - INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
         Input["quant_low"] = INPUT["Structure"]["f_0"] + INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
 
     directional = hc_calc.calc_HSTP(df[COLNAMES["H_s_swell"]], df[COLNAMES["T_p_swell"]], df[COLNAMES["dir_T_mean_Swell"]], angle_grid_mod,
@@ -556,7 +556,7 @@ if (('total' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
     df = df.loc[indizes_in]
 
     if Input["quantile_relative"] is not None:
-        Input["quant_up"] = INPUT["Structure"]["f_0"] - INPUT["Structure"]["f_0"] * Input["quantile_relative"]/100
+        Input["quant_up"] = INPUT["Structure"]["f_0"] - INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
         Input["quant_low"] = INPUT["Structure"]["f_0"] + INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
 
     directional = hc_calc.calc_HSTP(df[COLNAMES["H_s"]], df[COLNAMES["T_p"]], df[COLNAMES["dir_T_mean"]], angle_grid_mod,
@@ -620,7 +620,6 @@ if (('swell' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
     Calc.initilize_filter(mode='nans')
 
-
     Calc.result = hc_calc.calc_VMTP(DATA_OUT["VMHS"]["swell"].result, DATA_OUT["HSTP"]["swell"].result, vm_points=df[COLNAMES["v_m"]], fill_range=True)
     DATA_OUT["VMTP"]["swell"] = Calc
 
@@ -634,7 +633,6 @@ if (('total' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
 
     Calc = hc_calc.Calculation()
     Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
-
 
     Calc.result = hc_calc.calc_VMTP(DATA_OUT["VMHS"]["total"].result, DATA_OUT["HSTP"]["total"].result, fill_range=False)
     DATA_OUT["VMTP"]["total"] = Calc
@@ -735,16 +733,16 @@ if 'wind' in INPUT["Toggle_Modules"].get("calc_RWI", {}):
     df = df.loc[indizes_in]
 
     directional, _ = hc_calc.calc_RWI(df[COLNAMES["H_s_wind"]],
-                                            df[COLNAMES["T_p_wind"]],
-                                            df[COLNAMES["dir_v_m"]],
-                                            angle_grid_mod,
-                                            INPUT["Structure"]["f_0"])
+                                      df[COLNAMES["T_p_wind"]],
+                                      df[COLNAMES["dir_v_m"]],
+                                      angle_grid_mod,
+                                      INPUT["Structure"]["f_0"])
 
     omni, _ = hc_calc.calc_RWI(df[COLNAMES["H_s_wind"]],
-                                     df[COLNAMES["T_p_wind"]],
-                                     df[COLNAMES["dir_v_m"]],
-                                     None,
-                                     INPUT["Structure"]["f_0"])
+                               df[COLNAMES["T_p_wind"]],
+                               df[COLNAMES["dir_v_m"]],
+                               None,
+                               INPUT["Structure"]["f_0"])
 
     Calc.result = omni + directional
 
@@ -896,7 +894,6 @@ if INPUT["Toggle_Modules"].get("calc_Roseplots", {}):
     print("calculating Roseplots...")
     DATA_OUT["Roseplot"] = {}
 
-
     Roseplot_cols = []
     Roseplots_names = []
 
@@ -934,7 +931,7 @@ if INPUT["Toggle_Modules"].get("calc_ExtremeValues", {}):
     Input = INPUT["ExtremeValues"]
 
     sensors = [Input[key] for key in Input.keys() if 'sensors' in key]
-    sensor_group_names = [key.replace("sensors_" ,'') for key in Input.keys() if 'sensors' in key]
+    sensor_group_names = [key.replace("sensors_", '') for key in Input.keys() if 'sensors' in key]
     for cols, sensor_group_name in zip(sensors, sensor_group_names):
         table_name = 'Hind_combined'
         column_names = [COLNAMES[col] for col in cols if col is not None]
@@ -954,7 +951,7 @@ if INPUT["Toggle_Modules"].get("calc_ExtremeValues", {}):
                                                     perc_up=Input["perc_up"],
                                                     perc_down=Input["perc_down"],
                                                     time_window_offset=Input["time_window_offset"]
-                                                   )
+                                                    )
         else:
             directional = []
 
@@ -1187,8 +1184,8 @@ figsize_halfpage = [figsize_fullpage[0], figsize_fullpage[1] / 2.5]
 
 figsize_thirdpage = [figsize_fullpage[0], figsize_fullpage[1] / 3]
 figsize_thirdpage = [figsize_fullpage[0], figsize_fullpage[1] / 3]
-figsize_twothirdpage = [figsize_fullpage[0], figsize_fullpage[1] / 1.5 ]
-figsize_halfpage_halfpage = [figsize_fullpage[0]/2, figsize_fullpage[1] / 2.5 ]
+figsize_twothirdpage = [figsize_fullpage[0], figsize_fullpage[1] / 1.5]
+figsize_halfpage_halfpage = [figsize_fullpage[0] / 2, figsize_fullpage[1] / 2.5]
 
 if 'wind' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
     print('plotting VMHS wind...')
@@ -1236,9 +1233,9 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'VMHS_wind', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -1362,7 +1359,7 @@ if INPUT["Toggle_Modules"].get("plot_condensation_example", {}):
 
             Tiles_omni.append(tile_curr)
 
-    FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
+    FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_png(FIG_omni, path_out + 'VMHS_example', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -1415,9 +1412,9 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'VMHS_swell', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -1470,9 +1467,9 @@ if 'total' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'VMHS_total', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -1569,9 +1566,9 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'HSTP_wind', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -1632,9 +1629,9 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'HSTP_swell', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -1695,9 +1692,9 @@ if 'total' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'HSTP_total', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -1750,9 +1747,9 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_VMTP", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'VMTP_wind', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -1807,9 +1804,9 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_VMTP", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'VMTP_swell', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -1864,9 +1861,9 @@ if 'total' in INPUT["Toggle_Modules"].get("plot_VMTP", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'VMTP_total', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -1926,9 +1923,9 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_RWI", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], scatter_max='auto', figsize=figsize_fullpage)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], scatter_max='auto', figsize=figsize_fullpage, use_pgf=True)
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'RWI_wind', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -1988,9 +1985,9 @@ if 'total' in INPUT["Toggle_Modules"].get("plot_RWI", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], scatter_max='auto', figsize=figsize_fullpage)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], scatter_max='auto', figsize=figsize_fullpage, use_pgf=True)
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'RWI_total', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2047,9 +2044,9 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_BreakSteep", {}):
                 Tiles_omni.append(tile_curr)
 
         FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], scatter_max='auto', scatter_min=INPUT["Structure"]["steep_crit"],
-                                      figsize=figsize_fullpage)
+                                      figsize=figsize_fullpage, use_pgf=True)
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'WaveBreak_wind', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2106,9 +2103,9 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_BreakSteep", {}):
                 Tiles_omni.append(tile_curr)
 
         FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], scatter_max='auto', scatter_min=INPUT["Structure"]["steep_crit"],
-                                      figsize=figsize_fullpage)
+                                      figsize=figsize_fullpage, use_pgf=True)
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'WaveBreak_swell', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2234,13 +2231,14 @@ if INPUT["Toggle_Modules"].get("plot_AngleDeviation", {}):
                                     titel=titles[i],
                                     formater='.2e',
                                     heatmap=True,
-                                    figsize=figsize_fullpage)
+                                    figsize=figsize_fullpage,
+                                    use_pgf=True)
 
                 FIG_Tables.append(temp)
             else:
                 x_label = gl.alias(Seg.colnames['ang_orig'], COLNAMES, INPUT["Aliase"])
                 tile_scatter = hc_plt.Tile(i, x_label=x_label, y_label='deviation [°]',
-                                           title=f"Missalignment to {Calc.result[0].colnames['ang_comp']}" + "\n" + f"over {Calc.result[1].colnames['ang_comp']}")
+                                           title=f"Misalignment to {Calc.result[0].colnames['ang_comp']}" + "\n" + f"over {Calc.result[1].colnames['ang_comp']}")
 
                 point_data = df[df.index.isin(Seg.indizes)]
 
@@ -2259,7 +2257,7 @@ if INPUT["Toggle_Modules"].get("plot_AngleDeviation", {}):
 
                 tile_scatter.add_line(line)
 
-                temp = hc_plt.plot_tiled([tile_scatter], grid=[1, 1], figsize=figsize_halfpage)
+                temp = hc_plt.plot_tiled([tile_scatter], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
                 FIG_scatter = FIG_scatter + temp
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
@@ -2274,7 +2272,7 @@ if INPUT["Toggle_Modules"].get("plot_Roseplots", {}) and INPUT["Toggle_Modules"]
     print("plotting Roseplots...")
     i = 0
     Tiles_single = []
-    Tiles_multi  = []
+    Tiles_multi = []
 
     for Roseplot_name, Calc in DATA_OUT["Roseplot"].items():
         titel = f'Roseplot {Calc.basedata["colnames_ini"][1]} over' + "\n" + f'{Calc.basedata["colnames_ini"][0]}'
@@ -2292,7 +2290,8 @@ if INPUT["Toggle_Modules"].get("plot_Roseplots", {}) and INPUT["Toggle_Modules"]
                               radial_datatype='percent',
                               cbar=True,
                               cbar_label=gl.alias(Calc.basedata['colnames_ini'][1], COLNAMES, INPUT["Aliase"]),
-                              r_max=Calc.result["r_max"]
+                              r_max=Calc.result["r_max"],
+                              use_pgf=True
                               )
 
         Tile.add_RoseBar(temp)
@@ -2308,7 +2307,7 @@ if INPUT["Toggle_Modules"].get("plot_Roseplots", {}) and INPUT["Toggle_Modules"]
         i = i + 1
 
     for Tile_single in Tiles_single:
-        FIG = hc_plt.plot_tiled([Tile_single], figsize=figsize_halfpage_halfpage, grid=[1, 1])
+        FIG = hc_plt.plot_tiled([Tile_single], figsize=figsize_halfpage_halfpage, grid=[1, 1], use_pgf=True)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG, path_out + f'Roseplots_{Tile_single.name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2316,7 +2315,7 @@ if INPUT["Toggle_Modules"].get("plot_Roseplots", {}) and INPUT["Toggle_Modules"]
         if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_pdf(FIG, path_out + f'Roseplots_{Tile_single.name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-    FIG_multi = hc_plt.plot_tiled(Tiles_multi, figsize=figsize_fullpage)
+    FIG_multi = hc_plt.plot_tiled(Tiles_multi, figsize=figsize_fullpage, use_pgf=True)
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_png(FIG_multi, path_out + f'Roseplots_currents', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2351,6 +2350,7 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and INPUT["Toggle_Modul
                                y=df_seg[Seg.colnames['x']].values,
                                color='black',
                                linewidth=1)
+
             scatter = hc_plt.Scatter(x=Seg.result["points"]["x_max"].index,
                                      y=Seg.result["points"]["x_max"].values,
                                      color='red',
@@ -2365,9 +2365,9 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and INPUT["Toggle_Modul
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, grid=[3, 2], figsize=figsize_fullpage)
+        FIG_direc = hc_plt.plot_tiled(Tiles, grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, grid=[1, 1], figsize=figsize_halfpage)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f'Extreme_Timeseries_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2432,9 +2432,9 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and INPUT["Toggle_Modul
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=[None, None], global_min=[None, None], grid=[3, 2], figsize=figsize_fullpage)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=[None, None], global_min=[None, None], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], grid=[1, 1], figsize=figsize_halfpage)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f'Extreme_qq_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2455,7 +2455,7 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and INPUT["Toggle_Modul
                                                           f'intervall algorithm: {Seg.result["meta"]["intervall_algorithm"]}, '
                                                           f'itterations: {Seg.result["meta"]["N_itter"]}')
 
-            tile_curr = hc_plt.Tile(i, x_label='Returnperiod [years]',
+            tile_curr = hc_plt.Tile(i, x_label='Return period [years]',
                                     y_label=gl.alias(Seg.colnames['x'], COLNAMES, INPUT["Aliase"]),
                                     title=title,
                                     x_norm='log')
@@ -2463,28 +2463,40 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and INPUT["Toggle_Modul
             scatter = hc_plt.Scatter(x=Seg.result["points"]["T_R_x_max"].values,
                                      y=Seg.result["points"]["x_max"].values,
                                      color='red',
-                                     size=10)
+                                     size=10,
+                                     label='Maximal values')
 
             tile_curr.add_scatter(scatter)
+
+            if Seg.result["meta"]["intervall_algorithm"] == 'std':
+                upper_lim_label = 'upper band ($\\text{mean} + \sigma$)'
+                lower_lim_label = 'lower band ($\text{mean} - \sigma$)'
+
+            if Seg.result["meta"]["intervall_algorithm"] == 'percentile':
+                upper_lim_label = 'upper band (95-percentile)'
+                lower_lim_label = 'lower band (5-percentile)'
 
             Line = hc_plt.Line(x=Seg.result["T_return"]["T_R_grid"].values,
                                y=Seg.result["T_return"]["band_up"].values,
                                color='black',
-                               linestyle=':')
+                               linestyle=':',
+                               label=upper_lim_label)
 
             tile_curr.add_line(Line)
 
             Line = hc_plt.Line(x=Seg.result["T_return"]["T_R_grid"].values,
                                y=Seg.result["T_return"]["band_down"].values,
                                color='black',
-                               linestyle='--')
+                               linestyle='--',
+                               label=lower_lim_label)
 
             tile_curr.add_line(Line)
 
             Line = hc_plt.Line(x=Seg.result["T_return"]["T_R_grid"].values,
                                y=Seg.result["T_return"]["middle"].values,
                                color='black',
-                               linestyle='-')
+                               linestyle='-',
+                               label='gumbel distribution')
 
             tile_curr.add_line(Line)
 
@@ -2522,9 +2534,9 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and INPUT["Toggle_Modul
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=[None, None], global_min=[None, None], grid=[3, 2], figsize=figsize_fullpage)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=[None, None], global_min=[None, None], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], grid=[1, 1], figsize=figsize_halfpage)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f'Extreme_T_return_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2642,8 +2654,8 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
                 tile_curr.add_textbox(Textbox_DEL, zorder=9)
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage)
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'Valid_line_wind', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2699,8 +2711,8 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
                 else:
                     Tiles_omni.append(tile_curr)
 
-            FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage)
-            FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
+            FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
+            FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
 
             if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
                 gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f'Valid_scatter_wind', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2818,8 +2830,8 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
                 tile_curr.add_textbox(Textbox_DEL, zorder=-1)
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage)
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'Valid_line_swell', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2874,8 +2886,8 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
                 else:
                     Tiles_omni.append(tile_curr)
 
-            FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage)
-            FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage)
+            FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
+            FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
 
             if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
                 gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f'Valid_scatter_swell', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2937,7 +2949,7 @@ if INPUT["Toggle_Modules"].get("plot_SensorEval", {}):
 
         # FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2])
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], grid=[2, 1], figsize=figsize_twothirdpage)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], grid=[2, 1], figsize=figsize_twothirdpage, use_pgf=True)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_omni, path_out + f'SensorEval_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2992,16 +3004,15 @@ if INPUT["Toggle_Modules"].get("plot_Weibull", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=[None, None], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=[None, None], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], grid=[1, 1], figsize=figsize_halfpage)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f'Weibull_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
         if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f'Weibull_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
 
 # %% Data Out
 if INPUT["DataOut"]["CSV_out"]:
@@ -3183,20 +3194,17 @@ if INPUT["DataOut"]["CSV_out"]:
         gl.save_df_list_to_excel(path_csv + f'/Validation_{seastate}_added', table_wind_added, sheet_names=["hindcast", "condensed"])
 
     for calc_name, calc in DATA_OUT["Weibull"].items():
-
         data = unpack_funcs["weibull"](calc)
         angles = unpack_funcs["flat_angles"](calc)
         angles = ["omnidirectional" if name is None else f"{name[0]} to {name[1]}" for name in angles]
 
         indizes = unpack_funcs["indizes"](calc)
-        occurence = [ind/max(indizes)*100 for ind in indizes]
-        values = [list(dict.values()) + [round(occ,1)] for dict, occ in zip(data,occurence) ]
+        occurence = [ind / max(indizes) * 100 for ind in indizes]
+        values = [list(dict.values()) + [round(occ, 1)] for dict, occ in zip(data, occurence)]
 
         table_weibull = pd.DataFrame(columns=["k", "loc", "a", "mean", "std", "occurence"], index=angles, data=values)
 
         gl.save_df_list_to_excel(path_csv + f'/Weibull', [table_weibull])
-
-
 
     if len(Coeffs_string) > 0:
         with open(path_csv + "/Coeffs.txt", "w") as text_file:
@@ -3221,11 +3229,11 @@ if INPUT["DataOut"]["CSV_out"]:
 
         marg = 0.2
         f_0 = INPUT["Structure"]["f_0"]
-        T_0_range = [(1-marg)/f_0, (1+marg)/f_0]
+        T_0_range = [(1 - marg) / f_0, (1 + marg) / f_0]
 
         Table_Resonance = pd.DataFrame(columns=list(Seastate_DEL_max.columns) + ["Magnitude"])
-        Table_Resonance.loc['RWI',:] = list(Seastate_RWI.values[0]) + [RWI_max]
-        Table_Resonance.loc['DEL',:] = list(Seastate_DEL_max.values[0]) + [DEL_max]
+        Table_Resonance.loc['RWI', :] = list(Seastate_RWI.values[0]) + [RWI_max]
+        Table_Resonance.loc['DEL', :] = list(Seastate_DEL_max.values[0]) + [DEL_max]
 
         # if (Seastate_DEL_max[COLNAMES["T_p_wind"]].iloc[0] < T_0_range[0]) or (Seastate_DEL_max[COLNAMES["T_p_wind"]].iloc[0] > T_0_range[1]):
         #     RWI_seastates = DATA_OUT["RWI"]['wind'].load_from_db(colnames_ini=True)
@@ -3237,8 +3245,6 @@ if INPUT["DataOut"]["CSV_out"]:
         #     Table_Resonance.loc[f'DEL ($T_p$: {T_0_range[0]:.2f} to {T_0_range[1]:.2f})',:] = list(Seastate_DEL_max.values[0]) + [DEL_max_range]
 
         gl.save_df_list_to_excel(path_csv + f'/Resonance_Compare', [Table_Resonance])
-
-
 
 # %% plot report tables
 if INPUT["DataBase"].get("create_report", {}):
@@ -3272,10 +3278,10 @@ if INPUT["DataBase"].get("create_report", {}):
     templates_names = [name.removesuffix('.txt') for name in template_files]
 
     TEMPLATES = {}
-
     for path, name in zip(template_paths, templates_names):
         with open(path, 'r', encoding='utf-8') as file:
             TEMPLATES[name] = file.read()
+
 
     # load figures in Dataframe (from output dir or optional dir)
     if INPUT_REPORT["General"]["fig_path"] is not None:
@@ -3287,8 +3293,6 @@ if INPUT["DataBase"].get("create_report", {}):
     png_paths = [os.path.join(path_figs, f) for f in os.listdir(path_figs) if f.endswith('.png')]
     png_names = [name.removesuffix('.png') for name in png_files]
     png_width = [0.5 if 'Roseplots' in png_name else 1 for png_name in png_names]
-
-
 
     # Plot Tables
     cell_height_tables = 0.7
@@ -3335,7 +3339,6 @@ if INPUT["DataBase"].get("create_report", {}):
 
             for dataset_para, dataset_value in dataset_contents.items():
                 if dataset_value is not None:
-
                     meta_para.append(dataset_para)
                     meta_value.append(dataset_value)
 
@@ -3346,7 +3349,8 @@ if INPUT["DataBase"].get("create_report", {}):
                                collabels=col_labels,
                                cell_height=cell_height_tables,
                                figsize=figsize_fullpage,
-                               datatype='str')
+                               datatype='str',
+                               use_pgf=True)
 
             if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
                 gl.save_figs_as_png([FIG], path_out + f'DataSorce_{dataset_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3363,7 +3367,8 @@ if INPUT["DataBase"].get("create_report", {}):
                        row_label_name='Parameter',
                        figsize=figsize_halfpage,
                        datatype='str',
-                       cell_height=cell_height_tables)
+                       cell_height=cell_height_tables,
+                       use_pgf=True)
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_png([FIG], path_out + f'DataSorce_ResamplingTable', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3391,7 +3396,8 @@ if INPUT["DataBase"].get("create_report", {}):
                            row_label_name='Parameter',
                            figsize=figsize_halfpage,
                            datatype='str',
-                           cell_height=cell_height_tables)
+                           cell_height=cell_height_tables,
+                           use_pgf=True)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png([FIG], path_out + 'DataSorce_global', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3408,7 +3414,8 @@ if INPUT["DataBase"].get("create_report", {}):
                        figsize=figsize_fullpage,
                        cell_height=cell_height_tables,
                        datatype='str',
-                       cell_width=[1, 3, 1, 1])
+                       cell_width=[1, 3, 1, 1],
+                       use_pgf=True)
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_png([FIG], path_out + 'Sensor_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3424,7 +3431,8 @@ if INPUT["DataBase"].get("create_report", {}):
                        collabels=col_labels,
                        figsize=figsize_fullpage,
                        cell_height=cell_height_tables,
-                       datatype='str')
+                       datatype='str',
+                       use_pgf=True)
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_png([FIG], path_out + 'Sensor_Original', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3448,7 +3456,7 @@ if INPUT["DataBase"].get("create_report", {}):
     new_col = [Input["N_grid"],
                Input["avrg_method"],
                Input["average_correction"],
-               f"{100-Input['cut_reg']}" + "\\%",
+               f"{100 - Input['cut_reg']}" + "\\%",
                Input["deg_reg"],
                'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
                f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
@@ -3461,7 +3469,7 @@ if INPUT["DataBase"].get("create_report", {}):
     new_col = [Input["N_grid"],
                Input["avrg_method"],
                Input["average_correction"],
-               f"{100-Input['cut_reg']}" + "\\%",
+               f"{100 - Input['cut_reg']}" + "\\%",
                Input["deg_reg"],
                'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
                f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
@@ -3477,7 +3485,8 @@ if INPUT["DataBase"].get("create_report", {}):
                        rowlabels=row_labels,
                        row_label_name='Parameters',
                        figsize=figsize_halfpage,
-                       cell_height=cell_height_tables)
+                       cell_height=cell_height_tables,
+                       use_pgf=True)
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_png([FIG], path_out + 'Report_table_VMHS', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3493,7 +3502,7 @@ if INPUT["DataBase"].get("create_report", {}):
     new_col = [Input["N_grid"],
                Input["avrg_method"],
                Input["average_correction"],
-               f"{100-Input['cut_reg']}" + "\\%",
+               f"{100 - Input['cut_reg']}" + "\\%",
                Input["deg_reg"],
                'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
                f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
@@ -3509,7 +3518,8 @@ if INPUT["DataBase"].get("create_report", {}):
                        rowlabels=row_labels,
                        row_label_name='Parameters',
                        figsize=figsize_halfpage,
-                       cell_height=cell_height_tables)
+                       cell_height=cell_height_tables,
+                       use_pgf=True)
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_png([FIG], path_out + 'Report_table_VMHS_example', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3535,7 +3545,7 @@ if INPUT["DataBase"].get("create_report", {}):
                f"[{Input['quant_up']} .. {Input['quant_low']}]" if Input['quantile'] else "none",
                Input["N_grid"],
                Input["avrg_method"],
-               f"{100-Input['cut_reg']}" + " \\%",
+               f"{100 - Input['cut_reg']}" + " \\%",
                Input["deg_reg"],
                'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
                f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
@@ -3563,7 +3573,8 @@ if INPUT["DataBase"].get("create_report", {}):
                        row_label_name='Parameters',
                        figsize=figsize_halfpage,
                        datatype='str',
-                       cell_height=cell_height_tables)
+                       cell_height=cell_height_tables,
+                       use_pgf=True)
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_png([FIG], path_out + 'Report_table_HSTP', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3572,36 +3583,37 @@ if INPUT["DataBase"].get("create_report", {}):
         gl.save_figs_as_pdf([FIG], path_out + 'Report_table_HSTP', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
     # plot T_return Tables
-    T_return_xlsx = [f for f in os.listdir(path_figs+"\\csv_data") if "ExtremeValues_T_return" in f]
+    T_return_xlsx = [f for f in os.listdir(path_figs + "\\csv_data") if "ExtremeValues_T_return" in f]
     T_return_xlsx_path = [path_figs + "\\csv_data\\" + f for f in T_return_xlsx]
     T_return_keyword = [f.replace("ExtremeValues_T_return_", "").replace(".xlsx", "") for f in T_return_xlsx]
 
     for xlsx_path, keyword in zip(T_return_xlsx_path, T_return_keyword):
 
-                T_return_data = gl.xlsx2dict(xlsx_path)
+        T_return_data = gl.xlsx2dict(xlsx_path)
 
-                T_R_omni = T_return_data["omnidirectional"]
-                T_R_omni.iloc[:, 1:] = gl.significant_digits(T_R_omni.values[:, 1:], 3).astype(float)
-                new_order = ['T_Return', 'down', 'middle', 'up']
-                T_R_omni = T_R_omni[new_order]
+        T_R_omni = T_return_data["omnidirectional"]
+        T_R_omni.iloc[:, 1:] = gl.significant_digits(T_R_omni.values[:, 1:], 3).astype(float)
+        new_order = ['T_Return', 'down', 'middle', 'up']
+        T_R_omni = T_R_omni[new_order]
 
-                FIG = hc_plt.table(T_R_omni.values,
-                                   collabels=['T Return [years]', 'down', 'middle', 'up'],
-                                   rowlabels=None,
-                                   row_label_name=None,
-                                   figsize=figsize_halfpage,
-                                   datatype='str',
-                                   cell_height=cell_height_tables)
+        FIG = hc_plt.table(T_R_omni.values,
+                           collabels=['T Return [years]', 'lower band', 'gumbel distribution', 'upper band'],
+                           rowlabels=None,
+                           row_label_name=None,
+                           figsize=figsize_halfpage,
+                           datatype='str',
+                           cell_height=cell_height_tables,
+                           use_pgf=True)
 
-                if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-                    gl.save_figs_as_png([FIG], path_out + f'T_return_table_{keyword}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+        if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+            gl.save_figs_as_png([FIG], path_out + f'T_return_table_{keyword}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-                if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-                    gl.save_figs_as_pdf([FIG], path_out + f'T_return_table_{keyword}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+        if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+            gl.save_figs_as_pdf([FIG], path_out + f'T_return_table_{keyword}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
     # plot Extreme Parameter Table
-    points_xlsx = [f for f in os.listdir(path_figs+"\\csv_data") if "ExtremeValues_points_" in f]
-    points_xlsx_path = [path_figs + "\\csv_data\\" + f  for f in points_xlsx]
+    points_xlsx = [f for f in os.listdir(path_figs + "\\csv_data") if "ExtremeValues_points_" in f]
+    points_xlsx_path = [path_figs + "\\csv_data\\" + f for f in points_xlsx]
     points_keyword = [f.replace("ExtremeValues_points_", "").replace(".xlsx", "") for f in points_xlsx]
 
     for xlsx_path, keyword in zip(points_xlsx_path, points_keyword):
@@ -3617,7 +3629,8 @@ if INPUT["DataBase"].get("create_report", {}):
                            row_label_name='Parameter',
                            figsize=figsize_halfpage,
                            datatype='str',
-                           cell_height=cell_height_tables)
+                           cell_height=cell_height_tables,
+                           use_pgf=True)
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png([FIG], path_out + f'Extreme_Parameter_table_{keyword}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3626,12 +3639,12 @@ if INPUT["DataBase"].get("create_report", {}):
             gl.save_figs_as_pdf([FIG], path_out + f'Extreme_Parameter_table_{keyword}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
     # plot resonance compare tables
     resonance_xlsx = [f for f in os.listdir(path_figs + "\\csv_data") if "Resonance_Compare" in f]
-    resonance_xlsx_path = [path_figs + "\\csv_data\\" + f  for f in resonance_xlsx]
+    resonance_xlsx_path = [path_figs + "\\csv_data\\" + f for f in resonance_xlsx]
 
     data = gl.xlsx2dict(resonance_xlsx_path[0])
     data = data[list(data.keys())[0]]
-    col_labels = [COLNAMES_REPORT.loc["H_s_wind","Symbols"] + " " + COLNAMES_REPORT.loc["H_s_wind","Units"],
-                  COLNAMES_REPORT.loc["T_p_wind","Symbols"] + " " + COLNAMES_REPORT.loc["T_p_wind","Units"],
+    col_labels = [COLNAMES_REPORT.loc["H_s_wind", "Symbols"] + " " + COLNAMES_REPORT.loc["H_s_wind", "Units"],
+                  COLNAMES_REPORT.loc["T_p_wind", "Symbols"] + " " + COLNAMES_REPORT.loc["T_p_wind", "Units"],
                   COLNAMES_REPORT.loc["dir_v_m", "Symbols"] + " " + COLNAMES_REPORT.loc["dir_v_m", "Units"],
                   "Magnitude" + "[$\\sqrt{m^2 / Hz}$] or [Nm]"]
 
@@ -3646,7 +3659,8 @@ if INPUT["DataBase"].get("create_report", {}):
                        datatype='str',
                        cell_height=cell_height_tables,
                        formater='.3f',
-                       cell_width=[2,1,1,1,2])
+                       cell_width=[2, 1, 1, 1, 2],
+                       use_pgf=True)
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_png([FIG], path_out + f'Resonance_compare', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3654,7 +3668,7 @@ if INPUT["DataBase"].get("create_report", {}):
     if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_pdf([FIG], path_out + f'Resonance_compare', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-    #Revision Table
+    # Revision Table
     col_labels = ["Rev. JBO", "Rev. Employer", "Date", "Description"]
 
     Revisions = [INPUT_REPORT["RevisionTable"][rev] for rev in INPUT_REPORT["RevisionTable"].keys()]
@@ -3665,7 +3679,8 @@ if INPUT["DataBase"].get("create_report", {}):
                        row_label_name='Parameters',
                        figsize=figsize_fullpage,
                        cell_height=0.7,
-                       cell_width=[1, 1, 2, 3])
+                       cell_width=[1, 1, 2, 3],
+                       use_pgf=True)
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_png([FIG], path_out + f'Revision_Table', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3677,12 +3692,13 @@ if INPUT["DataBase"].get("create_report", {}):
     data = gl.xlsx2dict(path_figs + "\\csv_data\\Weibull.xlsx")["Sheet1"]
 
     FIG = hc_plt.table(data.values,
-                       collabels=["k", "loc", "a",	"mean",	"std",	"occurence [\%]"],
+                       collabels=["k [1]", "loc [m/s]", "A [m/s]", "mean [m/s]", "std [m/s]", "occurence [\\%]"],
                        rowlabels=data.index,
                        row_label_name='directional set [deg]',
                        figsize=figsize_fullpage,
                        cell_height=0.7,
-                       formater=".3f")
+                       formater=".3f",
+                       use_pgf=True)
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_png([FIG], path_out + f'Weibull_table', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3813,7 +3829,6 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter_main] = ltx.insertLatexVars(TEMPLATES[chapter_main], INPUT_REPORT["DocumentMeta"])
 
     if INPUT_REPORT["Biblografy"]["BIBDatasets"] == 'auto':
-
         INPUT_REPORT["Biblografy"]["BIBDatasets"] = os.path.abspath(db_path) + "/datasets.bib"
 
     TEX[chapter_main] = ltx.insertLatexVars(TEX[chapter_main], INPUT_REPORT["Biblografy"])
@@ -3830,16 +3845,16 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter] = ltx.insertLatexVars(TEMPLATES[chapter], INPUT_REPORT["DocumentMeta"])
     TEX[chapter_main], last_idx = ltx.include_include(TEX[chapter_main], chapter)
 
-    TEX[chapter_main], last_idx = ltx.include_str(TEX[chapter_main], '\\pagestyle{fancy}', last_idx+1)
+    TEX[chapter_main], last_idx = ltx.include_str(TEX[chapter_main], '\\pagestyle{fancy}', last_idx + 1)
 
     # Introduction
     chapter = 'Introduction'
     TEX[chapter] = TEMPLATES[chapter]
-    TEX[chapter_main], last_idx = ltx.include_include(TEX[chapter_main], chapter, line=last_idx+1)
+    TEX[chapter_main], last_idx = ltx.include_include(TEX[chapter_main], chapter, line=last_idx + 1)
     TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Revision_Table_page_1"])
     TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Status_table"])
 
-    TEX[chapter] = ltx.insertLatexVars(TEX[chapter] , INPUT_REPORT[chapter])
+    TEX[chapter] = ltx.insertLatexVars(TEX[chapter], INPUT_REPORT[chapter])
 
     # Data Basis
     chapter = 'DataBasis'
@@ -3860,9 +3875,9 @@ if INPUT["DataBase"].get("create_report", {}):
     for index, row in DATABASE.iterrows():
         if row["used"]:
             key_fig = [index for index in FIGURES.index if FIGURES.loc[index, "filename"] == row["png_name"]][0]
-            database = key_fig.replace("DataSorce_","").replace("_page_1", "")
+            database = key_fig.replace("DataSorce_", "").replace("_page_1", "")
 
-            FIGURES.loc[key_fig, "caption"] = f'"{database}" Data Set ' + "\\cite{"+f"{database}" +"}"
+            FIGURES.loc[key_fig, "caption"] = f'"{database}" Data Set ' + "\\cite{" + f"{database}" + "}"
             TEX["DataBasis"] = ltx.include_TableFig(TEX["DataBasis"], FIGURES.loc[key_fig])
 
     TEX["DataBasis"] = ltx.include_TableFig(TEX["DataBasis"], FIGURES.loc["DataSorce_ResamplingTable_page_1"])
@@ -3898,7 +3913,7 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["angle_deviation_scatter_page_1"])
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Roseplots_currents_page_1"])
 
-    #Data correlation
+    # Data correlation
     chapter = "DataCorrelation"
     TEX[chapter] = TEMPLATES[chapter]
     TEX[chapter_main], _ = ltx.include_include(TEX[chapter_main], chapter)
@@ -3914,7 +3929,6 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["HSTP_swell_page_3"])
     TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc["HSTP_wind_page_1"], FIGURES.loc["HSTP_wind_page_2"]])
     TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc["HSTP_swell_page_1"], FIGURES.loc["HSTP_swell_page_2"]])
-
 
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["VMTP_theory"])
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["VMTP_wind_page_3"])
@@ -3948,7 +3962,6 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Weibull_table_page_1"])
     TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc["Weibull_v_m over dir_v_m_page_1"], FIGURES.loc["Weibull_v_m over dir_v_m_page_2"]])
 
-
     # Extreme
     chapter = "Extreme"
     TEX[chapter] = TEMPLATES[chapter]
@@ -3962,9 +3975,8 @@ if INPUT["DataBase"].get("create_report", {}):
     sensor_group_names = [key.replace("sensors_", '') for key in INPUT["ExtremeValues"].keys() if 'sensors' in key]
 
     for sensor, sensor_group_name in zip(sensors, sensor_group_names):
-
         sensor_name = COLNAMES_REPORT.loc[sensor[1], "Aliase"]
-
+        sensor_group_name = sensor_group_name.replace('_', ' ')
         template = "\\subsubsection{Data Evaluation: " + f"{sensor_name}" + "} \n" + "?FIG \n ?FIG  \n ?TABLE \n ?FIG \n ?TABLE \n ?MULTIFIG \n ?MULTIFIG \n ?MULTIFIG"
 
         FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_3", "caption"] = f"Extreme Values of {sensor_group_name}, omnidirectional"
@@ -3979,8 +3991,10 @@ if INPUT["DataBase"].get("create_report", {}):
         FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_1", "caption"] = f"Comparison of real and theoretical extreme values of {sensor_group_name}, directional distribution A"
         FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_2", "caption"] = f"Comparison of real and theoretical extreme values of {sensor_group_name}, directional distribution B"
 
-        FIGURES.loc[[f"Extreme_T_return_{sensor_group_name}_page_1"], "caption"] = f"Return periods of extreme values of {sensor_group_name} with extrapolation, , directional distribution A"
-        FIGURES.loc[[f"Extreme_T_return_{sensor_group_name}_page_2"], "caption"] = f"Return periods of extreme values of {sensor_group_name} with extrapolation, , directional distribution B"
+        FIGURES.loc[[
+            f"Extreme_T_return_{sensor_group_name}_page_1"], "caption"] = f"Return periods of extreme values of {sensor_group_name} with extrapolation, , directional distribution A"
+        FIGURES.loc[[
+            f"Extreme_T_return_{sensor_group_name}_page_2"], "caption"] = f"Return periods of extreme values of {sensor_group_name} with extrapolation, , directional distribution B"
 
         temp = ltx.include_Fig(template, FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_3"])
         temp = ltx.include_Fig(temp, FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_3"])
@@ -4017,13 +4031,13 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc[f"WaveBreak_wind_page_1"], FIGURES.loc[f"WaveBreak_wind_page_2"]])
 
     # list of figures
-    TEX[chapter_main], last_idx = ltx.include_str(TEX[chapter_main], '\\listoffigures', last_idx+1)
-    TEX[chapter_main], last_idx = ltx.include_str(TEX[chapter_main], '\\listoftables \\newpage', last_idx+1)
+    TEX[chapter_main], last_idx = ltx.include_str(TEX[chapter_main], '\\listoffigures', last_idx + 1)
+    TEX[chapter_main], last_idx = ltx.include_str(TEX[chapter_main], '\\listoftables \\newpage', last_idx + 1)
 
     # Appendix
     chapter = "Annex"
     TEX[chapter] = TEMPLATES[chapter]
-    TEX[chapter_main], _  = ltx.include_include(TEX[chapter_main], chapter, line = last_idx +1 )
+    TEX[chapter_main], _ = ltx.include_include(TEX[chapter_main], chapter, line=last_idx + 1)
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["VMHS_example_page_1"])
     TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Report_table_VMHS_example_page_1"])
     TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Sensor_Original_page_1"])
@@ -4045,13 +4059,12 @@ if INPUT["DataBase"].get("create_report", {}):
 
     # save TEX files
     for name, tex in TEX.items():
-        with open(path_report+r'\\' + name + '.tex', 'w', encoding='utf-8') as file:
+        with open(path_report + r'\\' + name + '.tex', 'w', encoding='utf-8') as file:
             file.write(tex)
 
     # compiling Latex files
     print("   compiling Latex File, please press enter a couple of times...")
-    shutil.copy('./latex_templates/JBO_logo.jpg', path_report+r'\\'+'JBO_logo.jpg')
-
+    shutil.copy('./latex_templates/JBO_logo.jpg', path_report + r'\\' + 'JBO_logo.jpg')
 
     path_main = path_report + '\\main.tex'
     path_main = path_main.replace("\\", "/")
@@ -4071,4 +4084,3 @@ with open(path_out + 'Info_LOG.txt', "w") as log_text:
 del log_text
 
 print(f"{script_name} finished!")
-

@@ -110,7 +110,7 @@ For the final condensation of the sea state-parameters the $H_s$ and $T_p$ value
 \subsection{Proof of condensation method}
 \label{sec:condensation_method}
 
-The proof of the condensation method for normal sea state parameter is provided in this section in detail. A reference structural \ac{FE} model (REFERENZIEREN? ÜBERSICHT PARAMETER?) of the intended \ac{WTG} and foundation configuration has been set up for this purpose. Using a frequency domain approach, \ac{DEL}'s of the bending moment at decisive elevations are calculated for each individual sea state sample in the data set.
+The proof of the condensation method for normal sea state parameter is provided in this section in detail. A reference structural \ac{FE} model (\cite{Structure}) of the intended \ac{WTG} and foundation configuration has been set up for this purpose. Using a frequency domain approach, \ac{DEL}'s of the bending moment at decisive elevations are calculated for each individual sea state sample in the data set.
 \\
 \\
 Damage equivalent loads are applied to equate the fatigue damage represented by rainflow cycle counted data to that caused by a single stress range repeating at a single frequency. The method is based on the Miner's rule. The damage equivalent load is given by the following formula:

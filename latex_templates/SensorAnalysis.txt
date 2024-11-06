@@ -37,7 +37,6 @@ The occurrence probability of the wind direction and wave direction is considere
 
 For the assignment of probabilities to the load situations in the design load case table, the data set is evaluated for each wind speed bin ($\Delta v = 1 [m/s]$), wind direction and wave direction, both with a sector width of 30° (see Appendix). 
 
-\clearpage 
 
 \subsubsection{Current direction and current speed occurrence}
 

@@ -1,5 +1,6 @@
 
-\section*{Annex}
+\section{Annex}
+\subsection{Annex A1: Condensation method}
 
 The condensation methodology (explained in \ref{sec:NomalSeaState}) is visually detailed in this annex, exemplarily for the condensation of significant wave height over wind speed. \ref{fig:VMHS_example_page_1} illustrates the representative bin values (indicated by black dots). The calculated regression curve is depicted in blue. It is important to note that this curve is derived solely from the bins within the solid green range and is applied exclusively to the right of the green dashed line. In this region, the blue curve maintains non-transparent, whereas to the left, it appears more transparent. The selected correlation is then formed from the black dots to the left of the dashed green line and the blue non-transparent curve to the right of the dashed green line. The parameters pertinent to this example are enumerated in \ref{tab:Report_table_VMHS_example_page_1}.
 
@@ -9,8 +10,11 @@ The condensation methodology (explained in \ref{sec:NomalSeaState}) is visually 
 
 \newpage
 
+\subsection{Annex A2: Sensor names}
+
 ?TABLE
 
 \newpage
+\subsection{Annex A3: Misalignment tables}
 
 ?MULTIFIG 

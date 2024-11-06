@@ -1,6 +1,8 @@
 
 \thispagestyle{titlepage} % Use custom footer for the title page
 
+\vspace*{2cm}
+
 \begin{table}[]
     \begin{tabular}{|m{3.5cm}|m{6cm}|m{4cm}|m{1cm}|m{1cm}|m{1cm}|}
         \hline
