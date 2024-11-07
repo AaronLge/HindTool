@@ -149,7 +149,7 @@ class Calculation:
 
             if segment_curr.angle_name is not None:
                 if latex:
-                    header += r"\small " f"'{segment_curr.angle_name}': {segment_curr.angles[0]}° to {segment_curr.angles[1]}°"
+                    header += r"\centering \small " f"'{segment_curr.angle_name}': {segment_curr.angles[0]}° to {segment_curr.angles[1]}°"
                 else:
                     header += f"'{segment_curr.angle_name}':{segment_curr.angles[0]}° to {segment_curr.angles[1]}°"
 
@@ -161,7 +161,7 @@ class Calculation:
                 timeframe = self.basedata["db_timeframe"]
                 sample_rate = self.basedata["sample_rate"]
                 if latex:
-                    underscore = (r"\scriptsize " + f"samples: {N_exp:.2e} ({round(N_exp / N_ges * 100, 1)}\%), " +
+                    underscore = (r"\centering \scriptsize " + f"samples: {N_exp:.2e} ({round(N_exp / N_ges * 100, 1)}\%), " +
                                   f"{timeframe[0].round('1d').date()} to {timeframe[1].round('1d').date()}, " +
                                   f"d_t: {sample_rate.total_seconds()} s")
                 else:
@@ -172,9 +172,9 @@ class Calculation:
                 N_ges = self.basedata["N_rows"]
 
                 if latex:
-                    underscore = r"\scriptsize " + f"samples: {N_exp:.2e} ({round(N_exp / N_ges * 100, 1)}%)"
+                    underscore = r"\centering \scriptsize " + f"samples: {N_exp:.2e} ({round(N_exp / N_ges * 100, 1)}%)"
                 else:
-                    underscore = f"samples: {N_exp:.2e} ({round(N_exp / N_ges * 100, 1)}%)"
+                    underscore = f"\centering samples: {N_exp:.2e} ({round(N_exp / N_ges * 100, 1)}%)"
 
             elif mode == "sparse":
                 underscore = None

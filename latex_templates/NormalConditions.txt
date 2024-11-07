@@ -1,10 +1,10 @@
 \subsection{Normal Conditions}
 \subsubsection{Wind Speed occurrence probability}
 
-For each directional set a Weibull distribution (\cite{Gumb58}) is fitted for the parameters shape parameter $k$, the scale parameter $a$ and the horizontal displacement $loc$ with the log likelihood method. The Weibull distribution is described with:
+For each directional set a Weibull distribution (\cite{Gumb58}) is fitted for the parameters shape parameter $k$, the scale parameter $A$ and the horizontal displacement $loc$ with the log likelihood method. The Weibull distribution is described with:
 
 \begin{align}
-p(x, k, a)=\frac{k}{a}\left(\frac{x}{a}\right)^{k-1} e^{-\left(\frac{V}{a}\right)^k}
+p(x, k, A)=\frac{k}{A}\left(\frac{x}{A}\right)^{k-1} e^{-\left(\frac{V}{A}\right)^k}
 \end{align}
 
 

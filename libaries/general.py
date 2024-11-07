@@ -3,7 +3,7 @@ import os
 import random
 import sqlite3
 import subprocess
-
+import fitz
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
@@ -13,6 +13,7 @@ import sklearn as skl
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import PolynomialFeatures
+from matplotlib.backends.backend_pdf import PdfPages
 
 
 def model_regression(x: pd.core.series.Series, y: pd.core.series.Series,
@@ -977,8 +978,8 @@ def alias(input_data, original, alias):
         raise ValueError("Input must be either a string or a list of strings.")
 
 
-def save_figs_as_png(FIG, filename, **kwargs):
-    dpi = kwargs.get('dpi', 600)
+def save_figs_as_png(FIG, filename,dpi=600, lualatex_mode=False):
+
 
     i = 1
     for fig in FIG:
@@ -986,6 +987,44 @@ def save_figs_as_png(FIG, filename, **kwargs):
         i = i + 1
         plt.close(fig)
     return
+
+# def save_figs_as_png(figures, path_in, dpi=600):
+#     """
+#     Saves a list of Matplotlib figures as PNGs using a PDF file path.
+#
+#     Args:
+#         figures (list): List of Matplotlib figure objects to save.
+#         pdf_path (str): Path for the temporary PDF file (also used as a base name for PNGs).
+#         dpi (int, optional): DPI for the PNG output. Defaults to 600.
+#
+#     Returns:
+#         list: List of file paths for the saved PNG files.
+#     """
+#     pdf_path = path_in + '.pdf'
+#
+#     png_paths = []
+#     pdf_dir, pdf_filename = os.path.split(pdf_path)
+#     base_name = os.path.splitext(pdf_filename)[0]
+#
+#
+#     # Save figures to a PDF file at the specified path
+#     with PdfPages(pdf_path) as pdf:
+#         for fig in figures:
+#             pdf.savefig(fig, dpi=dpi)
+#
+#     # Open the PDF with fitz to convert each page to PNG
+#     with fitz.open(pdf_path) as pdf_document:
+#         for page_num in range(pdf_document.page_count):
+#             page = pdf_document.load_page(page_num)
+#             png_path = os.path.join(pdf_dir, f"{base_name}_page_{page_num + 1}.png")
+#             page_pix = page.get_pixmap(dpi=dpi)
+#             page_pix.save(png_path)
+#             png_paths.append(png_path)
+#
+#     # Remove the PDF file after PNG conversion
+#   #  os.remove(pdf_path)
+#
+#     return png_paths
 
 
 def save_figs_as_pdf(FIG, filename, **kwargs):

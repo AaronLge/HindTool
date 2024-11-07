@@ -35,10 +35,10 @@ datetime_start				>		'1979-01-01 07:00:00'							>	str:	startdatetime in the for
 datetime_end				>		'1981-07-01 07:00:00'							>	str:	enddatetime in the format: "YYYY-MM-DD"
 
 *Toggle_Modules*
-#calc_VMHS					>		['wind', 'total','swell']									
-#calc_HSTP					>		['wind', 'total','swell']							
-#calc_VMTP					>		['wind', 'total','swell']								
-#calc_RWI					>		['wind']								
+#calc_VMHS					>		['wind', 'total', 'swell']									
+#calc_HSTP					>		['wind', 'total', 'swell']							
+#calc_VMTP					>		['wind', 'total', 'swell']								
+#calc_RWI					>		['wind', 'total']								
 #calc_Tables					>		['wind', 'swell']											
 #calc_WaveBreak_Steep		>		['wind', 'total']										
 #calc_AngleDeviation 		>		['dir_v_m', 'dir_T_mean_Wind', 'v_m']						>	angle_orig, angle_deviation, v_m
@@ -49,7 +49,7 @@ datetime_end				>		'1981-07-01 07:00:00'							>	str:	enddatetime in the format:
 #calc_Weibull				>		[['dir_v_m', 'v_m']]
 #calc_ExtremeConture			>		[['H_s', 'T_p', 'dir_v_m']]
 
-plot_VMHS					>		['wind', 'swell', 'total']
+plot_VMHS					>		['wind', 'total', 'swell']
 plot_HSTP					>		['wind', 'swell', 'total']
 plot_VMTP					>		['wind', 'swell', 'total']
 plot_RWI					>		['wind', 'total']
@@ -63,8 +63,9 @@ plot_SensorEval				>		True
 plot_Weibull				>		True
 #plot_condensation_example	>		True
 plot_report_tables			>		True
-plot_as						>		["png"]
 
+plot_as						>		["png"]
+use_pgf						>		True
 dpi_figures					>		500									>	int: resolution (dots per sqinch) of all pdf's
 writing_box					>		[17, 22]
 
@@ -251,7 +252,7 @@ sensors_Wind				>		['dir_v_m','v_m']
 sensors_Wave_height			>		['dir_T_mean','H_max']
 
 time_window_offset			>		0.5
-N_itter						>		1000			
+N_itter						>		500			
 perc_up						>		95	
 perc_down					>		5
 conf_inter_mode				>		'percentile'							> percentile oder std

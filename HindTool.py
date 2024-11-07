@@ -1233,9 +1233,9 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'VMHS_wind', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -1359,7 +1359,7 @@ if INPUT["Toggle_Modules"].get("plot_condensation_example", {}):
 
             Tiles_omni.append(tile_curr)
 
-    FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
+    FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_png(FIG_omni, path_out + 'VMHS_example', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -1412,9 +1412,9 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'VMHS_swell', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -1467,9 +1467,9 @@ if 'total' in INPUT["Toggle_Modules"].get("plot_VMHS", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'VMHS_total', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -1566,9 +1566,9 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'HSTP_wind', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -1629,9 +1629,9 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'HSTP_swell', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -1692,9 +1692,9 @@ if 'total' in INPUT["Toggle_Modules"].get("plot_HSTP", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'HSTP_total', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -1747,9 +1747,9 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_VMTP", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'VMTP_wind', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -1804,9 +1804,9 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_VMTP", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'VMTP_swell', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -1861,9 +1861,9 @@ if 'total' in INPUT["Toggle_Modules"].get("plot_VMTP", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'VMTP_total', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -1923,9 +1923,9 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_RWI", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], scatter_max='auto', figsize=figsize_fullpage, use_pgf=True)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], scatter_max='auto', figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'RWI_wind', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -1985,9 +1985,9 @@ if 'total' in INPUT["Toggle_Modules"].get("plot_RWI", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], scatter_max='auto', figsize=figsize_fullpage, use_pgf=True)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], scatter_max='auto', figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'RWI_total', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2044,9 +2044,9 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_BreakSteep", {}):
                 Tiles_omni.append(tile_curr)
 
         FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], scatter_max='auto', scatter_min=INPUT["Structure"]["steep_crit"],
-                                      figsize=figsize_fullpage, use_pgf=True)
+                                      figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'WaveBreak_wind', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2103,9 +2103,9 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_BreakSteep", {}):
                 Tiles_omni.append(tile_curr)
 
         FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], scatter_max='auto', scatter_min=INPUT["Structure"]["steep_crit"],
-                                      figsize=figsize_fullpage, use_pgf=True)
+                                      figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'WaveBreak_swell', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2232,13 +2232,15 @@ if INPUT["Toggle_Modules"].get("plot_AngleDeviation", {}):
                                     formater='.2e',
                                     heatmap=True,
                                     figsize=figsize_fullpage,
-                                    use_pgf=True)
+                                    use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
                 FIG_Tables.append(temp)
             else:
+                title = f"Misalignment to {Calc.result[0].colnames['ang_orig']}" + " \n " + f"over {Calc.result[1].colnames['ang_comp']}"
+                title = gl.alias(title, COLNAMES, INPUT["Aliase"])
                 x_label = gl.alias(Seg.colnames['ang_orig'], COLNAMES, INPUT["Aliase"])
                 tile_scatter = hc_plt.Tile(i, x_label=x_label, y_label='deviation [°]',
-                                           title=f"Misalignment to {Calc.result[0].colnames['ang_comp']}" + "\n" + f"over {Calc.result[1].colnames['ang_comp']}")
+                                           title=title)
 
                 point_data = df[df.index.isin(Seg.indizes)]
 
@@ -2257,7 +2259,7 @@ if INPUT["Toggle_Modules"].get("plot_AngleDeviation", {}):
 
                 tile_scatter.add_line(line)
 
-                temp = hc_plt.plot_tiled([tile_scatter], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
+                temp = hc_plt.plot_tiled([tile_scatter], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
                 FIG_scatter = FIG_scatter + temp
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
@@ -2290,8 +2292,7 @@ if INPUT["Toggle_Modules"].get("plot_Roseplots", {}) and INPUT["Toggle_Modules"]
                               radial_datatype='percent',
                               cbar=True,
                               cbar_label=gl.alias(Calc.basedata['colnames_ini'][1], COLNAMES, INPUT["Aliase"]),
-                              r_max=Calc.result["r_max"],
-                              use_pgf=True
+                              r_max=Calc.result["r_max"]
                               )
 
         Tile.add_RoseBar(temp)
@@ -2307,7 +2308,7 @@ if INPUT["Toggle_Modules"].get("plot_Roseplots", {}) and INPUT["Toggle_Modules"]
         i = i + 1
 
     for Tile_single in Tiles_single:
-        FIG = hc_plt.plot_tiled([Tile_single], figsize=figsize_halfpage_halfpage, grid=[1, 1], use_pgf=True)
+        FIG = hc_plt.plot_tiled([Tile_single], figsize=figsize_halfpage_halfpage, grid=[1, 1], use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG, path_out + f'Roseplots_{Tile_single.name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2315,7 +2316,7 @@ if INPUT["Toggle_Modules"].get("plot_Roseplots", {}) and INPUT["Toggle_Modules"]
         if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_pdf(FIG, path_out + f'Roseplots_{Tile_single.name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-    FIG_multi = hc_plt.plot_tiled(Tiles_multi, figsize=figsize_fullpage, use_pgf=True)
+    FIG_multi = hc_plt.plot_tiled(Tiles_multi, figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_png(FIG_multi, path_out + f'Roseplots_currents', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2365,9 +2366,9 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and INPUT["Toggle_Modul
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
+        FIG_direc = hc_plt.plot_tiled(Tiles, grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f'Extreme_Timeseries_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2432,9 +2433,9 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and INPUT["Toggle_Modul
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=[None, None], global_min=[None, None], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=[None, None], global_min=[None, None], grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f'Extreme_qq_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2468,11 +2469,11 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and INPUT["Toggle_Modul
 
             tile_curr.add_scatter(scatter)
 
-            if Seg.result["meta"]["intervall_algorithm"] == 'std':
+            if Seg.result["meta"]["intervall_mode"] == 'std':
                 upper_lim_label = 'upper band ($\\text{mean} + \sigma$)'
                 lower_lim_label = 'lower band ($\text{mean} - \sigma$)'
 
-            if Seg.result["meta"]["intervall_algorithm"] == 'percentile':
+            if Seg.result["meta"]["intervall_mode"] == 'percentile':
                 upper_lim_label = 'upper band (95-percentile)'
                 lower_lim_label = 'lower band (5-percentile)'
 
@@ -2529,14 +2530,16 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and INPUT["Toggle_Modul
 
             tile_curr.add_textbox(Textbox)
 
+            tile_curr.legend_loc = "upper left"
+
             if Seg.angles is not None:
                 Tiles.append(tile_curr)
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=[None, None], global_min=[None, None], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=[None, None], global_min=[None, None], grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f'Extreme_T_return_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2654,8 +2657,8 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
                 tile_curr.add_textbox(Textbox_DEL, zorder=9)
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'Valid_line_wind', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2711,8 +2714,8 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
                 else:
                     Tiles_omni.append(tile_curr)
 
-            FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
-            FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
+            FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+            FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
             if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
                 gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f'Valid_scatter_wind', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2830,8 +2833,8 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
                 tile_curr.add_textbox(Textbox_DEL, zorder=-1)
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + 'Valid_line_swell', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2886,8 +2889,8 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
                 else:
                     Tiles_omni.append(tile_curr)
 
-            FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
-            FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
+            FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+            FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
             if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
                 gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f'Valid_scatter_swell', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2949,7 +2952,7 @@ if INPUT["Toggle_Modules"].get("plot_SensorEval", {}):
 
         # FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2])
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], grid=[2, 1], figsize=figsize_twothirdpage, use_pgf=True)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], grid=[2, 1], figsize=figsize_twothirdpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_omni, path_out + f'SensorEval_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3004,9 +3007,9 @@ if INPUT["Toggle_Modules"].get("plot_Weibull", {}):
             else:
                 Tiles_omni.append(tile_curr)
 
-        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=[None, None], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=True)
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=[None, None], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], grid=[1, 1], figsize=figsize_halfpage, use_pgf=True)
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f'Weibull_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3350,7 +3353,7 @@ if INPUT["DataBase"].get("create_report", {}):
                                cell_height=cell_height_tables,
                                figsize=figsize_fullpage,
                                datatype='str',
-                               use_pgf=True)
+                               use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
             if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
                 gl.save_figs_as_png([FIG], path_out + f'DataSorce_{dataset_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3368,7 +3371,7 @@ if INPUT["DataBase"].get("create_report", {}):
                        figsize=figsize_halfpage,
                        datatype='str',
                        cell_height=cell_height_tables,
-                       use_pgf=True)
+                       use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_png([FIG], path_out + f'DataSorce_ResamplingTable', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3397,7 +3400,7 @@ if INPUT["DataBase"].get("create_report", {}):
                            figsize=figsize_halfpage,
                            datatype='str',
                            cell_height=cell_height_tables,
-                           use_pgf=True)
+                           use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png([FIG], path_out + 'DataSorce_global', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3415,7 +3418,7 @@ if INPUT["DataBase"].get("create_report", {}):
                        cell_height=cell_height_tables,
                        datatype='str',
                        cell_width=[1, 3, 1, 1],
-                       use_pgf=True)
+                       use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_png([FIG], path_out + 'Sensor_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3432,7 +3435,7 @@ if INPUT["DataBase"].get("create_report", {}):
                        figsize=figsize_fullpage,
                        cell_height=cell_height_tables,
                        datatype='str',
-                       use_pgf=True)
+                       use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_png([FIG], path_out + 'Sensor_Original', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3486,7 +3489,7 @@ if INPUT["DataBase"].get("create_report", {}):
                        row_label_name='Parameters',
                        figsize=figsize_halfpage,
                        cell_height=cell_height_tables,
-                       use_pgf=True)
+                       use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_png([FIG], path_out + 'Report_table_VMHS', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3519,7 +3522,7 @@ if INPUT["DataBase"].get("create_report", {}):
                        row_label_name='Parameters',
                        figsize=figsize_halfpage,
                        cell_height=cell_height_tables,
-                       use_pgf=True)
+                       use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_png([FIG], path_out + 'Report_table_VMHS_example', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3574,7 +3577,7 @@ if INPUT["DataBase"].get("create_report", {}):
                        figsize=figsize_halfpage,
                        datatype='str',
                        cell_height=cell_height_tables,
-                       use_pgf=True)
+                       use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_png([FIG], path_out + 'Report_table_HSTP', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3603,7 +3606,7 @@ if INPUT["DataBase"].get("create_report", {}):
                            figsize=figsize_halfpage,
                            datatype='str',
                            cell_height=cell_height_tables,
-                           use_pgf=True)
+                           use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png([FIG], path_out + f'T_return_table_{keyword}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3630,7 +3633,7 @@ if INPUT["DataBase"].get("create_report", {}):
                            figsize=figsize_halfpage,
                            datatype='str',
                            cell_height=cell_height_tables,
-                           use_pgf=True)
+                           use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png([FIG], path_out + f'Extreme_Parameter_table_{keyword}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3660,7 +3663,7 @@ if INPUT["DataBase"].get("create_report", {}):
                        cell_height=cell_height_tables,
                        formater='.3f',
                        cell_width=[2, 1, 1, 1, 2],
-                       use_pgf=True)
+                       use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_png([FIG], path_out + f'Resonance_compare', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3680,7 +3683,7 @@ if INPUT["DataBase"].get("create_report", {}):
                        figsize=figsize_fullpage,
                        cell_height=0.7,
                        cell_width=[1, 1, 2, 3],
-                       use_pgf=True)
+                       use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_png([FIG], path_out + f'Revision_Table', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3698,7 +3701,7 @@ if INPUT["DataBase"].get("create_report", {}):
                        figsize=figsize_fullpage,
                        cell_height=0.7,
                        formater=".3f",
-                       use_pgf=True)
+                       use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_png([FIG], path_out + f'Weibull_table', dpi=INPUT["Toggle_Modules"]["dpi_figures"])

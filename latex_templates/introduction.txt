@@ -1,6 +1,14 @@
 \section*{Revision index}
 ?TABLE
 ?TABLE
+
+
+\\
+\\
+\\
+\textcolor{gray}{\textit{Please note that this report is automatically generated using Python and LaTeX.}}
+
+   
 \newpage
 
 \tableofcontents
@@ -22,7 +30,7 @@ substructure and foundation.
 
 \newpage
 
-\printacronyms[name=Abbreviations & definitions  ]
+\printacronyms[name=Abbreviations \& definitions  ]
 
 \newpage
 

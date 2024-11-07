@@ -76,7 +76,7 @@ class Scatter:
 
 class Tile:
     def __init__(self, num, errorbar=None, bar=None, textbox=None, lines=None, scatter=None, title=None, x_label=None, y_label=None, grid=None, x_lim=(None, None),
-                 y_lim=(None, None), x_norm='lin', y_norm='lin', spinecolor_left=None, spinecolor_right=None, y_label_right=None, legend='auto'):
+                 y_lim=(None, None), x_norm='lin', y_norm='lin', spinecolor_left=None, spinecolor_right=None, y_label_right=None, legend='auto', legend_loc="lower right"):
         if lines is None:
             lines = []
         if scatter is None:
@@ -105,6 +105,7 @@ class Tile:
         self.bar = bar
         self.y_label_right = y_label_right
         self.legend = legend
+        self.legend_loc = legend_loc
 
     def get_current_zorder(self):
         return len(self.lines) + len(self.scatter) + len(self.bar) + len(self.textbox) + len(self.errorbar) + len(self.bar)
@@ -216,31 +217,39 @@ class ErrorBar:
         self.yy_side = yy_side
         self.zorder = zorder
 # %% functions
+def plot_tiled(Tiles, figsize=None, global_max=None, global_min=None, fontsize_title=10, fontsize_legend=6, fontsize_label=8, fontsize_ticks=8, grid=None, scatter_max='auto',
+               scatter_min='auto', use_pgf=False, max_margins=None, min_margins=None):
 
-def plot_tiled(Tiles, **kwargs):
+    if figsize is None:
+        figsize = (8.268, 11.693)
+
+    if global_max is None:
+        global_max = ['auto', 'auto']
+
+    if global_min is None:
+        global_min = ['auto', 'auto']
+
+    if grid is None:
+        grid = [3, 2]
+
+    if max_margins is None:
+        max_margins = [None, None]
+
+    if min_margins is None:
+        min_margins = [None, None]
 
     rcParams['font.family'] = 'sans-serif'
     rcParams['font.sans-serif'] = 'Arial'
 
-    # If you want to use LaTeX for rendering text and set the font to Arial
-    rcParams['text.usetex'] = True
-    rcParams['text.latex.preamble'] = r'\usepackage{fontspec}\setmainfont{Arial}'
-
-    figsize = kwargs.get('figsize', (8.268, 11.693))
-    global_max = kwargs.get('global_max', ['auto', 'auto'])
-    global_min = kwargs.get('global_min', ['auto', 'auto'])
-    fontsize_title = kwargs.get('fontsize_title', 10)
-    fontsize_legend = kwargs.get('fontsize_legend', 6)
-    fontsize_label = kwargs.get('fontsize_label', 10)
-    fontsize_ticks = kwargs.get('fontsize_ticks', 8)
-    grid = kwargs.get('grid', [3, 2])
-    scatter_max = kwargs.get('scatter_max', 'auto')
-    scatter_min = kwargs.get('scatter_min', 'auto')
-    use_pgf = kwargs.get('use_pgf', False)
-
     if use_pgf:
         matplotlib.use('pgf')
-        rcParams['text.latex.preamble'] = r'\usepackage{fontspec}\setmainfont{Arial}'
+        pgf_with_pdflatex = {
+            "pgf.texsystem": "lualatex",
+            "pgf.preamble": r'\usepackage{fontspec} \setmainfont{Arial} \usepackage{amsmath} \usepackage{fontsize}'
+        }
+        matplotlib.rcParams.update(pgf_with_pdflatex)
+    else:
+        rcParams['text.usetex'] = True
 
     FIG = []
     i = 0
@@ -312,32 +321,61 @@ def plot_tiled(Tiles, **kwargs):
 
     if global_max[0] == 'auto':
         x_max = x_max_auto
+
+        if max_margins[0] is None:
+            max_margins[0] = 0.01
+
     elif global_max[0] is None:
         x_max = None
+
+        if max_margins[0] is None:
+            max_margins[0] = 0.05
+
     else:
         x_max = global_max[0]
 
     if global_min[0] == 'auto':
         x_min = x_min_auto
+
+        if min_margins[0] is None:
+            min_margins[0] = 0.01
+
     elif global_min[0] is None:
         x_min = None
+
+        if min_margins[0] is None:
+            min_margins[0] = 0.05
+
     else:
         x_min = global_min[0]
 
     if global_max[1] == 'auto':
-        if y_max_auto is not None:
-            y_max = 1.1*y_max_auto
-        else:
-            y_max = None
+        y_max = y_max_auto
+
+        if max_margins[1] is None:
+            max_margins[1] = 0.01
+
     elif global_max[1] is None:
         y_max = None
+
+        if max_margins[1] is None:
+            max_margins[1] = 0.05
+
     else:
         y_max = global_max[1]
 
     if global_min[1] == 'auto':
         y_min = y_min_auto
+
+        if min_margins[1] is None:
+            min_margins[1] = 0.01
+
     elif global_min[1] is None:
         y_min = None
+
+        if min_margins[1] is None:
+            min_margins[1] = 0.05
+
     else:
         y_min = global_min[1]
 
@@ -391,7 +429,6 @@ def plot_tiled(Tiles, **kwargs):
                     axin.imshow(image_bgr, zorder=-1)
                     axin.axis('off')
 
-
                     # SCATTER
                     for scatter in Tile.scatter:
 
@@ -410,6 +447,11 @@ def plot_tiled(Tiles, **kwargs):
                             if scatter.cmap_mode == 'manual':
                                 c = scatter.c
 
+                            if len(scatter.x) > 1000:
+                                rasterized = True
+                            else:
+                                rasterized = False
+
                             cmap = matplotlib.colormaps[scatter.cmap]
                             cmap.set_bad(color="grey")
 
@@ -424,7 +466,8 @@ def plot_tiled(Tiles, **kwargs):
                                           vmin=c_min,
                                           plotnonfinite=True,
                                           zorder=scatter.zorder,
-                                          marker=scatter.marker)
+                                          marker=scatter.marker,
+                                          rasterized=rasterized)
 
                             # colorbar
                             if scatter.cbar is not None:
@@ -460,7 +503,6 @@ def plot_tiled(Tiles, **kwargs):
                                     cbar.set_label(scatter.cbar_label, fontsize=cbar_label_fontsize)
 
                         else:
-
                             axis.scatter(scatter.x,
                                           scatter.y,
                                           c=scatter.color,
@@ -541,18 +583,60 @@ def plot_tiled(Tiles, **kwargs):
                                                    orientation_h=text.orientation_h,
                                                    header=text.header,
                                                    zorder=text.zorder,
-                                                   )
+                                                   use_pgf=True)
 
-                    if x_min is not None: axis.set_xlim(left=x_min)
-                    if x_max is not None: axis.set_xlim(right=x_max)
-                    if y_min is not None: axis.set_ylim(bottom=y_min)
-                    if y_max is not None: axis.set_ylim(top=y_max)
+                    # Lims
+                    if x_min is not None:
+                        x_min_set = x_min
+                    else:
+                        x_min_set = axis.get_xlim()[0]
 
-                    if x_min is None and x_max is None:
-                        axis.autoscale(enable=True, axis='x', tight=True)
+                    if min_margins[0] is not None:
+                        try:
+                            x_min_set = x_min_set - x_min_set * min_margins[0]
+                        except TypeError:
+                            x_min_set = x_min_set
 
-                    if y_min is None and y_max is None:
-                        axis.autoscale(enable=True, axis='y', tight=True)
+                    axis.set_xlim(left=x_min_set)
+
+                    if x_max is not None:
+                        x_max_set = x_max
+                    else:
+                        x_max_set = axis.get_xlim()[1]
+
+                    if max_margins[0] is not None:
+                        try:
+                            x_max_set = x_max_set + x_max_set * max_margins[0]
+                        except TypeError:
+                            x_max_set = x_max_set
+
+                    axis.set_xlim(right=x_max_set)
+
+                    if y_min is not None:
+                        y_min_set = y_min
+                    else:
+                        y_min_set = axis.get_ylim()[0]
+
+                    if min_margins[1] is not None:
+                        try:
+                            y_min_set = y_min_set - y_min_set * min_margins[1]
+                        except TypeError:
+                            y_min_set = y_min_set
+
+                    axis.set_ylim(bottom=y_min_set)
+
+                    if y_max is not None:
+                        y_max_set = y_max
+                    else:
+                        y_max_set = axis.get_ylim()[1]
+
+                    if max_margins[1] is not None:
+                        try:
+                            y_max_set = y_max_set + y_max_set * max_margins[1]
+                        except TypeError:
+                            y_max_set = y_max_set
+
+                    axis.set_ylim(top=y_max_set)
 
                     if Tile.x_label is not None:
                         axis.set_xlabel(Tile.x_label, fontsize=fontsize_label)
@@ -578,7 +662,7 @@ def plot_tiled(Tiles, **kwargs):
                     ax_legend.zorder = 100
                     handles, labels = axis.get_legend_handles_labels()
                     if Tile.legend == 'auto' and labels:
-                        ax_legend.legend(handles=handles,loc="lower right", fontsize=fontsize_legend)
+                        ax_legend.legend(handles=handles, loc=Tile.legend_loc, fontsize=fontsize_legend)
 
                     if type(Tile.legend) is list:
                         dummy = []
@@ -594,7 +678,7 @@ def plot_tiled(Tiles, **kwargs):
                     axis.remove()  # Remove the Cartesian axis
                     axis = fig.add_subplot(grid[0], grid[1], i_page+1, polar=True)
 
-                    # JBO-Logo    
+                    # JBO-Logo
                     image_bgr = plt.imread("JBO_Logo.png", format='png')
 
                     axin = axis.inset_axes([0.2, 0.6, 0.6, 0.4], zorder=-1)
@@ -612,7 +696,8 @@ def plot_tiled(Tiles, **kwargs):
                                                  radial_mode=RoseBar.radial_mode,
                                                  radial_datatype=RoseBar.radial_datatype,
                                                  cbar_label=RoseBar.cbar_label,
-                                                 cbar=RoseBar.cbar)
+                                                 cbar=RoseBar.cbar,
+                                                 use_pgf=use_pgf)
 
                 # title
                 if Tile.title is not None: axis.set_title(Tile.title, fontsize=fontsize_title)
@@ -664,16 +749,18 @@ def plot_rosebar(radial_data, r_bins, angles, r_max=None, plot=None, figsize=Non
     fig, ax
     """
 
-    if use_pgf:
-        matplotlib.use('pgf')
-        rcParams['text.latex.preamble'] = r'\usepackage{fontspec}\setmainfont{Arial}'
-
     rcParams['font.family'] = 'sans-serif'
     rcParams['font.sans-serif'] = 'Arial'
 
-    # If you want to use LaTeX for rendering text and set the font to Arial
-    rcParams['text.usetex'] = True
-
+    if use_pgf:
+        matplotlib.use('pgf')
+        pgf_with_pdflatex = {
+            "pgf.texsystem": "lualatex",
+            "pgf.preamble": r'\usepackage{fontspec} \setmainfont{Arial} \usepackage{amsmath} \usepackage{fontsize}'
+        }
+        matplotlib.rcParams.update(pgf_with_pdflatex)
+    else:
+        rcParams['text.usetex'] = True
 
     if plot is None:
 
@@ -719,7 +806,7 @@ def plot_rosebar(radial_data, r_bins, angles, r_max=None, plot=None, figsize=Non
         cbar = plt.colorbar(cmappable,
                             ax=axis,
                             pad=0.15,
-                            shrink=0.9,
+                            shrink=0.7,
                             spacing='proportional')
 
         cbar.set_ticks(ticks=bar_ticks, labels=[f"{tick:.15g}" for tick in r_bins], fontsize=7)
@@ -754,7 +841,7 @@ def plot_rosebar(radial_data, r_bins, angles, r_max=None, plot=None, figsize=Non
         y_ticklables = axis.get_yticklabels()
         y_tickpostions = axis.get_yticks()
         if radial_datatype == 'percent':
-            y_ticklables = [label.get_text()[:-1] + r' \%' + '$' for label in y_ticklables]
+            y_ticklables = ['$' + label.get_text() + r' \%' + '$' for label in y_ticklables]
         else:
             y_ticklables = [label.get_text() for label in y_ticklables]
 
@@ -809,15 +896,19 @@ def table(data,  **kwargs):
     cell_width_unit = kwargs.get('cell_width_unit', 'relative')
     use_pgf = kwargs.get('use_pgf', False)
 
-    if use_pgf:
-        matplotlib.use('pgf')
-        rcParams['text.latex.preamble'] = r'\usepackage{fontspec}\setmainfont{Arial}'
-
-    rcParams['text.usetex'] = True
     rcParams['font.family'] = 'sans-serif'
     rcParams['font.sans-serif'] = 'Arial'
 
-    # If you want to use LaTeX for rendering text and set the font to Arial
+    if use_pgf:
+        matplotlib.use('pgf')
+        pgf_with_pdflatex = {
+            "pgf.texsystem": "lualatex",
+            "pgf.preamble": r'\usepackage{fontspec} \setmainfont{Arial} \usepackage{amsmath} \usepackage{fontsize}'
+        }
+        matplotlib.rcParams.update(pgf_with_pdflatex)
+    else:
+        rcParams['text.usetex'] = True
+
 
 
     try:
@@ -990,7 +1081,7 @@ def table(data,  **kwargs):
     return fig
 
 
-def plot_dataframe(data, header=True, plot=None, corner1=(0.1, 0.9), corner2=(0.9, 0.1), fontsize=12, colors=None, orientation_v='center', orientation_h='center', zorder=0):
+def plot_dataframe(data, header=True, plot=None, corner1=(0.1, 0.9), corner2=(0.9, 0.1), fontsize=12, colors=None, orientation_v='center', orientation_h='center', zorder=0, use_pgf=False):
     """
     Plots a DataFrame or list of lists on a Matplotlib axis using ax.text() with coordinates specified by two corners,
     relative to the current axis limits, and handles logarithmic scaling.
@@ -1009,9 +1100,17 @@ def plot_dataframe(data, header=True, plot=None, corner1=(0.1, 0.9), corner2=(0.
     rcParams['font.family'] = 'sans-serif'
     rcParams['font.sans-serif'] = 'Arial'
 
-    # If you want to use LaTeX for rendering text and set the font to Arial
-    rcParams['text.usetex'] = True
-    rcParams['text.latex.preamble'] = r'\usepackage{fontspec}\setmainfont{Arial}'
+    if use_pgf:
+        matplotlib.use('pgf')
+        pgf_with_pdflatex = {
+            "pgf.texsystem": "lualatex",
+            "pgf.preamble": r'\usepackage{fontspec} \setmainfont{Arial} \usepackage{amsmath} \usepackage{fontsize}'
+        }
+        matplotlib.rcParams.update(pgf_with_pdflatex)
+    else:
+        rcParams['text.usetex'] = True
+
+
     if plot is None:
         fig, ax = plt.subplots()
     else:
@@ -1157,6 +1256,7 @@ def points_to_data(fig, ax, x_pt, y_pt):
     x_data = x_min + (x_inch / fig_width) * x_range
     y_data = y_min + (y_inch / fig_height) * y_range
     return x_data, y_data
+
 
 def update_axis_colors_ticksize_axlabels(
     ax,
