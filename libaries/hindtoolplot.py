@@ -586,57 +586,52 @@ def plot_tiled(Tiles, figsize=None, global_max=None, global_min=None, fontsize_t
                                                    use_pgf=True)
 
                     # Lims
+                    axis.margins(0)
                     if x_min is not None:
                         x_min_set = x_min
                     else:
                         x_min_set = axis.get_xlim()[0]
-
-                    if min_margins[0] is not None:
-                        try:
-                            x_min_set = x_min_set - x_min_set * min_margins[0]
-                        except TypeError:
-                            x_min_set = x_min_set
-
-                    axis.set_xlim(left=x_min_set)
 
                     if x_max is not None:
                         x_max_set = x_max
                     else:
                         x_max_set = axis.get_xlim()[1]
 
-                    if max_margins[0] is not None:
-                        try:
-                            x_max_set = x_max_set + x_max_set * max_margins[0]
-                        except TypeError:
-                            x_max_set = x_max_set
-
-                    axis.set_xlim(right=x_max_set)
-
                     if y_min is not None:
                         y_min_set = y_min
                     else:
                         y_min_set = axis.get_ylim()[0]
-
-                    if min_margins[1] is not None:
-                        try:
-                            y_min_set = y_min_set - y_min_set * min_margins[1]
-                        except TypeError:
-                            y_min_set = y_min_set
-
-                    axis.set_ylim(bottom=y_min_set)
 
                     if y_max is not None:
                         y_max_set = y_max
                     else:
                         y_max_set = axis.get_ylim()[1]
 
+                    if min_margins[0] is not None:
+                        try:
+                            x_min_set =  x_min_set - (x_max_set - x_min_set) * min_margins[0]
+                        except TypeError:
+                            x_min_set = x_min_set
+                    if max_margins[0] is not None:
+                        try:
+                            x_max_set = x_max_set + (x_max_set - x_min_set) * max_margins[0]
+                        except TypeError:
+                            x_max_set = x_max_set
+                    if min_margins[1] is not None:
+                        try:
+                            y_min_set = y_min_set - (y_max_set - y_min_set) * min_margins[1]
+                        except TypeError:
+                            y_min_set = y_min_set
                     if max_margins[1] is not None:
                         try:
-                            y_max_set = y_max_set + y_max_set * max_margins[1]
+                            y_max_set = y_max_set + (y_max_set - y_min_set) * max_margins[1]
                         except TypeError:
                             y_max_set = y_max_set
 
                     axis.set_ylim(top=y_max_set)
+                    axis.set_xlim(left=x_min_set)
+                    axis.set_ylim(bottom=y_min_set)
+                    axis.set_xlim(right=x_max_set)
 
                     if Tile.x_label is not None:
                         axis.set_xlabel(Tile.x_label, fontsize=fontsize_label)

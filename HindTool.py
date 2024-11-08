@@ -1180,9 +1180,10 @@ if len(INPUT["Toggle_Modules"].get("calc_Weibull", {})) > 0:
         DATA_OUT["Weibull"][f"{colnames[1]} over {colnames[0]}"] = Calc
 # %% Plot
 figsize_fullpage = [size * 0.39370079 for size in INPUT["Toggle_Modules"].get("writing_box", {})]
+figsize_fullpage_caption = [figsize_fullpage[0], figsize_fullpage[1]*0.9]
+
 figsize_halfpage = [figsize_fullpage[0], figsize_fullpage[1] / 2.5]
 
-figsize_thirdpage = [figsize_fullpage[0], figsize_fullpage[1] / 3]
 figsize_thirdpage = [figsize_fullpage[0], figsize_fullpage[1] / 3]
 figsize_twothirdpage = [figsize_fullpage[0], figsize_fullpage[1] / 1.5]
 figsize_halfpage_halfpage = [figsize_fullpage[0] / 2, figsize_fullpage[1] / 2.5]
@@ -2215,7 +2216,7 @@ if INPUT["Toggle_Modules"].get("plot_AngleDeviation", {}):
         FIG_scatter = []
         df = Calc.load_from_db(colnames_ini=True)
         # title management
-        title = r"\small Occurrence probability of missalinment " + "\n" + f" ({Calc.result[0].colnames['ang_comp']} - {Calc.result[0].colnames['ang_orig']})"
+        title = r"\small Occurrence probability of misalignment " + "\n" + f" ({Calc.result[0].colnames['ang_comp']} - {Calc.result[0].colnames['ang_orig']})"
         subtitle = Calc.create_segment_title(mode='sparse')
         subsubtitle = f"with v_m = {Calc.result[1].colnames['v_m']}"
         titles = [title + "\n " + subtitle_curr + "\n " + subsubtitle for subtitle_curr in subtitle]
@@ -2316,7 +2317,7 @@ if INPUT["Toggle_Modules"].get("plot_Roseplots", {}) and INPUT["Toggle_Modules"]
         if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_pdf(FIG, path_out + f'Roseplots_{Tile_single.name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-    FIG_multi = hc_plt.plot_tiled(Tiles_multi, figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+    FIG_multi = hc_plt.plot_tiled(Tiles_multi, figsize=figsize_fullpage_caption, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_png(FIG_multi, path_out + f'Roseplots_currents', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2932,7 +2933,7 @@ if INPUT["Toggle_Modules"].get("plot_SensorEval", {}):
             # tile timeseries
             df = Calc.load_from_db(colnames_ini=True, indizes=Seg.indizes)
             x = df[Seg.colnames['x']].values
-            titel = f'Timeseries with min={min(x)}' + r" $\vert$ " + f'max={max(x)}' + r" $\vert$ " + f'standard deviation={round(np.std(x), 4)}, ' + titels[i]
+            titel = f'Timeseries with min={gl.significant_digits([min(x)], 3)[0]}' + r" $\vert$ " + f'max={gl.significant_digits([max(x)], 3)[0]}' + r" $\vert$ " + f'standard deviation={round(np.std(x), 4)}, ' + titels[i]
 
             tile_time = hc_plt.Tile(i, x_label='date', y_label=gl.alias(Seg.colnames['x'], COLNAMES, INPUT["Aliase"]), title=titel)
 
@@ -2952,7 +2953,7 @@ if INPUT["Toggle_Modules"].get("plot_SensorEval", {}):
 
         # FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2])
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], grid=[2, 1], figsize=figsize_twothirdpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], max_margins=[0, 0], min_margins=[0, 0], grid=[2, 1], figsize=figsize_twothirdpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_omni, path_out + f'SensorEval_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -3521,7 +3522,7 @@ if INPUT["DataBase"].get("create_report", {}):
                        rowlabels=row_labels,
                        row_label_name='Parameters',
                        figsize=figsize_halfpage,
-                       cell_height=cell_height_tables,
+                       cell_height=cell_height_tables*0.8,
                        use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
@@ -3880,7 +3881,7 @@ if INPUT["DataBase"].get("create_report", {}):
             key_fig = [index for index in FIGURES.index if FIGURES.loc[index, "filename"] == row["png_name"]][0]
             database = key_fig.replace("DataSorce_", "").replace("_page_1", "")
 
-            FIGURES.loc[key_fig, "caption"] = f'"{database}" Data Set ' + "\\cite{" + f"{database}" + "}"
+            FIGURES.loc[key_fig, "caption"] = f'"{database}" Data Set ' + "\\citedataset{" + f"{database}" + "}"
             TEX["DataBasis"] = ltx.include_TableFig(TEX["DataBasis"], FIGURES.loc[key_fig])
 
     TEX["DataBasis"] = ltx.include_TableFig(TEX["DataBasis"], FIGURES.loc["DataSorce_ResamplingTable_page_1"])
@@ -3979,25 +3980,25 @@ if INPUT["DataBase"].get("create_report", {}):
 
     for sensor, sensor_group_name in zip(sensors, sensor_group_names):
         sensor_name = COLNAMES_REPORT.loc[sensor[1], "Aliase"]
-        sensor_group_name = sensor_group_name.replace('_', ' ')
+        sensor_group_name_clean = sensor_group_name.replace('_', ' ')
         template = "\\subsubsection{Data Evaluation: " + f"{sensor_name}" + "} \n" + "?FIG \n ?FIG  \n ?TABLE \n ?FIG \n ?TABLE \n ?MULTIFIG \n ?MULTIFIG \n ?MULTIFIG"
 
-        FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_3", "caption"] = f"Extreme Values of {sensor_group_name}, omnidirectional"
-        FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_3", "caption"] = f"Comparison of real and theoretical extreme values of {sensor_group_name}, omnidirectional"
-        FIGURES.loc[f"Extreme_Parameter_table_{sensor_group_name}_page_1", "caption"] = f"Parameters of extreme value extrapolation of {sensor_group_name}"
-        FIGURES.loc[[f"Extreme_T_return_{sensor_group_name}_page_3"], "caption"] = f"Return periods of extreme values of {sensor_group_name} with extrapolation, omnidirectional"
-        FIGURES.loc[f"T_return_table_{sensor_group_name}_page_1", "caption"] = f"Return periods of {sensor_group_name}"
+        FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_3", "caption"] = f"Extreme Values of {sensor_group_name_clean}, omnidirectional"
+        FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_3", "caption"] = f"Comparison of real and theoretical extreme values of {sensor_group_name_clean}, omnidirectional"
+        FIGURES.loc[f"Extreme_Parameter_table_{sensor_group_name}_page_1", "caption"] = f"Parameters of extreme value extrapolation of {sensor_group_name_clean}"
+        FIGURES.loc[[f"Extreme_T_return_{sensor_group_name}_page_3"], "caption"] = f"Return periods of extreme values of {sensor_group_name_clean} with extrapolation, omnidirectional"
+        FIGURES.loc[f"T_return_table_{sensor_group_name}_page_1", "caption"] = f"Return periods of {sensor_group_name_clean}"
 
-        FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_1", "caption"] = f"Extreme Values of {sensor_group_name}, directional distribution A"
-        FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_2", "caption"] = f"Extreme Values of {sensor_group_name}, directional distribution B"
+        FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_1", "caption"] = f"Extreme Values of {sensor_group_name_clean}, directional distribution A"
+        FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_2", "caption"] = f"Extreme Values of {sensor_group_name_clean}, directional distribution B"
 
-        FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_1", "caption"] = f"Comparison of real and theoretical extreme values of {sensor_group_name}, directional distribution A"
-        FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_2", "caption"] = f"Comparison of real and theoretical extreme values of {sensor_group_name}, directional distribution B"
+        FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_1", "caption"] = f"Comparison of real and theoretical extreme values of {sensor_group_name_clean}, directional distribution A"
+        FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_2", "caption"] = f"Comparison of real and theoretical extreme values of {sensor_group_name_clean}, directional distribution B"
 
         FIGURES.loc[[
-            f"Extreme_T_return_{sensor_group_name}_page_1"], "caption"] = f"Return periods of extreme values of {sensor_group_name} with extrapolation, , directional distribution A"
+            f"Extreme_T_return_{sensor_group_name}_page_1"], "caption"] = f"Return periods of extreme values of {sensor_group_name_clean} with extrapolation, , directional distribution A"
         FIGURES.loc[[
-            f"Extreme_T_return_{sensor_group_name}_page_2"], "caption"] = f"Return periods of extreme values of {sensor_group_name} with extrapolation, , directional distribution B"
+            f"Extreme_T_return_{sensor_group_name}_page_2"], "caption"] = f"Return periods of extreme values of {sensor_group_name_clean} with extrapolation, , directional distribution B"
 
         temp = ltx.include_Fig(template, FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_3"])
         temp = ltx.include_Fig(temp, FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_3"])
@@ -4066,7 +4067,7 @@ if INPUT["DataBase"].get("create_report", {}):
             file.write(tex)
 
     # compiling Latex files
-    print("   compiling Latex File, please press enter a couple of times...")
+    print("   compiling Latex File, this might take some time...")
     shutil.copy('./latex_templates/JBO_logo.jpg', path_report + r'\\' + 'JBO_logo.jpg')
 
     path_main = path_report + '\\main.tex'

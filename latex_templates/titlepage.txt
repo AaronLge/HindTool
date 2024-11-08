@@ -36,19 +36,19 @@
         }
         & \multicolumn{2}{l|}{
             \makebox[9cm][l]{ % Ensures horizontal centering with specified width
-                \raisebox{-1pt}[0cm][0pt]{ % Adjust height for vertical centering
+                \raisebox{-3pt}[0cm][0pt]{ % Adjust height for vertical centering
                     {\fontsize{10}{12}\selectfont \textbf{ ?RefNumber }}
                 }
             }
         } 
         & \multicolumn{2}{c|}{
             \makebox[1.8cm][l]{ % Ensures horizontal centering with specified width
-                \raisebox{0pt}[0cm][0pt]{ % Adjust height for vertical centering
+                \raisebox{-1pt}[0cm][0pt]{ % Adjust height for vertical centering
                     {\fontsize{10}{12}\selectfont \textbf{Revision}}
                 }
             }
         }
-        & \raisebox{-3pt}[0cm][0pt]{ % Keep this consistent with other columns
+        & \raisebox{-5pt}[0cm][0pt]{ % Keep this consistent with other columns
             \shortstack{
                 {\fontsize{7}{8.4}\selectfont Status} \\
                 {\fontsize{9}{10.8}\selectfont \textbf{ ?DocumentStatus }}
@@ -65,14 +65,14 @@
         }
         & \multicolumn{2}{l|}{
             \makebox[9cm][l]{ % Ensures horizontal centering with specified width
-                \raisebox{0pt}[0cm][0pt]{ % Adjust height for vertical centering
+                \raisebox{-2pt}[0cm][0pt]{ % Adjust height for vertical centering
                     {\fontsize{10}{5}\selectfont \textbf{ ?EmployerNumber }}
                 }
             }
         } 
         & 
         \makebox[0.9cm][l]{ 
-            \raisebox{-4pt}[0cm][0pt]{ % Keep this consistent with other columns
+            \raisebox{-6pt}[0cm][0pt]{ % Keep this consistent with other columns
                 \shortstack{
                     {\fontsize{7}{5}\selectfont JBO} \\
                     {\fontsize{9}{5}\selectfont \textbf{ ?RevisionJBO }}
@@ -82,7 +82,7 @@
         
         &
         \makebox[1cm][c]{ 
-            \raisebox{-4pt}[0cm][0pt]{ % Keep this consistent with other columns
+            \raisebox{-6pt}[0cm][0pt]{ % Keep this consistent with other columns
                 \shortstack{
                     {\fontsize{7}{5}\selectfont Employer} \\
                     {\fontsize{9}{5}\selectfont \textbf{ ?RevisionEmployer }}
@@ -92,7 +92,7 @@
         
         & 
         \makebox[1cm][c]{ 
-            \raisebox{-4pt}[0cm][0pt]{ % Keep this consistent with other columns
+            \raisebox{-6pt}[0cm][0pt]{ % Keep this consistent with other columns
                 \shortstack{
                     {\fontsize{7}{5}\selectfont Page} \\
                     {\fontsize{9}{5}\selectfont \textbf{\thepage/\pageref{LastPage}}}
@@ -128,13 +128,12 @@
     \end{tabular}
 \end{table}
 
-\vspace*{1cm}
 
 \begin{centering}
 \includegraphics[width=0.4\textwidth]{?ClientLogo} \\% Replace with actual image path \\
 \end{centering}
 
-\hspace{3.6cm}
+\hspace{3.5cm}
 \begin{minipage}{\textwidth}
 \vspace{2cm}
 

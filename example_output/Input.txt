@@ -5,8 +5,9 @@
 *DataBase*
 path_DataBase				>		"C:/Users/aaron.lange/Desktop/Projekte/HindcastArchive/2_54.41_5.95_ABP_Mer/54.41_5.95_ABP_Mer.db"
 colnames_preset				>		None
-JBOOST_proj					>		"A:/2024/24A523_Waterkant/JBOOST/JBOOST_Model_Gravity/proj.lua"						
-JBOOST_input				>		"A:/2024/24A523_Waterkant/JBOOST/JBOOST_Model_Gravity/Input JBOOST WAK-DP-A-LILA-MySE18-260-v0.lua"
+
+JBOOST_proj					>		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Tool/HindTool/db_example/proj.lua"					
+JBOOST_input				>	"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Tool/HindTool/db_example/Input JBOOST V236 - DP-A PreFeed L0.G0.S0.lua"
 create_report				>		True
 Report_Input				>		"ReportInput.txt"
 
@@ -35,18 +36,18 @@ datetime_start				>		'1979-01-01 07:00:00'							>	str:	startdatetime in the for
 datetime_end				>		'1981-07-01 07:00:00'							>	str:	enddatetime in the format: "YYYY-MM-DD"
 
 *Toggle_Modules*
-calc_VMHS					>		['wind', 'total', 'swell']									
-calc_HSTP					>		['wind', 'total', 'swell']							
-calc_VMTP					>		['wind', 'total', 'swell']								
-calc_RWI					>		['wind', 'total']								
-calc_Tables					>		['wind', 'swell']											
-calc_WaveBreak_Steep		>		['wind', 'total']										
-calc_AngleDeviation 		>		['dir_v_m', 'dir_T_mean_Wind', 'v_m']						>	angle_orig, angle_deviation, v_m
-calc_Roseplots				>		True									>	 [[angle, magnitude],[angle, magnitude]]
-calc_ExtremeValues			>		True									
-calc_Validation 			>		['wind', 'swell']											
-calc_SensorEval				>		True
-calc_Weibull				>		[['dir_v_m', 'v_m']]
+#calc_VMHS					>		['wind', 'total', 'swell']									
+#calc_HSTP					>		['wind', 'total', 'swell']							
+#calc_VMTP					>		['wind', 'total', 'swell']								
+#calc_RWI					>		['wind', 'total']								
+#calc_Tables					>		['wind', 'swell']											
+#calc_WaveBreak_Steep		>		['wind', 'total']										
+#calc_AngleDeviation 		>		['dir_v_m', 'dir_T_mean_Wind', 'v_m']						>	angle_orig, angle_deviation, v_m
+#calc_Roseplots				>		True									>	 [[angle, magnitude],[angle, magnitude]]
+#calc_ExtremeValues			>		True									
+#calc_Validation 			>		['wind', 'swell']											
+#calc_SensorEval				>		True
+#calc_Weibull				>		[['dir_v_m', 'v_m']]
 #calc_ExtremeConture			>		[['H_s', 'T_p', 'dir_v_m']]
 
 plot_VMHS					>		['wind', 'total', 'swell']

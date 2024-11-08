@@ -5,8 +5,9 @@
 *DataBase*
 path_DataBase				>		"C:/Users/aaron.lange/Desktop/Projekte/HindcastArchive/2_54.41_5.95_ABP_Mer/54.41_5.95_ABP_Mer.db"
 colnames_preset				>		None
-JBOOST_proj					>		"A:/2024/24A523_Waterkant/JBOOST/JBOOST_Model_Gravity/proj.lua"						
-JBOOST_input				>		"A:/2024/24A523_Waterkant/JBOOST/JBOOST_Model_Gravity/Input JBOOST WAK-DP-A-LILA-MySE18-260-v0.lua"
+
+JBOOST_proj					>		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Tool/HindTool/db_example/proj.lua"					
+JBOOST_input				>	"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Tool/HindTool/db_example/Input JBOOST V236 - DP-A PreFeed L0.G0.S0.lua"
 create_report				>		True
 Report_Input				>		"ReportInput.txt"
 
@@ -45,7 +46,7 @@ datetime_end				>		'1981-07-01 07:00:00'							>	str:	enddatetime in the format:
 #calc_Roseplots				>		True									>	 [[angle, magnitude],[angle, magnitude]]
 #calc_ExtremeValues			>		True									
 #calc_Validation 			>		['wind', 'swell']											
-#calc_SensorEval				>		True
+calc_SensorEval				>		True
 #calc_Weibull				>		[['dir_v_m', 'v_m']]
 #calc_ExtremeConture			>		[['H_s', 'T_p', 'dir_v_m']]
 

@@ -8,7 +8,6 @@ Investigated sensors are tabulated below:
 
 ?TABLE
 
-\clearpage 
 
 \subsection{Sensor illustration}
 

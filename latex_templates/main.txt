@@ -8,7 +8,7 @@
 \usepackage{multirow}  
 \usepackage{fancyhdr}
 \usepackage[htt]{hyphenat}
-\usepackage[hmargin=2cm,top=5cm,headheight=65pt,footskip=65pt]{geometry}
+\usepackage[hmargin=2cm,top=5cm,headheight=65pt,footskip=90pt]{geometry}
 \usepackage{xcolor, colortbl}
 \usepackage{geometry}
 \usepackage{graphicx} 
@@ -16,6 +16,10 @@
 \usepackage{fontspec}
 \setmainfont{Arial}
 \usepackage{caption}
+\captionsetup{justification=raggedright,singlelinecheck=false}
+\captionsetup[table]{font={it}}
+\captionsetup[figure]{font={it}}
+
 \usepackage{float}
 \usepackage{parskip}
 \usepackage{amsmath}
@@ -25,7 +29,8 @@
 \usepackage[
 backend=biber,
 style=numeric,
-sorting=none
+sorting=none,
+defernumbers=true % defer numbering until the bibliography sections are printed
 ]{biblatex}
 
 \usepackage{amsmath} % Ensure this package is included
@@ -60,7 +65,24 @@ sorting=none
   \usebibmacro{related}%
   \usebibmacro{finentry}}
 
-\DeclareFieldFormat{labelnumber}{R#1}
+% Define custom citation formats with prefixes for each section
+\DeclareCiteCommand{\citeguideline}[\mkbibbrackets]
+  {\usebibmacro{prenote}}
+  {\printtext{N\thefield{labelnumber}}}
+  {\multicitedelim}
+  {\usebibmacro{postnote}}
+
+\DeclareCiteCommand{\citedataset}[\mkbibbrackets]
+  {\usebibmacro{prenote}}
+  {\printtext{R\thefield{labelnumber}}}
+  {\multicitedelim}
+  {\usebibmacro{postnote}}
+
+\DeclareCiteCommand{\citelit}[\mkbibbrackets]
+  {\usebibmacro{prenote}}
+  {\printtext{L\thefield{labelnumber}}}
+  {\multicitedelim}
+  {\usebibmacro{postnote}}
 
 \addbibresource{?BIBDatasets}
 \addbibresource{?BIBLiteratur}
@@ -91,7 +113,7 @@ sorting=none
             \makebox[167pt][c]{ % Ensures horizontal centering within the multirow
                 \raisebox{0pt}[1cm][0pt]{ % Adjust height for vertical centering
                     \shortstack{
-                        {\fontsize{11}{20}\selectfont ?DocumentType } \\
+                        {\fontsize{11}{20}\selectfont ?DocumentType } \\ \\
                         {\textcolor{JBOGreen}{\fontsize{10}{20}\selectfont \textit{ ?DocumentTitle }}}
                     }
                 }

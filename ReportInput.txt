@@ -2,15 +2,15 @@
 path_latex_templates 		> 		".\latex_templates"	
 fig_path					>		".\example_output"
 #fig_path					>		
-acronym_path				>		"A:/_temp/ALa/Report_Automation/Acronyms.txt"
+acronym_path				>		"C:/Users/aaron.lange/Desktop/Projekte/Report_Automation/Acronyms.txt"
 
 *Database_Info*
 db_info_txt					>		'auto'
 
 *Biblografy*
-BIBDatasets                 >		"A:/2024/24A516_NSCB_NC3_and_NC4/Hindcast-ILA1/data/1_54.08_6.75_ABP_Mer/datasets.bib"
-BIBLiteratur				>		"A:/_temp/ALa/Report_Automation/Literature.bib"
-BIBGuidelines				>		"A:/_temp/ALa/Report_Automation/TechnicalGuidelines.bib"
+BIBDatasets                 >		"C:/Users/aaron.lange/Desktop/Projekte/HindcastArchive/2_54.41_5.95_ABP_Mer/datasets.bib"
+BIBLiteratur				>		"C:/Users/aaron.lange/Desktop/Projekte/Report_Automation/Literature.bib"
+BIBGuidelines				>		"C:/Users/aaron.lange/Desktop/Projekte/Report_Automation/TechnicalGuidelines.bib"
 
 
 *Symbols*

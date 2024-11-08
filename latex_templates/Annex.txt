@@ -8,13 +8,11 @@ The condensation methodology (explained in \ref{sec:NomalSeaState}) is visually 
 
 ?TABLE 
 
-\newpage
 
 \subsection{Annex A2: Sensor names}
 
 ?TABLE
 
-\newpage
 \subsection{Annex A3: Misalignment tables}
 
 ?MULTIFIG 

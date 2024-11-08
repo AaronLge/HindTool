@@ -87,127 +87,181 @@ def include_str(main, string, line, replace=False):
     return '\n'.join(lines), line + lines_include
 
 
-def compile_lualatex(tex_file, pdf_path=None, miktex_lualatex_path='C:/temp/MikTex/miktex/bin/x64/lualatex.exe', biber_path = 'C:/temp/MikTex/miktex/bin/x64/biber.exe'):
-    # def run_subprocess():
-    #     command = f"{miktex_lualatex_path} {tex_file} -output-directory {txt_path}"
-    #     with subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, text=True, cwd=txt_path) as process:
-    #         try:
-    #             # Read output line by line
-    #             while True:
-    #                 output = process.stdout.readline()
-    #                 if output:
-    #                     print(output.strip())  # Print the output
-    #
-    #                 # Check for the prompt and send an empty line
-    #                 if '?' in output:
-    #                     process.stdin.write('\n')
-    #                     process.stdin.write('\n')
-    #                     process.stdin.write('\n')
-    #                     process.stdin.write('\n')
-    #
-    #                     process.stdin.flush()
-    #
-    #         except Exception as e:
-    #             print(f"An error occurred: {e}")
+# def compile_lualatex(tex_file, pdf_path=None, miktex_lualatex_path='C:/temp/MikTex/miktex/bin/x64/lualatex.exe', biber_path = 'C:/temp/MikTex/miktex/bin/x64/biber.exe'):
+#     # def run_subprocess():
+#     #     command = f"{miktex_lualatex_path} {tex_file} -output-directory {txt_path}"
+#     #     with subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, text=True, cwd=txt_path) as process:
+#     #         try:
+#     #             # Read output line by line
+#     #             while True:
+#     #                 output = process.stdout.readline()
+#     #                 if output:
+#     #                     print(output.strip())  # Print the output
+#     #
+#     #                 # Check for the prompt and send an empty line
+#     #                 if '?' in output:
+#     #                     process.stdin.write('\n')
+#     #                     process.stdin.write('\n')
+#     #                     process.stdin.write('\n')
+#     #                     process.stdin.write('\n')
+#     #
+#     #                     process.stdin.flush()
+#     #
+#     #         except Exception as e:
+#     #             print(f"An error occurred: {e}")
+#
+#     """
+#     Compile a LaTeX document using LuaLaTeX and save the output PDF to a specified location.
+#
+#     Parameters:
+#     tex_files (str): Full path to the LaTeX (.tex) file you want to compile.
+#     output_pdf (str, optional): Full path to save the generated PDF. If not provided, the PDF will be saved
+#                                      in the same directory as the .tex file with the same base name.
+#     miktex_lualatex_path (str, optional): Full path to the LuaLaTeX executable (default is set to MiKTeX's standard location: 'C:/temp/MikTex/miktex/bin/x64/lualatex.exe').
+#
+#     Returns:
+#     str: Path to the generated PDF if successful, or None if compilation fails.
+#     """
+#     run_path = os.path.dirname(os.path.realpath(__file__))
+#     txt_path = os.path.dirname(tex_file)
+#
+#     Main_name = os.path.basename(tex_file)
+#     Main_name = Main_name.removesuffix('.tex')
+#
+#     if pdf_path is None:
+#         output_pdf = txt_path + '\\' + Main_name + '.pdf'
+#
+#     else:
+#         output_pdf = pdf_path
+#         shutil.move(run_path + '\\' + Main_name + '.pdf', output_pdf)
+#     # Step 2: Compile the .tex file using LuaLaTeX binary from MiKTeX
+#     try:
+#         # Extract the directory where the PDF should be output
+#
+#         subprocess.run(
+#             [miktex_lualatex_path, tex_file, '-output-directory', txt_path],
+#             check=True,
+#             cwd=txt_path,
+#             stdout=subprocess.PIPE,
+#             stderr=subprocess.PIPE,
+#         )
+#         #run_subprocess()
+#
+#         # # Run the bibliography tool (e.g., Biber)
+#         # subprocess.run(
+#         #     [biblio_tool_path, Main_name],
+#         #     check=True,
+#         #     cwd=tex_dir,
+#         #     stdout=subprocess.PIPE,
+#         #     stderr=subprocess.PIPE,
+#         #     timeout=timeout
+#         #)
+#     except subprocess.CalledProcessError as e:
+#         print(f"LuaLaTeX compilation failed (maybe): {e}")
+#     try:
+#         subprocess.run(
+#             [biber_path, Main_name, '-output-directory', txt_path],
+#             check=True,
+#             cwd=txt_path,
+#             stdout=subprocess.PIPE,
+#             stderr=subprocess.PIPE,
+#         )
+#         #run_subprocess()
+#     except subprocess.CalledProcessError as e:
+#         print(f"LuaLaTeX compilation failed (maybe): {e}")
+#     try:
+#         subprocess.run(
+#             [miktex_lualatex_path, tex_file, '-output-directory', txt_path],
+#             check=True,
+#             cwd=txt_path,
+#             stdout=subprocess.PIPE,
+#             stderr=subprocess.PIPE,
+#         )
+#         #run_subprocess()
+#
+#     except subprocess.CalledProcessError as e:
+#         print(f"LuaLaTeX compilation failed (maybe): {e}")
+#
+#     try:
+#         subprocess.run(
+#             [miktex_lualatex_path, tex_file, '-output-directory', txt_path],
+#             check=True,
+#             cwd=txt_path,
+#             stdout=subprocess.PIPE,
+#             stderr=subprocess.PIPE,
+#         )
+#         #run_subprocess()
+#
+#     except subprocess.CalledProcessError as e:
+#         print(f"LuaLaTeX compilation failed (maybe): {e}")
+#
+#     # Step 3: Verify if the output PDF was created
+#     if os.path.exists(output_pdf):
+#         print(f"PDF successfully created at: {output_pdf}")
+#         return output_pdf
+#     else:
+#         print(f"PDF was not created, something went wrong.")
+#         return output_pdf
 
-    """
-    Compile a LaTeX document using LuaLaTeX and save the output PDF to a specified location.
+import os
+import subprocess
+import time
+from threading import Thread
 
-    Parameters:
-    tex_files (str): Full path to the LaTeX (.tex) file you want to compile.
-    output_pdf (str, optional): Full path to save the generated PDF. If not provided, the PDF will be saved
-                                     in the same directory as the .tex file with the same base name.
-    miktex_lualatex_path (str, optional): Full path to the LuaLaTeX executable (default is set to MiKTeX's standard location: 'C:/temp/MikTex/miktex/bin/x64/lualatex.exe').
 
-    Returns:
-    str: Path to the generated PDF if successful, or None if compilation fails.
-    """
+def compile_lualatex(tex_file, pdf_path=None, miktex_lualatex_path='C:/temp/MikTex/miktex/bin/x64/lualatex.exe', biber_path='C:/temp/MikTex/miktex/bin/x64/biber.exe'):
+    def press_return_periodically(process):
+        # Function to send newline every second to simulate "return"
+        while process.poll() is None:  # Run as long as the process is active
+            process.stdin.write('\n')
+            process.stdin.flush()
+            time.sleep(1)
+
+    def run_subprocess(command, cwd):
+        with subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, stdin=subprocess.PIPE, text=True, cwd=cwd) as process:
+            # Start a separate thread to press "return" every second
+            thread = Thread(target=press_return_periodically, args=(process,))
+            thread.start()
+            process.wait()  # Wait for the process to complete
+            thread.join()  # Ensure the thread has finished
+
     run_path = os.path.dirname(os.path.realpath(__file__))
     txt_path = os.path.dirname(tex_file)
+    main_name = os.path.basename(tex_file).removesuffix('.tex')
 
-    Main_name = os.path.basename(tex_file)
-    Main_name = Main_name.removesuffix('.tex')
+    output_pdf = pdf_path if pdf_path else os.path.join(txt_path, f"{main_name}.pdf")
 
-    if pdf_path is None:
-        output_pdf = txt_path + '\\' + Main_name + '.pdf'
-
-    else:
-        output_pdf = pdf_path
-        shutil.move(run_path + '\\' + Main_name + '.pdf', output_pdf)
-    # Step 2: Compile the .tex file using LuaLaTeX binary from MiKTeX
+    # Compile the .tex file using LuaLaTeX
     try:
-        # Extract the directory where the PDF should be output
+        run_subprocess([miktex_lualatex_path, tex_file, '-output-directory', txt_path], cwd=txt_path)
+    except Exception as e:
+        print(f"LuaLaTeX compilation failed: {e}")
 
-        subprocess.run(
-            [miktex_lualatex_path, tex_file, '-output-directory', txt_path],
-            check=True,
-            cwd=txt_path,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        #run_subprocess()
-
-        # # Run the bibliography tool (e.g., Biber)
-        # subprocess.run(
-        #     [biblio_tool_path, Main_name],
-        #     check=True,
-        #     cwd=tex_dir,
-        #     stdout=subprocess.PIPE,
-        #     stderr=subprocess.PIPE,
-        #     timeout=timeout
-        #)
-    except subprocess.CalledProcessError as e:
-        print(f"LuaLaTeX compilation failed (maybe): {e}")
+    # Run the bibliography tool (Biber)
     try:
-        subprocess.run(
-            [biber_path, Main_name, '-output-directory', txt_path],
-            check=True,
-            cwd=txt_path,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        #run_subprocess()
-    except subprocess.CalledProcessError as e:
-        print(f"LuaLaTeX compilation failed (maybe): {e}")
-    try:
-        subprocess.run(
-            [miktex_lualatex_path, tex_file, '-output-directory', txt_path],
-            check=True,
-            cwd=txt_path,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        #run_subprocess()
+        run_subprocess([biber_path, main_name, '-output-directory', txt_path], cwd=txt_path)
+    except Exception as e:
+        print(f"Biber execution failed: {e}")
 
-    except subprocess.CalledProcessError as e:
-        print(f"LuaLaTeX compilation failed (maybe): {e}")
+    # Run LuaLaTeX two more times for references update
+    for i in range(2):
+        try:
+            run_subprocess([miktex_lualatex_path, tex_file, '-output-directory', txt_path], cwd=txt_path)
+        except Exception as e:
+            print(f"LuaLaTeX pass {i + 2} failed: {e}")
 
-    try:
-        subprocess.run(
-            [miktex_lualatex_path, tex_file, '-output-directory', txt_path],
-            check=True,
-            cwd=txt_path,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        #run_subprocess()
-
-    except subprocess.CalledProcessError as e:
-        print(f"LuaLaTeX compilation failed (maybe): {e}")
-
-    # Step 3: Verify if the output PDF was created
+    # Check if the output PDF was created
     if os.path.exists(output_pdf):
         print(f"PDF successfully created at: {output_pdf}")
         return output_pdf
     else:
-        print(f"PDF was not created, something went wrong.")
-        return output_pdf
-
+        print("PDF was not created, something went wrong.")
+        return None
 
 def include_Fig(string, FigInfo):
     figure_template = ("\\begin{figure}[H] \n "
                        "\\includegraphics[width=?FIGURE_WIDTH\\textwidth]{?FIGURE_PATH} \n "
-                       "\\caption{ textit{?CAPTION}} \n "
+                       "\\caption{ \\textit{?CAPTION}} \n "
                        "\\label{fig:?FIGURE_NAME} \n"
                        "\\end{figure}")
 
@@ -230,7 +284,7 @@ def include_MultiFig(string, FigInfo):
 
     figure_template = ("\\begin{figure}[H] \n "
                        "\\includegraphics[width=?FIGURE_WIDTH\\textwidth]{?FIGURE_PATH} \n "
-                       "\\caption{ textit{?CAPTION}} \n "
+                       "\\caption{ \\textit{?CAPTION}} \n "
                        "\\label{fig:?FIGURE_NAME} \n"
                        "\\end{figure}")
 
@@ -258,7 +312,7 @@ def include_MultiFig(string, FigInfo):
 def include_TableFig(string, FigInfo):
     figure_template = ("\\begin{figure}[H] \n "
                        "\\captionsetup{type=table} \n"
-                       "\\caption{ textit{?CAPTION}} \n "
+                       "\\caption{ \\textit{?CAPTION}} \n "
                        "\\includegraphics[width=?FIGURE_WIDTH\\textwidth ]{?FIGURE_PATH} \n "
                        "\\label{tab:?FIGURE_NAME} \n"
                        "\\end{figure}")

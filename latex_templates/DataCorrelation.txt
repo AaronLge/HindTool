@@ -7,7 +7,7 @@ Wind speed dependent omnidirectional and directional normal sea state parameter 
 As monopiles are sensitive to wave excitation, a methodology shall be applied to derive sea state parameters for the wave load generation in the most accurate way. Wave loading has two effects on design loads:
 
 \begin{itemize}
-  \item Quasi-static contribution: Wave loads on individual members do have a quasi-static effect, i.e. the wave loads result in internal member forces. Quasi-static fatigue loads can be assumed to be proportional to $\mathrm{H}_{\mathrm{s}}{ }^{\lambda}$, where $\lambda$ is 1 if the wave loading is inertia dominated and 2 if the wave loading is drag dominated \cite{Seid14}.
+  \item Quasi-static contribution: Wave loads on individual members do have a quasi-static effect, i.e. the wave loads result in internal member forces. Quasi-static fatigue loads can be assumed to be proportional to $\mathrm{H}_{\mathrm{s}}{ }^{\lambda}$, where $\lambda$ is 1 if the wave loading is inertia dominated and 2 if the wave loading is drag dominated \citelit{Seid14}.
   \item Energy conservation: In order to maintain the wave energy of the measured/modelled sea states it is considered that $E \sim \mathrm{H}_{\mathrm{s}}{ }^{2}$.
   \item Dynamic contribution: In addition to the (local) quasi-static contribution, global dynamic excitation occurs. For monopiles this is the dominant effect. For stiff structures, such as jackets, this effect may be negligible. The most probable peak periods will be applied in the expected bandwidth of the first natural frequency ( $50 \%$-quantile), while the periods above and below this defined range are chosen to be on the slightly conservative side by means of different quantiles. See also .
 \end{itemize}
@@ -48,7 +48,7 @@ H_{s, e q}=\left(\frac{\sum_{n} H_{s, n}{ }^{\lambda m} \cdot p(n)}{\sum_{n} p(n
 \end{align}
 
 
-Here, $\lambda$ is chosen to be 1 as wave loads on monopiles are inertia dominated (see also \cite{Seid14}), whereas $m$ shall be equal to 2 and denotes the power mean exponent. This approach is solely based on the conservation of the wave energy of a sea state or the corresponding spectrum, respectively. The wave energy of a linear sea state is proportional to the square of significant wave height $\left(E \sim H_{S}^{2}\right)$.
+Here, $\lambda$ is chosen to be 1 as wave loads on monopiles are inertia dominated (see also \citelit{Seid14}), whereas $m$ shall be equal to 2 and denotes the power mean exponent. This approach is solely based on the conservation of the wave energy of a sea state or the corresponding spectrum, respectively. The wave energy of a linear sea state is proportional to the square of significant wave height $\left(E \sim H_{S}^{2}\right)$.
 
 The calculated condensation curve is adjusted to ensure it forms a monotone increasing function. This means that as wind speeds increase, the $H_{S}$ either increases or remains constant. This is physically obvious but can be calculated differently for high bins due to a lack of data.
 
@@ -110,7 +110,7 @@ For the final condensation of the sea state-parameters the $H_s$ and $T_p$ value
 \subsection{Proof of condensation method}
 \label{sec:condensation_method}
 
-The proof of the condensation method for normal sea state parameter is provided in this section in detail. A reference structural \ac{FE} model (\cite{Structure}) of the intended \ac{WTG} and foundation configuration has been set up for this purpose. Using a frequency domain approach, \ac{DEL}'s of the bending moment at decisive elevations are calculated for each individual sea state sample in the data set.
+The proof of the condensation method for normal sea state parameter is provided in this section in detail. A reference structural \ac{FE} model (\citedataset{Structure}) of the intended \ac{WTG} and foundation configuration has been set up for this purpose. Using a frequency domain approach, \ac{DEL}'s of the bending moment at decisive elevations are calculated for each individual sea state sample in the data set.
 \\
 \\
 Damage equivalent loads are applied to equate the fatigue damage represented by rainflow cycle counted data to that caused by a single stress range repeating at a single frequency. The method is based on the Miner's rule. The damage equivalent load is given by the following formula:
