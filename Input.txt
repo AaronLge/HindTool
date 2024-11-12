@@ -39,7 +39,7 @@ datetime_end				>		'1981-07-01 07:00:00'							>	str:	enddatetime in the format:
 #calc_VMHS					>		['wind', 'total', 'swell']									
 #calc_HSTP					>		['wind', 'total', 'swell']							
 #calc_VMTP					>		['wind', 'total', 'swell']								
-#calc_RWI					>		['wind', 'total']								
+calc_RWI					>		['wind', 'total']								
 #calc_Tables					>		['wind', 'swell']											
 #calc_WaveBreak_Steep		>		['wind', 'total']										
 #calc_AngleDeviation 		>		['dir_v_m', 'dir_T_mean_Wind', 'v_m']						>	angle_orig, angle_deviation, v_m
@@ -214,6 +214,8 @@ vm_step						>		1										>	float:	Vm-step, starting from the lower limit as th
 label_by_section			>		True									>	bool: 	if True, every predefined section has its own label, if False, 8 sections 
 rot_r_label					> 		0										>	float:	roation of r-lables in degree
 
+*RWI*
+gamma						>		'torset'
 
 *Validation_wind*
 from_DB						> 		True
