@@ -1,7 +1,7 @@
 
 \subsection{Extreme conditions}
 
-The extreme values for the respective occurrence periods are analysed using the Extreme Value Theory developed by Gumbel \cite{Gumb58}. Therefore, the extreme values $x$ are determined by choosing the $n$ maxima per year of the dataset (here, $n=1$ ). The segmentation must not be strictly at the change of the year but can be shifted by a relative offset to isolate seasonal periods with increased density of extreme values (see Figure \ref{fig:Extreme_Timeseries_Example}). This ensures that any two extreme values aren't correlated with each other.\\
+The extreme values for the respective occurrence periods are analysed using the Extreme Value Theory developed by Gumbel \citelit{Gumb58}. Therefore, the extreme values $x$ are determined by choosing the $n$ maxima per year of the dataset (here, $n=1$ ). The segmentation must not be strictly at the change of the year but can be shifted by a relative offset to isolate seasonal periods with increased density of extreme values (see Figure \ref{fig:Extreme_Timeseries_Example}). This ensures that any two extreme values aren't correlated with each other.\\
 
 ?FIG
 
@@ -37,7 +37,7 @@ Here, $n$ theoretical extreme values $x_{th}$ are found and compared to the real
 
 By visually evaluating the distance from a perfect correlation (Figure \ref{fig:Extreme_qq_example}), shown as the line $x=x_{t h}$, the fit of the distribution can be evaluated. Also shown are the percentiles of the Gumbel distribution. These are numerically determined. $N$ uniformly distributed probabilities $p_{n} \in[0,1], n=1 \ldots N$ are generated and the corresponding theoretical extreme values are found using equation \ref{eq:gumbel}. This is repeated many times ($N_{rep}$) and each of the resulting sets of size $N$ are sorted by magnitude. Now for each magnitude rank with size $N_{rep}$ any percentile can be calculated and is associated with the theoretical extreme values $x_{th}$.
 
-For finding the return periods $T_{R}$ corresponding to the probability value $P$ or vice versa, the formulas below can be applied (see \cite{DNV-ST_0437}).
+For finding the return periods $T_{R}$ corresponding to the probability value $P$ or vice versa, the formulas below can be applied (see \citeguideline{DNV-ST_0437}).
 
 \begin{align}
 \label{eq:P_to_TR}
@@ -47,7 +47,7 @@ For finding the return periods $T_{R}$ corresponding to the probability value $P
 
 Starting from a return period, Eq. \ref{eq:P_to_TR} can be used to the probability $P$. From there, the inverse Gumbel distribution (Eq. \ref{eq:gumbel_inv}) can be used to determine the expected extreme value. Therefore, a logarithmic grid of return periods in the required range $T_{R, j}, j=1 \ldots M$ is created and the corresponding theoretical extreme values $x_{j, m i d}$ are determined.
 
-For finding the confidence intervals, labelled $x_{j, \sigma}$ and $x_{j,-\sigma}$, another numerical method is applied. For each of the $i$ determined sets $p_{n}$, new Gumbel coefficients $\beta_{i}$ and $\sigma_{i}$ are calculated. For each of the return periods $T_{R, j}$, the corresponding probabilities $P_{j}$ of the current Gumbel distribution are found. The result is a $N_{r e p}$ by $M$ matrix, in which there are a big number ( $N_{r e p}$ ) of extreme values corresponding to the return periods $T_{R, j}$ on the logarithmic grid. Those can be used to determine the standard deviation $\sigma_{j}$ for each of the $j$ return periods $T_{R, j}$. As suggested in \cite{DNV-ST_0437}, these values can be simply added or subtracted to the appropriate value $x_{j, m i d}$ :
+For finding the confidence intervals, labelled $x_{j, \sigma}$ and $x_{j,-\sigma}$, another numerical method is applied. For each of the $i$ determined sets $p_{n}$, new Gumbel coefficients $\beta_{i}$ and $\sigma_{i}$ are calculated. For each of the return periods $T_{R, j}$, the corresponding probabilities $P_{j}$ of the current Gumbel distribution are found. The result is a $N_{r e p}$ by $M$ matrix, in which there are a big number ( $N_{r e p}$ ) of extreme values corresponding to the return periods $T_{R, j}$ on the logarithmic grid. Those can be used to determine the standard deviation $\sigma_{j}$ for each of the $j$ return periods $T_{R, j}$. As suggested in \citeguideline{DNV-ST_0437}, these values can be simply added or subtracted to the appropriate value $x_{j, m i d}$ :
 
 $$
 \begin{aligned}

@@ -6,7 +6,10 @@
 \\
 \\
 \\
-\textcolor{gray}{\textit{Please note that this report is automatically generated using Python and LaTeX.}}
+\\
+\\
+\\
+\textcolor{gray}{\textbf{\textit{\large Please note that this report is automatically generated using Python and LaTeX.}}}
 
    
 \newpage
@@ -18,7 +21,7 @@
 \section{Introduction}
 \subsection{General}
 For the support structure design of an offshore wind farm, the interpretation of the metocean data is required.
-Hydrodynamic load analysis will be conducted on this basis, which basically follow the recommendations in \cite{DNV-ST_0437} supported by \cite{IEC_61400_3_1}.
+Hydrodynamic load analysis will be conducted on this basis, which basically follow the recommendations in \citeguideline{DNV-ST_0437} supported by \citeguideline{IEC_61400_3_1}.
 \\
 
 ?siteSpecific
@@ -36,6 +39,14 @@ substructure and foundation.
 
 \section{References}
 
-\printbibliography[keyword={guideline},title={Technical guidelines and standards}]
-\printbibliography[keyword={dataset},title={Project-specific documents}]
-\printbibliography[keyword={lit},title={Literature}]
+\DeclareFieldFormat{labelnumber}{N#1}
+\printbibliography[keyword={guideline},title={Technical guidelines and standards},sorting=none,resetnumbers=true]
+
+% Datasets Section with Separate Counter
+\DeclareFieldFormat{labelnumber}{R#1}
+\printbibliography[keyword={dataset},title={Project-specific documents},sorting=none,resetnumbers=true]
+
+% Literature Section with Separate Counter
+\DeclareFieldFormat{labelnumber}{L#1}
+\printbibliography[keyword={lit},title={Literature},sorting=none,resetnumbers=true]
+

@@ -244,7 +244,7 @@ def compile_lualatex(tex_file, pdf_path=None, miktex_lualatex_path='C:/temp/MikT
         print(f"Biber execution failed: {e}")
 
     # Run LuaLaTeX two more times for references update
-    for i in range(2):
+    for i in range(3):
         try:
             run_subprocess([miktex_lualatex_path, tex_file, '-output-directory', txt_path], cwd=txt_path)
         except Exception as e:

@@ -736,13 +736,15 @@ if 'wind' in INPUT["Toggle_Modules"].get("calc_RWI", {}):
                                       df[COLNAMES["T_p_wind"]],
                                       df[COLNAMES["dir_v_m"]],
                                       angle_grid_mod,
-                                      INPUT["Structure"]["f_0"])
+                                      INPUT["Structure"]["f_0"],
+                                      gamma_mode=INPUT["RWI"]["gamma"])
 
     omni, _ = hc_calc.calc_RWI(df[COLNAMES["H_s_wind"]],
                                df[COLNAMES["T_p_wind"]],
                                df[COLNAMES["dir_v_m"]],
                                None,
-                               INPUT["Structure"]["f_0"])
+                               INPUT["Structure"]["f_0"],
+                               gamma_mode=INPUT["RWI"]["gamma"])
 
     Calc.result = omni + directional
 
@@ -765,13 +767,15 @@ if 'total' in INPUT["Toggle_Modules"].get("calc_RWI", {}):
                                             df[COLNAMES["T_p"]],
                                             df[COLNAMES["dir_v_m"]],
                                             angle_grid_mod,
-                                            INPUT["Structure"]["f_0"])
+                                            INPUT["Structure"]["f_0"],
+                                      gamma_mode=INPUT["RWI"]["gamma"])
 
-    omni, RWI_max = hc_calc.calc_RWI(df[COLNAMES["H_s"]],
+    omni, _ = hc_calc.calc_RWI(df[COLNAMES["H_s"]],
                                      df[COLNAMES["T_p"]],
                                      df[COLNAMES["dir_v_m"]],
                                      None,
-                                     INPUT["Structure"]["f_0"])
+                                     INPUT["Structure"]["f_0"],
+                                      gamma_mode=INPUT["RWI"]["gamma"])
 
     Calc.result = omni + directional
 

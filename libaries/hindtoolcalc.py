@@ -1696,7 +1696,7 @@ def calc_Roseplot(angle, magnitude, angle_segments):
     return counts, r_edges
 
 
-def calc_RWI(Hs, Tp, angle, angle_grid, f_0):
+def calc_RWI(Hs, Tp, angle, angle_grid, f_0, gamma_mode='default'):
     """retruns list of RWI segment objects for all segments in angle_grid, if angle_grid is None, omnidirectional is returned
 
     Arguments:
@@ -1717,7 +1717,7 @@ def calc_RWI(Hs, Tp, angle, angle_grid, f_0):
 
     if angle_grid is None:
 
-        RWI_list = RWI(Hs, Tp, f_0)
+        RWI_list = RWI(Hs, Tp, f_0, gamma_mode=gamma_mode)
 
         RWI_df = pd.DataFrame(RWI_list, index=Hs.index)
 
@@ -1736,7 +1736,7 @@ def calc_RWI(Hs, Tp, angle, angle_grid, f_0):
 
             df_filt = gl.filter_dataframe(df, angle.name, angle_segment[0], angle_segment[1])
 
-            RWI_list = RWI(df_filt[Hs.name], df_filt[Tp.name], f_0)
+            RWI_list = RWI(df_filt[Hs.name], df_filt[Tp.name], f_0, gamma_mode=gamma_mode)
 
             RWI_df = pd.DataFrame(RWI_list, index=df_filt[Hs.name].index)
 

@@ -46,7 +46,7 @@ datetime_end				>		'1981-07-01 07:00:00'							>	str:	enddatetime in the format:
 #calc_Roseplots				>		True									>	 [[angle, magnitude],[angle, magnitude]]
 #calc_ExtremeValues			>		True									
 #calc_Validation 			>		['wind', 'swell']											
-calc_SensorEval				>		True
+#calc_SensorEval				>		True
 #calc_Weibull				>		[['dir_v_m', 'v_m']]
 #calc_ExtremeConture			>		[['H_s', 'T_p', 'dir_v_m']]
 
