@@ -162,7 +162,7 @@ class Calculation:
             else:
                 common_dates = pd.DatetimeIndex([])  # empty if no lists are provided
 
-        return common_dates
+        return sorted(common_dates)
 
     def create_segment_title(self, mode='verbose', latex=True):
         """"if the data stored in result is list of "Segment",  it exports a list of title in Latex format
@@ -223,10 +223,10 @@ class Calculation:
 
         df = gl.export_df_from_sql(self.basedata["dbname"], self.basedata["tablename"], column_names=column_names, indizes=indizes)
 
-        if (self.filt is None) or not applie_filt:
+        if (self.filters is None) or not applie_filt:
             df = df[df.index.isin(self.basedata["indizes"])]
         else:
-            df = df[df.index.isin(self.filt["indizes_in"])]
+            df = df.loc[self.apply_filters()]
 
         return df
 
@@ -930,7 +930,6 @@ def DEL_points(DEL, v_m, v_m_edges, design_life, N_ref, SN_slope):
 
     return Table, Added
 
-
 def histogramm(x, x_max=None, x_min=None, auto_size=True, bin_size=None):
     bin_size_soll = bin_size
 
@@ -941,10 +940,11 @@ def histogramm(x, x_max=None, x_min=None, auto_size=True, bin_size=None):
         x_max = np.max(x)
 
     # get significant Digits
-    x_str = [str(value) for value in x]
-    lenths = [len(dig.split('.')[1]) for dig in x_str]
-    sig_dig = max(lenths)
-    if sig_dig > 3: sig_dig = 3
+    # x_str = [str(value) for value in x]
+    # lenths = [len(dig.split('.')[1]) for dig in x_str]
+    # sig_dig = max(lenths)
+    sig_dig = gl.get_significant_digits(x)
+    if sig_dig > 3: sig_dig = 2
 
     # get minmal distance
     x_values = np.sort(x)

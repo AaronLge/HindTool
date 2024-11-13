@@ -240,55 +240,53 @@ DATA_OUT["SensorEval"] = {}
 DATA_OUT["Weibull"] = {}
 DATA_OUT["ExtremeConture"] = {}
 DATA_OUT["ExtremeValues"] = {}
+
 # VMHS
-if (('wind' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
-        or ('wind' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
-        or ('wind' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
-        or ('wind' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
-    print("calculating VMHS Wind Sea...")
+toggle_modules = ["calc_VMHS", "calc_VMTP", "calc_Tables", "calc_Validation"]
+table_name = 'Hind_combined'
+vmhs_calculations = {
+    "wind": [COLNAMES["v_m"], COLNAMES["H_s_wind"], COLNAMES["dir_v_m"]],
+    "swell": [COLNAMES["v_m"], COLNAMES["H_s_swell"], COLNAMES["dir_T_mean_Swell"]],
+    "total": [COLNAMES["v_m"], COLNAMES["H_s"], COLNAMES["dir_T_mean"]]
+}
 
-    Input = INPUT["VMHS_wind"]
-    table_name = 'Hind_combined'
-    column_names = [COLNAMES["dir_v_m"], COLNAMES["v_m"], COLNAMES["H_s_wind"]]
+for sea_type, column_names in vmhs_calculations.items():
+    if any(sea_type in INPUT["Toggle_Modules"].get(module, {}) for module in toggle_modules):
+        print(f"calculating VMHS {sea_type.capitalize()} Sea...")
 
-    Calc = hc_calc.Calculation()
-    Calc.anglecol = COLNAMES["dir_v_m"]
+        # Set input and table configurations
+        Input = INPUT[f"VMHS_{sea_type}"]
 
-    df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
+        # Initialize calculation object
+        Calc = hc_calc.Calculation()
 
-    # filter for nans
-    indizes_in = Calc.initilize_filter(mode='nans')
-    df = df.loc[indizes_in]
+        # Load and filter data
+        df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
+        Calc.add_filter(mode='nans')
+        Calc.add_filter(mode='range', colnames=[column_names[1]], ranges=[[0, None]])
+        indizes_in = Calc.apply_filters()
+        df = df.loc[indizes_in]
 
-    directional = hc_calc.calc_VMHS(df[COLNAMES["v_m"]], df[COLNAMES["H_s_wind"]], df[COLNAMES["dir_v_m"]], angle_grid_mod,
-                                    N_grid=Input["N_grid"],
-                                    deg_reg=Input["deg_reg"],
-                                    model_reg=Input["model_reg"],
-                                    cut_reg=Input["cut_reg"],
-                                    weighting_reg=Input["weighting_reg"],
-                                    zone_reg=Input["zone_reg"],
-                                    zone_line=Input["zone_line"],
-                                    bin_min=Input["bin_min"],
-                                    average_correction=Input["average_correction"],
-                                    avrg_method=Input["avrg_method"],
-                                    make_monotone=Input["make_monotone"])
+        # Perform directional and omni calculations
+        calc_params = {
+            "N_grid": Input["N_grid"],
+            "deg_reg": Input["deg_reg"],
+            "model_reg": Input["model_reg"],
+            "cut_reg": Input["cut_reg"],
+            "weighting_reg": Input["weighting_reg"],
+            "zone_reg": Input["zone_reg"],
+            "zone_line": Input["zone_line"],
+            "bin_min": Input["bin_min"],
+            "average_correction": Input["average_correction"],
+            "avrg_method": Input["avrg_method"],
+            "make_monotone": Input["make_monotone"]
+        }
+        directional = hc_calc.calc_VMHS(df[column_names[0]], df[column_names[1]], df[column_names[2]], angle_grid_mod, **calc_params)
+        omni = hc_calc.calc_VMHS(df[column_names[0]], df[column_names[1]], df[column_names[2]], None, **calc_params)
+        Calc.result = omni + directional
 
-    omni = hc_calc.calc_VMHS(df[COLNAMES["v_m"]], df[COLNAMES["H_s_wind"]], df[COLNAMES["dir_v_m"]], None,
-                             N_grid=Input["N_grid"],
-                             deg_reg=Input["deg_reg"],
-                             model_reg=Input["model_reg"],
-                             cut_reg=Input["cut_reg"],
-                             weighting_reg=Input["weighting_reg"],
-                             zone_reg=Input["zone_reg"],
-                             zone_line=Input["zone_line"],
-                             bin_min=Input["bin_min"],
-                             average_correction=Input["average_correction"],
-                             avrg_method=Input["avrg_method"],
-                             make_monotone=Input["make_monotone"])
-
-    Calc.result = omni + directional
-
-    DATA_OUT["VMHS"]["wind"] = Calc
+        # Store the result in DATA_OUT
+        DATA_OUT["VMHS"][sea_type] = Calc
 
 if (INPUT["Toggle_Modules"].get("plot_condensation_example", {})):
     print("calculating VMHS Wind Sea example plot...")
@@ -340,124 +338,21 @@ if (INPUT["Toggle_Modules"].get("plot_condensation_example", {})):
 
     DATA_OUT["VMHS"]["wind_example"] = Calc
 
-if (('swell' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
-        or ('swell' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
-        or ('swell' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
-        or ('swell' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
-    print("calculating VMHS Swell Sea...")
-
-    Input = INPUT["VMHS_swell"]
-    table_name = 'Hind_combined'
-    column_names = [COLNAMES["dir_T_mean_Swell"], COLNAMES["v_m"], COLNAMES["H_s_swell"]]
-
-    Calc = hc_calc.Calculation()
-    df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
-
-    # filter for nans and H_s over 0
-    Calc.add_filter(mode='nans')
-    Calc.add_filter(mode='range', colnames=[COLNAMES["H_s_swell"]], ranges=[[0,None]])
-
-    indizes_in = Calc.apply_filters()
-
-    df = df.loc[indizes_in]
-
-    directional = hc_calc.calc_VMHS(df[COLNAMES["v_m"]], df[COLNAMES["H_s_swell"]], df[COLNAMES["dir_T_mean_Swell"]], angle_grid_mod,
-                                    N_grid=Input["N_grid"],
-                                    deg_reg=Input["deg_reg"],
-                                    model_reg=Input["model_reg"],
-                                    cut_reg=Input["cut_reg"],
-                                    weighting_reg=Input["weighting_reg"],
-                                    zone_reg=Input["zone_reg"],
-                                    zone_line=Input["zone_line"],
-                                    bin_min=Input["bin_min"],
-                                    average_correction=Input["average_correction"],
-                                    avrg_method=Input["avrg_method"],
-                                    make_monotone=Input["make_monotone"])
-
-    omni = hc_calc.calc_VMHS(df[COLNAMES["v_m"]], df[COLNAMES["H_s_swell"]], df[COLNAMES["dir_T_mean_Swell"]], None,
-                             N_grid=Input["N_grid"],
-                             deg_reg=Input["deg_reg"],
-                             model_reg=Input["model_reg"],
-                             cut_reg=Input["cut_reg"],
-                             weighting_reg=Input["weighting_reg"],
-                             zone_reg=Input["zone_reg"],
-                             zone_line=Input["zone_line"],
-                             bin_min=Input["bin_min"],
-                             average_correction=Input["average_correction"],
-                             avrg_method=Input["avrg_method"],
-                             make_monotone=Input["make_monotone"])
-
-    Calc.result = omni + directional
-    DATA_OUT["VMHS"]["swell"] = Calc
-
-if (('total' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
-        or ('total' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
-        or ('total' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
-        or ('total' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
-    print("calculating VMHS Total Sea...")
-
-    Input = INPUT["VMHS_total"]
-    table_name = 'Hind_combined'
-    column_names = [COLNAMES["dir_T_mean"], COLNAMES["v_m"], COLNAMES["H_s"]]
-
-    Calc = hc_calc.Calculation()
-    df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
-
-    # filter for nans and H_s over 0
-    Calc.add_filter(mode='nans')
-    Calc.add_filter(mode='range', colnames=[COLNAMES["H_s"]], ranges=[[0,None]])
-
-    indizes_in = Calc.apply_filters()
-
-    df = df.loc[indizes_in]
-
-    directional = hc_calc.calc_VMHS(df[COLNAMES["v_m"]], df[COLNAMES["H_s"]], df[COLNAMES["dir_T_mean"]], angle_grid_mod,
-                                    N_grid=Input["N_grid"],
-                                    deg_reg=Input["deg_reg"],
-                                    model_reg=Input["model_reg"],
-                                    cut_reg=Input["cut_reg"],
-                                    weighting_reg=Input["weighting_reg"],
-                                    zone_reg=Input["zone_reg"],
-                                    zone_line=Input["zone_line"],
-                                    bin_min=Input["bin_min"],
-                                    average_correction=Input["average_correction"],
-                                    avrg_method=Input["avrg_method"],
-                                    make_monotone=Input["make_monotone"])
-
-    omni = hc_calc.calc_VMHS(df[COLNAMES["v_m"]], df[COLNAMES["H_s"]], df[COLNAMES["dir_T_mean"]], None,
-                             N_grid=Input["N_grid"],
-                             deg_reg=Input["deg_reg"],
-                             model_reg=Input["model_reg"],
-                             cut_reg=Input["cut_reg"],
-                             weighting_reg=Input["weighting_reg"],
-                             zone_reg=Input["zone_reg"],
-                             zone_line=Input["zone_line"],
-                             bin_min=Input["bin_min"],
-                             average_correction=Input["average_correction"],
-                             avrg_method=Input["avrg_method"],
-                             make_monotone=Input["make_monotone"])
-
-    Calc.result = omni + directional
-    DATA_OUT["VMHS"]["total"] = Calc
-
-# %% HSTP
-# Toggle with:
+# HSTP
 toggle_modules = ["calc_HSTP", "calc_VMTP", "calc_Tables", "calc_Validation"]
 table_name = 'Hind_combined'
-
-# Columnnames
 hstp_columns = {
     "wind": [COLNAMES["H_s_wind"], COLNAMES["T_p_wind"], COLNAMES["dir_v_m"]],
     "swell": [COLNAMES["H_s_swell"], COLNAMES["T_p_swell"], COLNAMES["dir_T_mean_Swell"]],
     "total": [COLNAMES["H_s"], COLNAMES["T_p"], COLNAMES["dir_T_mean"]]
 }
 
-for condition, column_names in hstp_columns.items():
-    if any(condition in INPUT["Toggle_Modules"].get(module, {}) for module in toggle_modules):
-        print(f"calculating HSTP {condition.capitalize()} Sea...")
+for sea_type, column_names in hstp_columns.items():
+    if any(sea_type in INPUT["Toggle_Modules"].get(module, {}) for module in toggle_modules):
+        print(f"calculating HSTP {sea_type.capitalize()} Sea...")
 
         # Derive input key and initialize calculation
-        Input = INPUT[f"HSTP_{condition}"]
+        Input = INPUT[f"HSTP_{sea_type}"]
         Calc = hc_calc.Calculation()
         df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
@@ -504,448 +399,144 @@ for condition, column_names in hstp_columns.items():
 
         # Store result in DATA_OUT
         Calc.result = omni + directional
-        DATA_OUT["HSTP"][condition] = Calc
-
-
-
-# # HSTP
-# if (('wind' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
-#         or ('wind' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
-#         or ('wind' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
-#         or ('wind' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
-#     print("calculating HSTP Wind Sea...")
-#
-#     Input = INPUT["HSTP_wind"]
-#     table_name = 'Hind_combined'
-#     column_names = [COLNAMES["H_s_wind"], COLNAMES["T_p_wind"], COLNAMES["dir_v_m"]]
-#
-#     Calc = hc_calc.Calculation()
-#     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
-#
-#     # filter for nans and H_s over 0
-#     Calc.add_filter(mode='nans')
-#     Calc.add_filter(mode='range', colnames=[COLNAMES["H_s_wind"]], ranges=[[0,None]])
-#
-#     indizes_in = Calc.apply_filters()
-#
-#     df = df.loc[indizes_in]
-#
-#
-#     if Input["quantile_relative"] is not None:
-#         Input["quant_up"] = INPUT["Structure"]["f_0"] - INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
-#         Input["quant_low"] = INPUT["Structure"]["f_0"] + INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
-#
-#     omni = hc_calc.calc_HSTP(df[COLNAMES["H_s_wind"]], df[COLNAMES["T_p_wind"]], df[COLNAMES["dir_v_m"]], None,
-#                              N_grid=Input["N_grid"],
-#                              deg_reg=Input["deg_reg"],
-#                              model_reg=Input["model_reg"],
-#                              cut_reg=Input["cut_reg"],
-#                              weighting_reg=Input["weighting_reg"],
-#                              zone_reg=Input["zone_reg"],
-#                              zone_line=Input["zone_line"],
-#                              bin_min=Input["bin_min"],
-#                              quantile=Input["quantile"],
-#                              quant_up=Input["quant_up"],
-#                              quant_low=Input["quant_low"],
-#                              percentiles=Input["percentiles"],
-#                              avrg_method=Input["avrg_method"])
-#
-#     directional = hc_calc.calc_HSTP(df[COLNAMES["H_s_wind"]], df[COLNAMES["T_p_wind"]], df[COLNAMES["dir_v_m"]], angle_grid_mod,
-#                                     N_grid=Input["N_grid"],
-#                                     deg_reg=Input["deg_reg"],
-#                                     model_reg=Input["model_reg"],
-#                                     cut_reg=Input["cut_reg"],
-#                                     weighting_reg=Input["weighting_reg"],
-#                                     zone_reg=Input["zone_reg"],
-#                                     zone_line=Input["zone_line"],
-#                                     bin_min=Input["bin_min"],
-#                                     quantile=Input["quantile"],
-#                                     quant_up=Input["quant_up"],
-#                                     quant_low=Input["quant_low"],
-#                                     percentiles=Input["percentiles"],
-#                                     avrg_method=Input["avrg_method"])
-#
-#     Calc.result = omni + directional
-#
-#     DATA_OUT["HSTP"]["wind"] = Calc
-#
-# if (('swell' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
-#         or ('swell' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
-#         or ('swell' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
-#         or ('swell' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
-#     print("calculating HSTP Swell Sea...")
-#
-#     Input = INPUT["HSTP_swell"]
-#     table_name = 'Hind_combined'
-#     column_names = [COLNAMES["H_s_swell"], COLNAMES["T_p_swell"], COLNAMES["dir_T_mean_Swell"]]
-#
-#     Calc = hc_calc.Calculation()
-#     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
-#
-#     # filter for nans and H_s over 0
-#     Calc.add_filter(mode='nans')
-#     Calc.add_filter(mode='range', colnames=[COLNAMES["H_s_swell"]], ranges=[[0,None]])
-#
-#     indizes_in = Calc.apply_filters()
-#
-#     df = df.loc[indizes_in]
-#
-#     if Input["quantile_relative"] is not None:
-#         Input["quant_up"] = INPUT["Structure"]["f_0"] - INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
-#         Input["quant_low"] = INPUT["Structure"]["f_0"] + INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
-#
-#     directional = hc_calc.calc_HSTP(df[COLNAMES["H_s_swell"]], df[COLNAMES["T_p_swell"]], df[COLNAMES["dir_T_mean_Swell"]], angle_grid_mod,
-#                                     N_grid=Input["N_grid"],
-#                                     deg_reg=Input["deg_reg"],
-#                                     model_reg=Input["model_reg"],
-#                                     cut_reg=Input["cut_reg"],
-#                                     weighting_reg=Input["weighting_reg"],
-#                                     zone_reg=Input["zone_reg"],
-#                                     zone_line=Input["zone_line"],
-#                                     bin_min=Input["bin_min"],
-#                                     quantile=Input["quantile"],
-#                                     quant_up=Input["quant_up"],
-#                                     quant_low=Input["quant_low"],
-#                                     percentiles=Input["percentiles"],
-#                                     avrg_method=Input["avrg_method"])
-#
-#     omni = hc_calc.calc_HSTP(df[COLNAMES["H_s_swell"]], df[COLNAMES["T_p_swell"]], df[COLNAMES["dir_T_mean_Swell"]], None,
-#                              N_grid=Input["N_grid"],
-#                              deg_reg=Input["deg_reg"],
-#                              model_reg=Input["model_reg"],
-#                              cut_reg=Input["cut_reg"],
-#                              weighting_reg=Input["weighting_reg"],
-#                              zone_reg=Input["zone_reg"],
-#                              zone_line=Input["zone_line"],
-#                              bin_min=Input["bin_min"],
-#                              quantile=Input["quantile"],
-#                              quant_up=Input["quant_up"],
-#                              quant_low=Input["quant_low"],
-#                              percentiles=Input["percentiles"],
-#                              avrg_method=Input["avrg_method"])
-#
-#     Calc.result = omni + directional
-#     DATA_OUT["HSTP"]["swell"] = Calc
-#
-# if (('total' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
-#         or ('total' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
-#         or ('total' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
-#         or ('total' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
-#     print("calculating HSTP total Sea...")
-#
-#     Input = INPUT["HSTP_total"]
-#     table_name = 'Hind_combined'
-#     column_names = [COLNAMES["H_s"], COLNAMES["T_p"], COLNAMES["dir_T_mean"]]
-#
-#     Calc = hc_calc.Calculation()
-#     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
-#
-#     # filter for nans and H_s over 0
-#     Calc.add_filter(mode='nans')
-#     Calc.add_filter(mode='range', colnames=[COLNAMES["H_s"]], ranges=[[0,None]])
-#
-#     indizes_in = Calc.apply_filters()
-#
-#     df = df.loc[indizes_in]
-#
-#     if Input["quantile_relative"] is not None:
-#         Input["quant_up"] = INPUT["Structure"]["f_0"] - INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
-#         Input["quant_low"] = INPUT["Structure"]["f_0"] + INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
-#
-#     directional = hc_calc.calc_HSTP(df[COLNAMES["H_s"]], df[COLNAMES["T_p"]], df[COLNAMES["dir_T_mean"]], angle_grid_mod,
-#                                     N_grid=Input["N_grid"],
-#                                     deg_reg=Input["deg_reg"],
-#                                     model_reg=Input["model_reg"],
-#                                     cut_reg=Input["cut_reg"],
-#                                     weighting_reg=Input["weighting_reg"],
-#                                     zone_reg=Input["zone_reg"],
-#                                     zone_line=Input["zone_line"],
-#                                     bin_min=Input["bin_min"],
-#                                     quantile=Input["quantile"],
-#                                     quant_up=Input["quant_up"],
-#                                     quant_low=Input["quant_low"],
-#                                     percentiles=Input["percentiles"],
-#                                     avrg_method=Input["avrg_method"])
-#
-#     omni = hc_calc.calc_HSTP(df[COLNAMES["H_s"]], df[COLNAMES["T_p"]], df[COLNAMES["dir_T_mean"]], None,
-#                              N_grid=Input["N_grid"],
-#                              deg_reg=Input["deg_reg"],
-#                              model_reg=Input["model_reg"],
-#                              cut_reg=Input["cut_reg"],
-#                              weighting_reg=Input["weighting_reg"],
-#                              zone_reg=Input["zone_reg"],
-#                              zone_line=Input["zone_line"],
-#                              bin_min=Input["bin_min"],
-#                              quantile=Input["quantile"],
-#                              quant_up=Input["quant_up"],
-#                              quant_low=Input["quant_low"],
-#                              percentiles=Input["percentiles"],
-#                              avrg_method=Input["avrg_method"])
-#
-#     Calc.result = omni + directional
-#     DATA_OUT["HSTP"]["total"] = Calc
+        DATA_OUT["HSTP"][sea_type] = Calc
 
 # VMTP
-if (('wind' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
-        or ('wind' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
-        or ('wind' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
-    print("calculating VMTP Wind Sea...")
+toggle_modules = ["calc_VMTP", "calc_Tables", "calc_Validation"]
+table_name = 'Hind_combined'
+vmtp_columns = {
+    "wind": [COLNAMES["T_p_wind"], COLNAMES["v_m"], COLNAMES["dir_v_m"]],
+    "swell": [COLNAMES["T_p_swell"], COLNAMES["v_m"], COLNAMES["dir_T_mean_Swell"]],
+    "total": [COLNAMES["T_p"], COLNAMES["v_m"], COLNAMES["dir_T_mean"]]
+}
 
-    table_name = 'Hind_combined'
-    column_names = [COLNAMES["T_p_wind"], COLNAMES["v_m"], COLNAMES["dir_v_m"]]
+for sea_type, columns in vmtp_columns.items():
+    if any(sea_type in INPUT["Toggle_Modules"].get(module, {}) for module in toggle_modules):
+        print(f"calculating VMTP {sea_type.capitalize()} Sea...")
 
-    Calc = hc_calc.Calculation()
-    Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
-    Calc.initilize_filter(mode='nans')
+        # Set up the calculation
+        column_names = columns
+        Calc = hc_calc.Calculation()
 
-    Calc.result = hc_calc.calc_VMTP(DATA_OUT["VMHS"]["wind"].result, DATA_OUT["HSTP"]["wind"].result, fill_range=False)
-    DATA_OUT["VMTP"]["wind"] = Calc
+        # Initialize from DB and filter
+        df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
-if (('swell' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
-        or ('swell' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
-        or ('swell' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
-    print("calculating VMTP Swell Sea...")
+        # Apply filters
+        Calc.add_filter(mode='nans')
+        df = df.loc[Calc.apply_filters()]
 
-    table_name = 'Hind_combined'
-    column_names = [COLNAMES["T_p_swell"], COLNAMES["v_m"], COLNAMES["dir_T_mean_Swell"]]
+        # Perform VMTP calculation and store result
+        if sea_type == "wind" or sea_type == "total":
+            # For wind and total seas, don't fill range
+            Calc.result = hc_calc.calc_VMTP(DATA_OUT["VMHS"][sea_type].result, DATA_OUT["HSTP"][sea_type].result, fill_range=False)
+        else:
+            # For swell sea, fill range
+            Calc.result = hc_calc.calc_VMTP(DATA_OUT["VMHS"][sea_type].result, DATA_OUT["HSTP"][sea_type].result, vm_points=df[COLNAMES["v_m"]], fill_range=True)
 
-    Calc = hc_calc.Calculation()
-    df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
-    Calc.initilize_filter(mode='nans')
+        # Store the VMTP result in DATA_OUT
+        DATA_OUT["VMTP"][sea_type] = Calc
 
-    Calc.result = hc_calc.calc_VMTP(DATA_OUT["VMHS"]["swell"].result, DATA_OUT["HSTP"]["swell"].result, vm_points=df[COLNAMES["v_m"]], fill_range=True)
-    DATA_OUT["VMTP"]["swell"] = Calc
+# Tables
+toggle_modules = ["calc_Tables", "calc_Validation"]
+sea_types = ["wind", "swell", "total"]
 
-if (('total' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
-        or ('total' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
-        or ('total' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
-    print("calculating VMTP total Sea...")
+for sea_type in sea_types:
+    if any(sea_type in INPUT["Toggle_Modules"].get(module, {}) for module in toggle_modules):
+        print(f"calculating Tables {sea_type.capitalize()} Sea...")
 
-    table_name = 'Hind_combined'
-    column_names = [COLNAMES["T_p"], COLNAMES["v_m"], COLNAMES["dir_T_mean"]]
+        # Get VMHS and VMTP results for the current sea type
+        vmhs = DATA_OUT["VMHS"][sea_type]
+        vmtp = DATA_OUT["VMTP"][sea_type]
 
-    Calc = hc_calc.Calculation()
-    Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
+        # Load the vm_data from DB
+        vm_data = vmhs.load_from_db([COLNAMES["v_m"]])
+        vm_data = vm_data[vm_data.keys()[0]]
 
-    Calc.result = hc_calc.calc_VMTP(DATA_OUT["VMHS"]["total"].result, DATA_OUT["HSTP"]["total"].result, fill_range=False)
-    DATA_OUT["VMTP"]["total"] = Calc
+        # Get the input parameters
+        Input = INPUT["Tables"]
 
-# Table
-if (('wind' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
-        or ('wind' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
+        # Set up the zone and grid for VM data
+        vm_zone = Input["vm_zone"]
+        if vm_zone[1] is None:
+            vm_zone[1] = max(vm_data.values)
+        vm_grid = gl.range_stepfix(Input["vm_step"], vm_zone)
 
-    print("calculating Tables Wind Sea...")
+        # Calculate VMHS and VMTP tables
+        Calc = hc_calc.Calculation()
+        Calc.result = hc_calc.calc_tables(vmhs.result, vm_grid, vm_data)
+        DATA_OUT["table_vmhs"][sea_type] = Calc
 
-    vmhs = DATA_OUT["VMHS"]["wind"]
-    vmtp = DATA_OUT["VMTP"]["wind"]
+        Calc = hc_calc.Calculation()
+        Calc.result = hc_calc.calc_tables(vmtp.result, vm_grid, vm_data)
+        DATA_OUT["table_vmtp"][sea_type] = Calc
 
-    vm_data = vmhs.load_from_db([COLNAMES["v_m"]])
-    vm_data = vm_data[vm_data.keys()[0]]
-
-    Input = INPUT["Tables"]
-
-    vm_zone = Input["vm_zone"]
-    if Input["vm_zone"][1] is None:
-        vm_zone[1] = max(vm_data.values)
-    vm_grid = gl.range_stepfix(Input["vm_step"], vm_zone)
-
-    Calc = hc_calc.Calculation()
-
-    Calc.result = hc_calc.calc_tables(DATA_OUT["VMHS"]["wind"].result, vm_grid, vm_data)
-    DATA_OUT["table_vmhs"]["wind"] = Calc
-
-    Calc = hc_calc.Calculation()
-    Calc.result = hc_calc.calc_tables(DATA_OUT["VMTP"]["wind"].result, vm_grid, vm_data)
-    DATA_OUT["table_vmtp"]["wind"] = Calc
-
-if (('swell' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
-        or ('swell' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
-
-    print("calculating Tables Swell Sea...")
-
-    vmhs = DATA_OUT["VMHS"]["swell"]
-    vmtp = DATA_OUT["VMTP"]["swell"]
-
-    vm_data = vmhs.load_from_db([COLNAMES["v_m"]])
-    vm_data = vm_data[vm_data.keys()[0]]
-
-    Input = INPUT["Tables"]
-
-    vm_zone = Input["vm_zone"]
-    if Input["vm_zone"][1] is None:
-        vm_zone[1] = max(vm_data.values)
-
-    vm_grid = gl.range_stepfix(Input["vm_step"], vm_zone)
-
-    Calc = hc_calc.Calculation()
-    Calc.result = hc_calc.calc_tables(DATA_OUT["VMHS"]["swell"].result, vm_grid, vm_data)
-    DATA_OUT["table_vmhs"]["swell"] = Calc
-
-    Calc = hc_calc.Calculation()
-    Calc.result = hc_calc.calc_tables(DATA_OUT["VMTP"]["swell"].result, vm_grid, vm_data)
-    DATA_OUT["table_vmtp"]["swell"] = Calc
-
-if (('total' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
-        or ('total' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
-    print("calculating Tables Total Sea...")
-
-    vmhs = DATA_OUT["VMHS"]["total"]
-    vmtp = DATA_OUT["VMTP"]["total"]
-
-    vm_data = vmhs.load_from_db([COLNAMES["v_m"]])
-    vm_data = vm_data[vm_data.keys()[0]]
-
-    Input = INPUT["Tables"]
-
-    vm_zone = Input["vm_zone"]
-    if Input["vm_zone"][1] is None:
-        vm_zone[1] = max(vm_data.values)
-
-    vm_grid = gl.range_stepfix(Input["vm_step"], vm_zone)
-
-    Calc = hc_calc.Calculation()
-    Calc.result = hc_calc.calc_tables(DATA_OUT["VMHS"]["total"].result, vm_grid, vm_data)
-    DATA_OUT["table_vmhs"]["total"] = Calc
-
-    Calc = hc_calc.Calculation()
-    Calc.result = hc_calc.calc_tables(DATA_OUT["VMTP"]["total"].result, vm_grid, vm_data)
-    DATA_OUT["table_vmtp"]["total"] = Calc
 
 # RWI
-if 'wind' in INPUT["Toggle_Modules"].get("calc_RWI", {}):
-    print("calculating RWI Wind Sea...")
+toggle_modules = ["calc_RWI"]
+column_names_dict = {
+    "wind": [COLNAMES["H_s_wind"], COLNAMES["T_p_wind"], COLNAMES["dir_v_m"]],
+    "total": [COLNAMES["H_s"], COLNAMES["T_p"], COLNAMES["dir_v_m"]]
+}
 
-    table_name = 'Hind_combined'
-    column_names = [COLNAMES["H_s_wind"], COLNAMES["T_p_wind"], COLNAMES["dir_v_m"]]
+for sea_type, column_names in column_names_dict.items():
+    if any(sea_type in INPUT["Toggle_Modules"].get(module, {}) for module in toggle_modules):
+        print(f"calculating RWI {sea_type.capitalize()} Sea...")
 
-    Calc = hc_calc.Calculation()
-    df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
+        # Initialize the Calculation object and load the data
+        Calc = hc_calc.Calculation()
+        df = Calc.initilize_from_db(db_path, 'Hind_combined', column_names, timeframe=timeframe)
 
-    # filter for nans
-    Calc.add_filter(mode='nans')
-    Calc.add_filter(mode='range', colnames=[COLNAMES["H_s_wind"]], ranges=[[0,None]])
+        # Apply filters for nans and range
+        Calc.add_filter(mode='nans')
+        Calc.add_filter(mode='range', colnames=[column_names[0]], ranges=[[0, None]])
 
-    indizes_in = Calc.apply_filters()
+        indizes_in = Calc.apply_filters()
+        df = df.loc[indizes_in]
 
-    df = df.loc[indizes_in]
+        # Calculate directional and omni RWI
+        directional, _ = hc_calc.calc_RWI(df[column_names[0]], df[column_names[1]], df[column_names[2]],
+                                          angle_grid_mod, INPUT["Structure"]["f_0"], gamma_mode=INPUT["RWI"]["gamma"])
 
-    directional, _ = hc_calc.calc_RWI(df[COLNAMES["H_s_wind"]],
-                                      df[COLNAMES["T_p_wind"]],
-                                      df[COLNAMES["dir_v_m"]],
-                                      angle_grid_mod,
-                                      INPUT["Structure"]["f_0"],
-                                      gamma_mode=INPUT["RWI"]["gamma"])
+        omni, _ = hc_calc.calc_RWI(df[column_names[0]], df[column_names[1]], df[column_names[2]], None,
+                                    INPUT["Structure"]["f_0"], gamma_mode=INPUT["RWI"]["gamma"])
 
-    omni, _ = hc_calc.calc_RWI(df[COLNAMES["H_s_wind"]],
-                               df[COLNAMES["T_p_wind"]],
-                               df[COLNAMES["dir_v_m"]],
-                               None,
-                               INPUT["Structure"]["f_0"],
-                               gamma_mode=INPUT["RWI"]["gamma"])
+        # Combine the results and save them
+        Calc.result = omni + directional
+        DATA_OUT["RWI"][sea_type] = Calc
 
-    Calc.result = omni + directional
+# WaveBreak steep
+toggle_modules = ["calc_WaveBreak_Steep"]
+column_names_dict = {
+    "wind": [COLNAMES["H_s_wind"],COLNAMES["T_p_wind"], COLNAMES["dir_v_m"]],
+    "total": [COLNAMES["H_s"],COLNAMES["T_p"], COLNAMES["dir_v_m"]]
+}
 
-    DATA_OUT["RWI"]["wind"] = Calc
+for sea_type, column_names in column_names_dict.items():
+    if any(sea_type in INPUT["Toggle_Modules"].get(module, {}) for module in toggle_modules):
+        print(f"calculating WaveBreakSteep {sea_type.capitalize()} Sea...")
 
-if 'total' in INPUT["Toggle_Modules"].get("calc_RWI", {}):
-    print("calculating RWI total Sea...")
+        Input = INPUT["Structure"]
+        table_name = 'Hind_combined'
 
-    table_name = 'Hind_combined'
-    column_names = [COLNAMES["H_s"], COLNAMES["T_p"], COLNAMES["dir_v_m"]]
+        # Initialize the Calculation object and load the data
+        Calc = hc_calc.Calculation()
+        df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
-    Calc = hc_calc.Calculation()
-    df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
+        # Apply filters
+        Calc.add_filter(mode='nans')
+        Calc.add_filter(mode='range', colnames=[column_names[0]], ranges=[[0, None]])
+        df = df.loc[Calc.apply_filters()]
 
-    # filter for nans and H_s over 0
-    Calc.add_filter(mode='nans')
-    Calc.add_filter(mode='range', colnames=[COLNAMES["H_s"]], ranges=[[0,None]])
+        # Calculate directional and omni wave break steepness
+        directional = hc_calc.calc_WaveBreak_Steep(df[column_names[0]], df[column_names[1]], df[column_names[2]],
+                                                   angle_grid_mod, Input["steep_crit"], Input["d"])
 
-    indizes_in = Calc.apply_filters()
+        omni = hc_calc.calc_WaveBreak_Steep(df[column_names[0]], df[column_names[1]], df[column_names[2]], None,
+                                            Input["steep_crit"], Input["d"])
 
-    df = df.loc[indizes_in]
-
-    directional, RWI_max = hc_calc.calc_RWI(df[COLNAMES["H_s"]],
-                                            df[COLNAMES["T_p"]],
-                                            df[COLNAMES["dir_v_m"]],
-                                            angle_grid_mod,
-                                            INPUT["Structure"]["f_0"],
-                                      gamma_mode=INPUT["RWI"]["gamma"])
-
-    omni, _ = hc_calc.calc_RWI(df[COLNAMES["H_s"]],
-                                     df[COLNAMES["T_p"]],
-                                     df[COLNAMES["dir_v_m"]],
-                                     None,
-                                     INPUT["Structure"]["f_0"],
-                                      gamma_mode=INPUT["RWI"]["gamma"])
-
-    Calc.result = omni + directional
-
-    DATA_OUT["RWI"]["total"] = Calc
-
-# WaveBreak
-if 'wind' in INPUT["Toggle_Modules"].get("calc_WaveBreak_Steep", {}):
-    print("calculating WaveBreakSteep Wind Sea...")
-
-    Input = INPUT["Structure"]
-    table_name = 'Hind_combined'
-    column_names = [COLNAMES["dir_v_m"], COLNAMES["H_s_wind"], COLNAMES["T_p_wind"]]
-
-    Calc = hc_calc.Calculation()
-    df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
-
-    # filter for nans
-    indizes_in = Calc.initilize_filter(mode='nans')
-    df = df.loc[indizes_in]
-
-    directional = hc_calc.calc_WaveBreak_Steep(df[COLNAMES["H_s_wind"]],
-                                               df[COLNAMES["T_p_wind"]],
-                                               df[COLNAMES["dir_v_m"]],
-                                               angle_grid_mod,
-                                               Input["steep_crit"],
-                                               Input["d"])
-
-    omni = hc_calc.calc_WaveBreak_Steep(df[COLNAMES["H_s_wind"]],
-                                        df[COLNAMES["T_p_wind"]],
-                                        df[COLNAMES["dir_v_m"]],
-                                        None,
-                                        Input["steep_crit"],
-                                        Input["d"])
-
-    Calc.result = omni + directional
-
-    DATA_OUT["WaveBreak_Steep"]["wind"] = Calc
-
-if 'total' in INPUT["Toggle_Modules"].get("calc_WaveBreak_Steep", {}):
-    print("calculating WaveBreakSteep total Sea...")
-
-    Input = INPUT["Structure"]
-    table_name = 'Hind_combined'
-    column_names = [COLNAMES["dir_v_m"], COLNAMES["H_s"], COLNAMES["T_p"]]
-
-    Calc = hc_calc.Calculation()
-    df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
-
-    # filter for nans
-    indizes_in = Calc.initilize_filter(mode='nans')
-    df = df.loc[indizes_in]
-
-    directional = hc_calc.calc_WaveBreak_Steep(df[COLNAMES["H_s"]],
-                                               df[COLNAMES["T_p"]],
-                                               df[COLNAMES["dir_v_m"]],
-                                               angle_grid_mod,
-                                               Input["steep_crit"],
-                                               Input["d"])
-
-    omni = hc_calc.calc_WaveBreak_Steep(df[COLNAMES["H_s"]],
-                                        df[COLNAMES["T_p"]],
-                                        df[COLNAMES["dir_v_m"]],
-                                        None,
-                                        Input["steep_crit"],
-                                        Input["d"])
-
-    Calc.result = omni + directional
-
-    DATA_OUT["WaveBreak_Steep"]["total"] = Calc
+        # Combine the results and save them
+        Calc.result = omni + directional
+        DATA_OUT["WaveBreak_Steep"][sea_type] = Calc
 
 # Angle deviation
 if INPUT["Toggle_Modules"].get("calc_AngleDeviation", {}):
@@ -960,18 +551,20 @@ if INPUT["Toggle_Modules"].get("calc_AngleDeviation", {}):
     Calc = hc_calc.Calculation()
     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
-    # filter for nans
-    indizes_in = Calc.initilize_filter(mode='nans')
-    df = df.loc[indizes_in]
+    # Apply filters
+    Calc.add_filter(mode='nans')
 
     if INPUT["AngleDeviation"]["filter_by"] is not None:
         cols = [COLNAMES[curr] for curr in INPUT["AngleDeviation"]["filter_by"]]
-        indizes_in = Calc.initilize_filter(cols, INPUT["AngleDeviation"]["margin"])
-        df = df[df.index.isin(indizes_in)]
+        range = INPUT["AngleDeviation"]["margin"]
+        Calc.add_filter(mode='range', colnames=cols, ranges=range)
+
+    indizes_in = Calc.apply_filters()
+
+    df = df.loc[indizes_in]
 
     # omni, only comparison of global angles
     diff, diff_abs = gl.angle_deviation(df[column_names[0]], df[column_names[1]])
-
     diff_rolling_mean, bin_edges, _ = sc.stats.binned_statistic(df[column_names[0]], diff_abs, statistic='mean', bins=np.linspace(0, 360, 200))
     diff_rolling_mean = pd.Series(diff_rolling_mean, index=(bin_edges[1:] + bin_edges[:-1]) / 2)
 
@@ -1013,9 +606,9 @@ if INPUT["Toggle_Modules"].get("calc_Roseplots", {}):
         Calc = hc_calc.Calculation()
         df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
-        # filter for nans
-        indizes_in = Calc.initilize_filter(mode='nans')
-        df = df.loc[indizes_in]
+        # Apply filters
+        Calc.add_filter(mode='nans')
+        df = df.loc[Calc.apply_filters()]
 
         temp, bins = hc_calc.calc_Roseplot(df[column_names[0]], df[column_names[1]], angle_grid_mod)
 
@@ -1088,9 +681,9 @@ if len(INPUT["Toggle_Modules"].get("calc_ExtremeConture", {})) > 0:
         Calc = hc_calc.Calculation()
         df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
-        # filter for nans
-        indizes_in = Calc.initilize_filter(mode='nans')
-        df = df.loc[indizes_in]
+        # Apply filters
+        Calc.add_filter(mode='nans')
+        df = df.loc[Calc.apply_filters()]
 
         out_direc = hc_calc.calc_extreme_contures(df[column_names[0]],
                                                   df[column_names[1]],
@@ -1108,127 +701,71 @@ if len(INPUT["Toggle_Modules"].get("calc_ExtremeConture", {})) > 0:
         DATA_OUT["ExtremeConture"][f"{cols[0]} over {cols[1]}"] = Calc
 
 # Validation
-if 'wind' in INPUT["Toggle_Modules"].get("calc_Validation", {}):
-    print("calculating Validation wind...")
+toggle_modules = ["calc_Validation"]
+validation_column_names_dict = {
+    "wind": [COLNAMES["H_s_wind"], COLNAMES["T_p_wind"], COLNAMES["dir_v_m"], COLNAMES["v_m"]],
+    "swell": [COLNAMES["H_s_swell"], COLNAMES["T_p_swell"], COLNAMES["dir_T_mean_Swell"], COLNAMES["v_m"]]
+}
 
-    Input = INPUT["Validation_wind"]
-    table_name = 'Hind_combined'
-    column_names = [COLNAMES["H_s_wind"], COLNAMES["T_p_wind"], COLNAMES["dir_v_m"], COLNAMES["v_m"]]
+for sea_type, column_names in validation_column_names_dict.items():
+    if any(sea_type in INPUT["Toggle_Modules"].get(module, {}) for module in toggle_modules):
+        print(f"calculating Validation {sea_type}...")
 
-    Calc = hc_calc.Calculation()
+        Input = INPUT[f"Validation_{sea_type}"]
+        table_name = 'Hind_combined'
 
-    df_data = gl.export_df_from_sql(db_path, table_name, column_names=column_names, timeframe=timeframe)
-    df_data['gamma'] = 3.3
+        Calc = hc_calc.Calculation()
+        df_data = gl.export_df_from_sql(db_path, table_name, column_names=column_names, timeframe=timeframe)
+        df_data['gamma'] = 3.3
+        df_data = df_data.dropna(how='any')
 
-    df_data = df_data.dropna(how='any')
+        JBOOST_proj_Path = INPUT['DataBase']['JBOOST_proj']
+        JBOOST_proj_input_path = INPUT['DataBase']['JBOOST_input']
+        JBOOST_exe_path = path_main + '\\JBOOST\\'
 
-    JBOOST_proj_Path = INPUT['DataBase']['JBOOST_proj']
-    JBOOST_proj_input_path = INPUT['DataBase']['JBOOST_input']
-    JBOOST_exe_path = path_main + '\\JBOOST\\'
+        if not Input["from_DB"]:
+            print(f"   looking in database: {db_path} for current nodes and timeframe")
+            table_name_DEL, colnames_DEL = hc_calc.update_DEL_db(db_path,
+                                                                 df_data[column_names[0]],
+                                                                 df_data[column_names[1]],
+                                                                 df_data['gamma'],
+                                                                 proj_path=JBOOST_proj_Path,
+                                                                 input_path=JBOOST_proj_input_path,
+                                                                 exe_path=JBOOST_exe_path)
 
-    if not Input["from_DB"]:
-        print(f"   looking in database: {db_path} for current nodes and timeframe")
-        table_name_DEL, colnames_DEL = hc_calc.update_DEL_db(db_path,
-                                                             df_data[column_names[0]],
-                                                             df_data[column_names[1]],
-                                                             df_data['gamma'],
-                                                             proj_path=JBOOST_proj_Path,
-                                                             input_path=JBOOST_proj_input_path,
-                                                             exe_path=JBOOST_exe_path)
+            colnames_DEL = gl.find_string_with_substrings(colnames_DEL, Input['nodes_to_load'])
+            df = Calc.initilize_from_db(db_path, table_name_DEL, colnames_DEL, timeframe=timeframe, indizes=df_data.index)
 
-        colnames_DEL = gl.find_string_with_substrings(colnames_DEL, Input['nodes_to_load'])
+        else:
+            print(f"   loading from database: {db_path} in table {Input['table_name']} for current nodes and timeframe")
+            df = gl.export_df_from_sql(db_path, Input['table_name'], timeframe=timeframe, indizes=df_data.index)
+            df = gl.filter_df_cols_by_keywords(df, Input['nodes_to_load'])
 
-        df = Calc.initilize_from_db(db_path, table_name_DEL, colnames_DEL, timeframe=timeframe, indizes=df_data.index)
+            Calc.basedata = {"dbname": db_path,
+                             "tablename": Input['table_name'],
+                             "colnames_ini": df.keys,
+                             "db_timeframe": [df.index[0], df.index[1]],
+                             "N_rows": len(df),
+                             "sample_rate": gl.median_sample_rate(df.index),
+                             "indizes": df.index}
 
-    else:
-        print(f"   loading from database: {db_path} in table {Input['table_name']} for current nodes and timeframe")
+        # Apply filters
+        Calc.add_filter(mode='nans', colnames='all')
+        df = df.loc[Calc.apply_filters()]
 
-        df = gl.export_df_from_sql(db_path, Input['table_name'], timeframe=timeframe, indizes=df_data.index)
-        df = gl.filter_df_cols_by_keywords(df, Input['nodes_to_load'])
+        print(f"   processing calculated/loaded DEL data and comparing to condensed data in tables")
+        result = hc_calc.calc_Validation(df,
+                                         df_data[column_names[3]],
+                                         df_data[column_names[2]],
+                                         DATA_OUT["table_vmhs"][sea_type].result,
+                                         DATA_OUT["table_vmtp"][sea_type].result,
+                                         INPUT["DataBase"]["JBOOST_proj"],
+                                         INPUT["DataBase"]["JBOOST_input"],
+                                         r".\\JBOOST\\")
 
-        Calc.basedata = {"dbname": db_path,
-                         "tablename": Input['table_name'],
-                         "colnames_ini": df.keys,
-                         "db_timeframe": [df.index[0], df.index[1]],
-                         "N_rows": len(df),
-                         "sample_rate": gl.median_sample_rate(df.index),
-                         "indizes": df.index}
+        Calc.result = result
 
-    Calc.initilize_filter(mode='nans', colnames='all')
-
-    print(f"   processing calculated/loaded DEL data and comparing to condensed data in tables")
-    result = hc_calc.calc_Validation(df,
-                                     df_data[column_names[3]],
-                                     df_data[column_names[2]],
-                                     DATA_OUT["table_vmhs"]["wind"].result,
-                                     DATA_OUT["table_vmtp"]["wind"].result,
-                                     INPUT["DataBase"]["JBOOST_proj"],
-                                     INPUT["DataBase"]["JBOOST_input"],
-                                     r".\\JBOOST\\")
-
-    Calc.result = result
-
-    DATA_OUT["Validation"]["wind"] = Calc
-
-if 'swell' in INPUT["Toggle_Modules"].get("calc_Validation", {}):
-    print("calculating Validation swell...")
-
-    Input = INPUT["Validation_swell"]
-    table_name = 'Hind_combined'
-    column_names = [COLNAMES["H_s_swell"], COLNAMES["T_p_swell"], COLNAMES["dir_T_mean_Swell"], COLNAMES["v_m"]]
-
-    Calc = hc_calc.Calculation()
-    df_data = gl.export_df_from_sql(db_path, table_name, column_names=column_names, timeframe=timeframe)
-    df_data['gamma'] = 3.3
-    df_data = df_data.dropna(how='any')
-
-    JBOOST_proj_Path = INPUT['DataBase']['JBOOST_proj']
-    JBOOST_proj_input_path = INPUT['DataBase']['JBOOST_input']
-    JBOOST_exe_path = path_main + '\\JBOOST\\'
-
-    if not Input["from_DB"]:
-        print(f"   looking in database: {db_path} for current nodes and timeframe")
-        table_name_DEL, colnames_DEL = hc_calc.update_DEL_db(db_path,
-                                                             df_data[column_names[0]],
-                                                             df_data[column_names[1]],
-                                                             df_data['gamma'],
-                                                             proj_path=JBOOST_proj_Path,
-                                                             input_path=JBOOST_proj_input_path,
-                                                             exe_path=JBOOST_exe_path)
-
-        colnames_DEL = gl.find_string_with_substrings(colnames_DEL, Input['nodes_to_load'])
-
-        df = Calc.initilize_from_db(db_path, table_name_DEL, colnames_DEL, timeframe=timeframe, indizes=df_data.index)
-
-    else:
-        print(f"   loading from database: {db_path} in table {Input['table_name']} for current nodes and timeframe")
-
-        df = gl.export_df_from_sql(db_path, Input['table_name'], timeframe=timeframe, indizes=df_data.index)
-        df = gl.filter_df_cols_by_keywords(df, Input['nodes_to_load'])
-
-        Calc.basedata = {"dbname": db_path,
-                         "tablename": Input['table_name'],
-                         "colnames_ini": df.keys,
-                         "db_timeframe": [df.index[0], df.index[1]],
-                         "N_rows": len(df),
-                         "sample_rate": gl.median_sample_rate(df.index),
-                         "indizes": df.index}
-
-    Calc.initilize_filter(mode='nans', colnames='all')
-
-    print(f"   processing calculated/loaded DEL data and comparing to condensed data in tables")
-    result = hc_calc.calc_Validation(df,
-                                     df_data[column_names[3]],
-                                     df_data[column_names[2]],
-                                     DATA_OUT["table_vmhs"]["swell"].result,
-                                     DATA_OUT["table_vmtp"]["swell"].result,
-                                     INPUT["DataBase"]["JBOOST_proj"],
-                                     INPUT["DataBase"]["JBOOST_input"],
-                                     r".\\JBOOST\\")
-
-    Calc.result = result
-
-    DATA_OUT["Validation"]["swell"] = Calc
+        DATA_OUT["Validation"][sea_type] = Calc
 
 # SensorEval
 if INPUT["Toggle_Modules"].get("calc_SensorEval", {}):
@@ -1241,9 +778,9 @@ if INPUT["Toggle_Modules"].get("calc_SensorEval", {}):
         Calc = hc_calc.Calculation()
         df = Calc.initilize_from_db(db_path, table_name, [colname_data], timeframe=timeframe)
 
-        # filter for nans
-        indizes_in = Calc.initilize_filter(mode='nans')
-        df = df.loc[indizes_in]
+        # Apply filters
+        Calc.add_filter(mode='nans', colnames='all')
+        df = df.loc[Calc.apply_filters()]
 
         #  directional = hc_calc.calc_histogram(df[column_names[0]],
         #                                      df[column_names[1]],
@@ -1268,9 +805,9 @@ if len(INPUT["Toggle_Modules"].get("calc_Weibull", {})) > 0:
         Calc = hc_calc.Calculation()
         df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
-        # filter for nans
-        indizes_in = Calc.initilize_filter(mode='nans')
-        df = df.loc[indizes_in]
+        # Apply filters
+        Calc.add_filter(mode='nans')
+        df = df.loc[Calc.apply_filters()]
 
         directional = hc_calc.calc_weibull(df[column_names[1]],
                                            df[column_names[0]],
@@ -1283,6 +820,7 @@ if len(INPUT["Toggle_Modules"].get("calc_Weibull", {})) > 0:
         Calc.result = directional + omni
 
         DATA_OUT["Weibull"][f"{colnames[1]} over {colnames[0]}"] = Calc
+
 # %% Plot
 figsize_fullpage = [size * 0.39370079 for size in INPUT["Toggle_Modules"].get("writing_box", {})]
 figsize_fullpage_caption = [figsize_fullpage[0], figsize_fullpage[1]*0.9]
@@ -2133,8 +1671,8 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_BreakSteep", {}):
 
             c_krit.iloc[Seg.result["bool_break"] == False] = float('nan')
 
-            scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]],
-                                     y=point_data[Seg.colnames["y"]],
+            scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]].values,
+                                     y=point_data[Seg.colnames["y"]].values,
                                      cmap='cool',
                                      cmap_mode='manual',
                                      c=c_krit.values,
@@ -2625,7 +2163,7 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and INPUT["Toggle_Modul
             tile_curr.add_scatter(scatter)
 
             T_R_text = Seg.result["T_return_single"]
-            T_R_text.iloc[:, 1:] = gl.significant_digits(T_R_text.values[:, 1:], 3).astype(float)
+            T_R_text.iloc[:, 1:] = gl.round_to_significant_digit(T_R_text.values[:, 1:], 3).astype(float)
             new_order = ['T_Return', 'down', 'middle', 'up']
             T_R_text = T_R_text[new_order]
 
@@ -3018,7 +2556,7 @@ if INPUT["Toggle_Modules"].get("plot_SensorEval", {}):
 
         for i, Seg in enumerate(Calc.result):
 
-            titel = f'Histogramm with binsize={Seg.result["bin_size"]}, ' + titels[i]
+            titel = f'Histogram with binsize={Seg.result["bin_size"]}, ' + titels[i]
 
             Seg.indizes = pd.to_datetime(Seg.indizes)
 
@@ -3038,7 +2576,7 @@ if INPUT["Toggle_Modules"].get("plot_SensorEval", {}):
             # tile timeseries
             df = Calc.load_from_db(colnames_ini=True, indizes=Seg.indizes)
             x = df[Seg.colnames['x']].values
-            titel = f'Timeseries with min={gl.significant_digits([min(x)], 3)[0]}' + r" $\vert$ " + f'max={gl.significant_digits([max(x)], 3)[0]}' + r" $\vert$ " + f'standard deviation={round(np.std(x), 4)}, ' + titels[i]
+            titel = f'Timeseries with min={gl.round_to_significant_digit([min(x)], 3)[0]}' + r" $\vert$ " + f'max={gl.round_to_significant_digit([max(x)], 3)[0]}' + r" $\vert$ " + f'standard deviation={round(np.std(x), 4)}, ' + titels[i]
 
             tile_time = hc_plt.Tile(i, x_label='date', y_label=gl.alias(Seg.colnames['x'], COLNAMES, INPUT["Aliase"]), title=titel)
 
@@ -3701,7 +3239,7 @@ if INPUT["DataBase"].get("create_report", {}):
         T_return_data = gl.xlsx2dict(xlsx_path)
 
         T_R_omni = T_return_data["omnidirectional"]
-        T_R_omni.iloc[:, 1:] = gl.significant_digits(T_R_omni.values[:, 1:], 3).astype(float)
+        T_R_omni.iloc[:, 1:] = gl.round_to_significant_digit(T_R_omni.values[:, 1:], 3).astype(float)
         new_order = ['T_Return', 'down', 'middle', 'up']
         T_R_omni = T_R_omni[new_order]
 

@@ -13,6 +13,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import PolynomialFeatures
 from matplotlib.backends.backend_pdf import PdfPages
+import decimal
 
 
 def model_regression(x: pd.core.series.Series, y: pd.core.series.Series,
@@ -1156,7 +1157,7 @@ def compare_values(value1, value2, operation="=="):
         raise ValueError("Invalid operation. Supported operations are '==', '>', and '<'.")
 
 
-def significant_digits(arr, sig_digits):
+def round_to_significant_digit(arr, sig_digits):
     """
     Rounds each element in the numpy array to the specified number of significant digits and
     returns the results as strings.
@@ -1185,6 +1186,49 @@ def significant_digits(arr, sig_digits):
     vectorized_round = np.vectorize(lambda x: round_to_significant(x, sig_digits))
 
     return vectorized_round(arr)
+
+
+def get_significant_digits(x):
+    """
+    Calculate the maximum number of significant digits after the decimal point
+    in a list of floating-point numbers, including those in scientific notation.
+
+    Args:
+        x (list of float): A list of floating-point numbers, which may include
+                            numbers in scientific notation.
+
+    Returns:
+        int: The maximum number of digits after the decimal point in the list.
+             If no number has a decimal part, returns 0.
+
+    Example:
+        >>> get_significant_digits([-1e-06, -2e-06, -3e-06, 8e-05, -3e-05, 8e-06, 6e-06, 5e-05, 3e-05])
+        6
+
+    Notes:
+        - The function uses the `decimal.Decimal` class to handle floating-point precision and scientific notation.
+        - The input list can contain both small and large float values, and the function will correctly count significant digits for all valid inputs.
+    """
+
+    # Convert each number to a string
+    x_str = [str(value) for value in x]
+
+    # Use decimal module to handle floating point precision issues
+    lenths = []
+    for dig in x_str:
+        # Try to parse scientific notation as a float, then convert to a string with fixed precision
+        try:
+            dec_value = decimal.Decimal(dig)
+            # Split the number at the decimal point
+            if '.' in str(dec_value):
+                lenths.append(len(str(dec_value).split('.')[1]))
+            else:
+                lenths.append(0)
+        except:
+            lenths.append(0)
+
+    # Return the maximum length of the decimal parts
+    return max(lenths)
 
 
 def merge_dataframes(df1, df2):
@@ -1468,7 +1512,6 @@ def gumbel_conf_intervall(x_max, beta=None, mu=None, mode='percentile', algorith
 
 
 # Function to check if df1 is in df2, and if so, output the row number of the matching row
-import pandas as pd
 
 def add_unique_row(df1, df2, exclude_columns=None):
     """
@@ -1511,7 +1554,6 @@ def add_unique_row(df1, df2, exclude_columns=None):
         matching_indices = []
 
     return df2, matching_indices
-
 
 
 # Validation

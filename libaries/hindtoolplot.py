@@ -217,6 +217,7 @@ class ErrorBar:
         self.yy_side = yy_side
         self.zorder = zorder
 # %% functions
+
 def plot_tiled(Tiles, figsize=None, global_max=None, global_min=None, fontsize_title=10, fontsize_legend=6, fontsize_label=8, fontsize_ticks=8, grid=None, scatter_max='auto',
                scatter_min='auto', use_pgf=False, max_margins=None, min_margins=None):
 
@@ -836,12 +837,12 @@ def plot_rosebar(radial_data, r_bins, angles, r_max=None, plot=None, figsize=Non
         y_ticklables = axis.get_yticklabels()
         y_tickpostions = axis.get_yticks()
         if radial_datatype == 'percent':
-            y_ticklables = ['$' + label.get_text() + r' \%' + '$' for label in y_ticklables]
+            y_ticklables = ['$' + str(label) + r' \%' + '$' for label in y_tickpostions]
         else:
             y_ticklables = [label.get_text() for label in y_ticklables]
 
         axis.set_yticks(y_tickpostions)
-        axis.set_yticklabels(y_ticklables, fontsize=6)
+        axis.set_yticklabels(y_ticklables, fontsize=6, zorder=-10)
 
         cbar.set_label(cbar_label, fontsize=8)
         axis.set_theta_zero_location("N")
