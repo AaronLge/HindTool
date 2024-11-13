@@ -43,14 +43,14 @@ class Segment:
 
 class Calculation:
 
-    def __init__(self, result=None, basedata=None, filt=None):
+    def __init__(self, result=None, basedata=None, filters=None):
         self.result = result
 
         self.basedata = basedata
         if basedata is None:
             self.basedata = dict()
 
-        self.filt = filt
+        self.filters = filters
 
     def initilize_from_db(self, db_path, table_name, colnames, **kwargs):
         """initilizes dataframe from sql database at "db_path" by loading the colims specified by colnames in the table "table_name". If colnames is None, all columns are loaded
@@ -84,7 +84,7 @@ class Calculation:
 
         return df
 
-    def initilize_filter(self, colnames=None, mode='range', ranges=None):
+    def add_filter(self, colnames=None, mode='range', ranges=None):
         """filters data specified in "basedata" propterty, has to be initilized by using "initilize_from_db". creats "filt" dictionary, that contains:
          indizes_in: datetime index object, with all indizies still in the filtered list
          indizes_out: datetime index object, with all indizies excluded by filtering
@@ -103,13 +103,14 @@ class Calculation:
 
         if colnames is None:
             colnames = self.basedata["colnames_ini"]
-        if colnames is 'all':
+        if colnames == 'all':
             df_filt = gl.export_df_from_sql(self.basedata["dbname"], self.basedata["tablename"])
             colnames = list(df_filt.columns)
         else:
             df_filt = gl.export_df_from_sql(self.basedata["dbname"], self.basedata["tablename"], column_names=colnames)
 
-        self.filt = dict()
+        if self.filters is None:
+            self.filters = []
 
         if mode == 'range':
             for i, range_curr in enumerate(ranges):
@@ -120,22 +121,49 @@ class Calculation:
             a_max = [curr[1] for curr in ranges]
 
             df_filt = gl.filter_dataframe(df_filt, colnames, a_min, a_max)
-            self.filt["ranges"] = ranges
-            self.filt["colnames"] = colnames
 
         if mode == 'nans':
             df_filt = df_filt.dropna(how='any')
+            ranges = None
 
         index_filt = df_filt.index
         indizes_in = index_filt.intersection(indizes_full)
         indizes_out = indizes_full.difference(index_filt)
 
-        self.filt["indizes_in"] = indizes_in
-        self.filt["indizes_out"] = indizes_out
-        self.filt["mode"] = mode
+        filt = {}
+        filt["indizes_in"] = indizes_in
+        filt["indizes_out"] = indizes_out
+        filt["mode"] = mode
+        filt["ranges"] = ranges
+        filt["colnames"] = colnames
 
-        return indizes_in
-    
+        self.filters.append(filt)
+        return filt
+
+    def apply_filters(self, apply_only=None):
+        if self.filters is None:
+            print("no filters specified")
+            return
+        else:
+
+            if apply_only is None:
+                datetime_lists = [filt["indizes_in"] for filt in self.filters]
+            else:
+                datetime_lists = [filt["indizes_in"] for filt in self.filters]
+                datetime_lists = [datetime_lists[i] for i in range(len(datetime_lists)) if i+1 in apply_only]
+
+            if datetime_lists:
+                common_dates = set(datetime_lists[0])
+                for dates in datetime_lists[1:]:
+                    common_dates &= set(dates)
+
+                # Convert to a DatetimeIndex if needed
+                common_dates = pd.DatetimeIndex(common_dates)
+            else:
+                common_dates = pd.DatetimeIndex([])  # empty if no lists are provided
+
+        return common_dates
+
     def create_segment_title(self, mode='verbose', latex=True):
         """"if the data stored in result is list of "Segment",  it exports a list of title in Latex format
             if mode='general', Segment.basedata has to be initilized

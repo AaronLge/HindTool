@@ -302,8 +302,12 @@ if (INPUT["Toggle_Modules"].get("plot_condensation_example", {})):
 
     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
-    # filter for nans
-    indizes_in = Calc.initilize_filter(mode='nans')
+    # filter for nans and H_s over 0
+    Calc.add_filter(mode='nans')
+    Calc.add_filter(mode='range', colnames=[COLNAMES["H_s_wind"]], ranges=[[0,None]])
+
+    indizes_in = Calc.apply_filters()
+
     df = df.loc[indizes_in]
 
     directional = hc_calc.calc_VMHS(df[COLNAMES["v_m"]], df[COLNAMES["H_s_wind"]], df[COLNAMES["dir_v_m"]], angle_grid_mod,
@@ -349,8 +353,12 @@ if (('swell' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
     Calc = hc_calc.Calculation()
     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
-    # filter for nans
-    indizes_in = Calc.initilize_filter(mode='nans')
+    # filter for nans and H_s over 0
+    Calc.add_filter(mode='nans')
+    Calc.add_filter(mode='range', colnames=[COLNAMES["H_s_swell"]], ranges=[[0,None]])
+
+    indizes_in = Calc.apply_filters()
+
     df = df.loc[indizes_in]
 
     directional = hc_calc.calc_VMHS(df[COLNAMES["v_m"]], df[COLNAMES["H_s_swell"]], df[COLNAMES["dir_T_mean_Swell"]], angle_grid_mod,
@@ -395,8 +403,12 @@ if (('total' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
     Calc = hc_calc.Calculation()
     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
-    # filter for nans
-    indizes_in = Calc.initilize_filter(mode='nans')
+    # filter for nans and H_s over 0
+    Calc.add_filter(mode='nans')
+    Calc.add_filter(mode='range', colnames=[COLNAMES["H_s"]], ranges=[[0,None]])
+
+    indizes_in = Calc.apply_filters()
+
     df = df.loc[indizes_in]
 
     directional = hc_calc.calc_VMHS(df[COLNAMES["v_m"]], df[COLNAMES["H_s"]], df[COLNAMES["dir_T_mean"]], angle_grid_mod,
@@ -428,169 +440,250 @@ if (('total' in INPUT["Toggle_Modules"].get("calc_VMHS", {}))
     Calc.result = omni + directional
     DATA_OUT["VMHS"]["total"] = Calc
 
-# HSTP
-if (('wind' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
-        or ('wind' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
-        or ('wind' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
-        or ('wind' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
-    print("calculating HSTP Wind Sea...")
+# %% HSTP
+# Toggle with:
+toggle_modules = ["calc_HSTP", "calc_VMTP", "calc_Tables", "calc_Validation"]
+table_name = 'Hind_combined'
 
-    Input = INPUT["HSTP_wind"]
-    table_name = 'Hind_combined'
-    column_names = [COLNAMES["H_s_wind"], COLNAMES["T_p_wind"], COLNAMES["dir_v_m"]]
+# Columnnames
+hstp_columns = {
+    "wind": [COLNAMES["H_s_wind"], COLNAMES["T_p_wind"], COLNAMES["dir_v_m"]],
+    "swell": [COLNAMES["H_s_swell"], COLNAMES["T_p_swell"], COLNAMES["dir_T_mean_Swell"]],
+    "total": [COLNAMES["H_s"], COLNAMES["T_p"], COLNAMES["dir_T_mean"]]
+}
 
-    Calc = hc_calc.Calculation()
-    df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
+for condition, column_names in hstp_columns.items():
+    if any(condition in INPUT["Toggle_Modules"].get(module, {}) for module in toggle_modules):
+        print(f"calculating HSTP {condition.capitalize()} Sea...")
 
-    # filter for nans
-    indizes_in = Calc.initilize_filter(mode='nans')
-    df = df.loc[indizes_in]
+        # Derive input key and initialize calculation
+        Input = INPUT[f"HSTP_{condition}"]
+        Calc = hc_calc.Calculation()
+        df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
-    if Input["quantile_relative"] is not None:
-        Input["quant_up"] = INPUT["Structure"]["f_0"] - INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
-        Input["quant_low"] = INPUT["Structure"]["f_0"] + INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
+        # Apply filters
+        Calc.add_filter(mode='nans')
+        Calc.add_filter(mode='range', colnames=[column_names[0]], ranges=[[0, None]])
+        df = df.loc[Calc.apply_filters()]
 
-    omni = hc_calc.calc_HSTP(df[COLNAMES["H_s_wind"]], df[COLNAMES["T_p_wind"]], df[COLNAMES["dir_v_m"]], None,
-                             N_grid=Input["N_grid"],
-                             deg_reg=Input["deg_reg"],
-                             model_reg=Input["model_reg"],
-                             cut_reg=Input["cut_reg"],
-                             weighting_reg=Input["weighting_reg"],
-                             zone_reg=Input["zone_reg"],
-                             zone_line=Input["zone_line"],
-                             bin_min=Input["bin_min"],
-                             quantile=Input["quantile"],
-                             quant_up=Input["quant_up"],
-                             quant_low=Input["quant_low"],
-                             percentiles=Input["percentiles"],
-                             avrg_method=Input["avrg_method"])
+        # Set quantile bounds if applicable
+        if Input.get("quantile_relative") is not None:
+            Input["quant_up"] = INPUT["Structure"]["f_0"] - INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
+            Input["quant_low"] = INPUT["Structure"]["f_0"] + INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
 
-    directional = hc_calc.calc_HSTP(df[COLNAMES["H_s_wind"]], df[COLNAMES["T_p_wind"]], df[COLNAMES["dir_v_m"]], angle_grid_mod,
-                                    N_grid=Input["N_grid"],
-                                    deg_reg=Input["deg_reg"],
-                                    model_reg=Input["model_reg"],
-                                    cut_reg=Input["cut_reg"],
-                                    weighting_reg=Input["weighting_reg"],
-                                    zone_reg=Input["zone_reg"],
-                                    zone_line=Input["zone_line"],
-                                    bin_min=Input["bin_min"],
-                                    quantile=Input["quantile"],
-                                    quant_up=Input["quant_up"],
-                                    quant_low=Input["quant_low"],
-                                    percentiles=Input["percentiles"],
-                                    avrg_method=Input["avrg_method"])
+        # Run calculations for omni and directional HSTP
+        omni = hc_calc.calc_HSTP(df[column_names[0]], df[column_names[1]], df[column_names[2]], None,
+                                 N_grid=Input["N_grid"],
+                                 deg_reg=Input["deg_reg"],
+                                 model_reg=Input["model_reg"],
+                                 cut_reg=Input["cut_reg"],
+                                 weighting_reg=Input["weighting_reg"],
+                                 zone_reg=Input["zone_reg"],
+                                 zone_line=Input["zone_line"],
+                                 bin_min=Input["bin_min"],
+                                 quantile=Input["quantile"],
+                                 quant_up=Input["quant_up"],
+                                 quant_low=Input["quant_low"],
+                                 percentiles=Input["percentiles"],
+                                 avrg_method=Input["avrg_method"])
 
-    Calc.result = omni + directional
+        directional = hc_calc.calc_HSTP(df[column_names[0]], df[column_names[1]], df[column_names[2]], angle_grid_mod,
+                                        N_grid=Input["N_grid"],
+                                        deg_reg=Input["deg_reg"],
+                                        model_reg=Input["model_reg"],
+                                        cut_reg=Input["cut_reg"],
+                                        weighting_reg=Input["weighting_reg"],
+                                        zone_reg=Input["zone_reg"],
+                                        zone_line=Input["zone_line"],
+                                        bin_min=Input["bin_min"],
+                                        quantile=Input["quantile"],
+                                        quant_up=Input["quant_up"],
+                                        quant_low=Input["quant_low"],
+                                        percentiles=Input["percentiles"],
+                                        avrg_method=Input["avrg_method"])
 
-    DATA_OUT["HSTP"]["wind"] = Calc
+        # Store result in DATA_OUT
+        Calc.result = omni + directional
+        DATA_OUT["HSTP"][condition] = Calc
 
-if (('swell' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
-        or ('swell' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
-        or ('swell' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
-        or ('swell' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
-    print("calculating HSTP Swell Sea...")
 
-    Input = INPUT["HSTP_swell"]
-    table_name = 'Hind_combined'
-    column_names = [COLNAMES["H_s_swell"], COLNAMES["T_p_swell"], COLNAMES["dir_T_mean_Swell"]]
 
-    Calc = hc_calc.Calculation()
-    df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
-
-    # filter for nans
-    indizes_in = Calc.initilize_filter(mode='nans')
-    df = df.loc[indizes_in]
-
-    if Input["quantile_relative"] is not None:
-        Input["quant_up"] = INPUT["Structure"]["f_0"] - INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
-        Input["quant_low"] = INPUT["Structure"]["f_0"] + INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
-
-    directional = hc_calc.calc_HSTP(df[COLNAMES["H_s_swell"]], df[COLNAMES["T_p_swell"]], df[COLNAMES["dir_T_mean_Swell"]], angle_grid_mod,
-                                    N_grid=Input["N_grid"],
-                                    deg_reg=Input["deg_reg"],
-                                    model_reg=Input["model_reg"],
-                                    cut_reg=Input["cut_reg"],
-                                    weighting_reg=Input["weighting_reg"],
-                                    zone_reg=Input["zone_reg"],
-                                    zone_line=Input["zone_line"],
-                                    bin_min=Input["bin_min"],
-                                    quantile=Input["quantile"],
-                                    quant_up=Input["quant_up"],
-                                    quant_low=Input["quant_low"],
-                                    percentiles=Input["percentiles"],
-                                    avrg_method=Input["avrg_method"])
-
-    omni = hc_calc.calc_HSTP(df[COLNAMES["H_s_swell"]], df[COLNAMES["T_p_swell"]], df[COLNAMES["dir_T_mean_Swell"]], None,
-                             N_grid=Input["N_grid"],
-                             deg_reg=Input["deg_reg"],
-                             model_reg=Input["model_reg"],
-                             cut_reg=Input["cut_reg"],
-                             weighting_reg=Input["weighting_reg"],
-                             zone_reg=Input["zone_reg"],
-                             zone_line=Input["zone_line"],
-                             bin_min=Input["bin_min"],
-                             quantile=Input["quantile"],
-                             quant_up=Input["quant_up"],
-                             quant_low=Input["quant_low"],
-                             percentiles=Input["percentiles"],
-                             avrg_method=Input["avrg_method"])
-
-    Calc.result = omni + directional
-    DATA_OUT["HSTP"]["swell"] = Calc
-
-if (('total' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
-        or ('total' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
-        or ('total' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
-        or ('total' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
-    print("calculating HSTP total Sea...")
-
-    Input = INPUT["HSTP_total"]
-    table_name = 'Hind_combined'
-    column_names = [COLNAMES["H_s"], COLNAMES["T_p"], COLNAMES["dir_T_mean"]]
-
-    Calc = hc_calc.Calculation()
-    df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
-
-    # filter for nans
-    indizes_in = Calc.initilize_filter(mode='nans')
-    df = df.loc[indizes_in]
-
-    if Input["quantile_relative"] is not None:
-        Input["quant_up"] = INPUT["Structure"]["f_0"] - INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
-        Input["quant_low"] = INPUT["Structure"]["f_0"] + INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
-
-    directional = hc_calc.calc_HSTP(df[COLNAMES["H_s"]], df[COLNAMES["T_p"]], df[COLNAMES["dir_T_mean"]], angle_grid_mod,
-                                    N_grid=Input["N_grid"],
-                                    deg_reg=Input["deg_reg"],
-                                    model_reg=Input["model_reg"],
-                                    cut_reg=Input["cut_reg"],
-                                    weighting_reg=Input["weighting_reg"],
-                                    zone_reg=Input["zone_reg"],
-                                    zone_line=Input["zone_line"],
-                                    bin_min=Input["bin_min"],
-                                    quantile=Input["quantile"],
-                                    quant_up=Input["quant_up"],
-                                    quant_low=Input["quant_low"],
-                                    percentiles=Input["percentiles"],
-                                    avrg_method=Input["avrg_method"])
-
-    omni = hc_calc.calc_HSTP(df[COLNAMES["H_s"]], df[COLNAMES["T_p"]], df[COLNAMES["dir_T_mean"]], None,
-                             N_grid=Input["N_grid"],
-                             deg_reg=Input["deg_reg"],
-                             model_reg=Input["model_reg"],
-                             cut_reg=Input["cut_reg"],
-                             weighting_reg=Input["weighting_reg"],
-                             zone_reg=Input["zone_reg"],
-                             zone_line=Input["zone_line"],
-                             bin_min=Input["bin_min"],
-                             quantile=Input["quantile"],
-                             quant_up=Input["quant_up"],
-                             quant_low=Input["quant_low"],
-                             percentiles=Input["percentiles"],
-                             avrg_method=Input["avrg_method"])
-
-    Calc.result = omni + directional
-    DATA_OUT["HSTP"]["total"] = Calc
+# # HSTP
+# if (('wind' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
+#         or ('wind' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
+#         or ('wind' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
+#         or ('wind' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
+#     print("calculating HSTP Wind Sea...")
+#
+#     Input = INPUT["HSTP_wind"]
+#     table_name = 'Hind_combined'
+#     column_names = [COLNAMES["H_s_wind"], COLNAMES["T_p_wind"], COLNAMES["dir_v_m"]]
+#
+#     Calc = hc_calc.Calculation()
+#     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
+#
+#     # filter for nans and H_s over 0
+#     Calc.add_filter(mode='nans')
+#     Calc.add_filter(mode='range', colnames=[COLNAMES["H_s_wind"]], ranges=[[0,None]])
+#
+#     indizes_in = Calc.apply_filters()
+#
+#     df = df.loc[indizes_in]
+#
+#
+#     if Input["quantile_relative"] is not None:
+#         Input["quant_up"] = INPUT["Structure"]["f_0"] - INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
+#         Input["quant_low"] = INPUT["Structure"]["f_0"] + INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
+#
+#     omni = hc_calc.calc_HSTP(df[COLNAMES["H_s_wind"]], df[COLNAMES["T_p_wind"]], df[COLNAMES["dir_v_m"]], None,
+#                              N_grid=Input["N_grid"],
+#                              deg_reg=Input["deg_reg"],
+#                              model_reg=Input["model_reg"],
+#                              cut_reg=Input["cut_reg"],
+#                              weighting_reg=Input["weighting_reg"],
+#                              zone_reg=Input["zone_reg"],
+#                              zone_line=Input["zone_line"],
+#                              bin_min=Input["bin_min"],
+#                              quantile=Input["quantile"],
+#                              quant_up=Input["quant_up"],
+#                              quant_low=Input["quant_low"],
+#                              percentiles=Input["percentiles"],
+#                              avrg_method=Input["avrg_method"])
+#
+#     directional = hc_calc.calc_HSTP(df[COLNAMES["H_s_wind"]], df[COLNAMES["T_p_wind"]], df[COLNAMES["dir_v_m"]], angle_grid_mod,
+#                                     N_grid=Input["N_grid"],
+#                                     deg_reg=Input["deg_reg"],
+#                                     model_reg=Input["model_reg"],
+#                                     cut_reg=Input["cut_reg"],
+#                                     weighting_reg=Input["weighting_reg"],
+#                                     zone_reg=Input["zone_reg"],
+#                                     zone_line=Input["zone_line"],
+#                                     bin_min=Input["bin_min"],
+#                                     quantile=Input["quantile"],
+#                                     quant_up=Input["quant_up"],
+#                                     quant_low=Input["quant_low"],
+#                                     percentiles=Input["percentiles"],
+#                                     avrg_method=Input["avrg_method"])
+#
+#     Calc.result = omni + directional
+#
+#     DATA_OUT["HSTP"]["wind"] = Calc
+#
+# if (('swell' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
+#         or ('swell' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
+#         or ('swell' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
+#         or ('swell' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
+#     print("calculating HSTP Swell Sea...")
+#
+#     Input = INPUT["HSTP_swell"]
+#     table_name = 'Hind_combined'
+#     column_names = [COLNAMES["H_s_swell"], COLNAMES["T_p_swell"], COLNAMES["dir_T_mean_Swell"]]
+#
+#     Calc = hc_calc.Calculation()
+#     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
+#
+#     # filter for nans and H_s over 0
+#     Calc.add_filter(mode='nans')
+#     Calc.add_filter(mode='range', colnames=[COLNAMES["H_s_swell"]], ranges=[[0,None]])
+#
+#     indizes_in = Calc.apply_filters()
+#
+#     df = df.loc[indizes_in]
+#
+#     if Input["quantile_relative"] is not None:
+#         Input["quant_up"] = INPUT["Structure"]["f_0"] - INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
+#         Input["quant_low"] = INPUT["Structure"]["f_0"] + INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
+#
+#     directional = hc_calc.calc_HSTP(df[COLNAMES["H_s_swell"]], df[COLNAMES["T_p_swell"]], df[COLNAMES["dir_T_mean_Swell"]], angle_grid_mod,
+#                                     N_grid=Input["N_grid"],
+#                                     deg_reg=Input["deg_reg"],
+#                                     model_reg=Input["model_reg"],
+#                                     cut_reg=Input["cut_reg"],
+#                                     weighting_reg=Input["weighting_reg"],
+#                                     zone_reg=Input["zone_reg"],
+#                                     zone_line=Input["zone_line"],
+#                                     bin_min=Input["bin_min"],
+#                                     quantile=Input["quantile"],
+#                                     quant_up=Input["quant_up"],
+#                                     quant_low=Input["quant_low"],
+#                                     percentiles=Input["percentiles"],
+#                                     avrg_method=Input["avrg_method"])
+#
+#     omni = hc_calc.calc_HSTP(df[COLNAMES["H_s_swell"]], df[COLNAMES["T_p_swell"]], df[COLNAMES["dir_T_mean_Swell"]], None,
+#                              N_grid=Input["N_grid"],
+#                              deg_reg=Input["deg_reg"],
+#                              model_reg=Input["model_reg"],
+#                              cut_reg=Input["cut_reg"],
+#                              weighting_reg=Input["weighting_reg"],
+#                              zone_reg=Input["zone_reg"],
+#                              zone_line=Input["zone_line"],
+#                              bin_min=Input["bin_min"],
+#                              quantile=Input["quantile"],
+#                              quant_up=Input["quant_up"],
+#                              quant_low=Input["quant_low"],
+#                              percentiles=Input["percentiles"],
+#                              avrg_method=Input["avrg_method"])
+#
+#     Calc.result = omni + directional
+#     DATA_OUT["HSTP"]["swell"] = Calc
+#
+# if (('total' in INPUT["Toggle_Modules"].get("calc_HSTP", {}))
+#         or ('total' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
+#         or ('total' in INPUT["Toggle_Modules"].get("calc_Tables", {}))
+#         or ('total' in INPUT["Toggle_Modules"].get("calc_Validation", {}))):
+#     print("calculating HSTP total Sea...")
+#
+#     Input = INPUT["HSTP_total"]
+#     table_name = 'Hind_combined'
+#     column_names = [COLNAMES["H_s"], COLNAMES["T_p"], COLNAMES["dir_T_mean"]]
+#
+#     Calc = hc_calc.Calculation()
+#     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
+#
+#     # filter for nans and H_s over 0
+#     Calc.add_filter(mode='nans')
+#     Calc.add_filter(mode='range', colnames=[COLNAMES["H_s"]], ranges=[[0,None]])
+#
+#     indizes_in = Calc.apply_filters()
+#
+#     df = df.loc[indizes_in]
+#
+#     if Input["quantile_relative"] is not None:
+#         Input["quant_up"] = INPUT["Structure"]["f_0"] - INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
+#         Input["quant_low"] = INPUT["Structure"]["f_0"] + INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
+#
+#     directional = hc_calc.calc_HSTP(df[COLNAMES["H_s"]], df[COLNAMES["T_p"]], df[COLNAMES["dir_T_mean"]], angle_grid_mod,
+#                                     N_grid=Input["N_grid"],
+#                                     deg_reg=Input["deg_reg"],
+#                                     model_reg=Input["model_reg"],
+#                                     cut_reg=Input["cut_reg"],
+#                                     weighting_reg=Input["weighting_reg"],
+#                                     zone_reg=Input["zone_reg"],
+#                                     zone_line=Input["zone_line"],
+#                                     bin_min=Input["bin_min"],
+#                                     quantile=Input["quantile"],
+#                                     quant_up=Input["quant_up"],
+#                                     quant_low=Input["quant_low"],
+#                                     percentiles=Input["percentiles"],
+#                                     avrg_method=Input["avrg_method"])
+#
+#     omni = hc_calc.calc_HSTP(df[COLNAMES["H_s"]], df[COLNAMES["T_p"]], df[COLNAMES["dir_T_mean"]], None,
+#                              N_grid=Input["N_grid"],
+#                              deg_reg=Input["deg_reg"],
+#                              model_reg=Input["model_reg"],
+#                              cut_reg=Input["cut_reg"],
+#                              weighting_reg=Input["weighting_reg"],
+#                              zone_reg=Input["zone_reg"],
+#                              zone_line=Input["zone_line"],
+#                              bin_min=Input["bin_min"],
+#                              quantile=Input["quantile"],
+#                              quant_up=Input["quant_up"],
+#                              quant_low=Input["quant_low"],
+#                              percentiles=Input["percentiles"],
+#                              avrg_method=Input["avrg_method"])
+#
+#     Calc.result = omni + directional
+#     DATA_OUT["HSTP"]["total"] = Calc
 
 # VMTP
 if (('wind' in INPUT["Toggle_Modules"].get("calc_VMTP", {}))
@@ -729,7 +822,11 @@ if 'wind' in INPUT["Toggle_Modules"].get("calc_RWI", {}):
     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
     # filter for nans
-    indizes_in = Calc.initilize_filter(mode='nans')
+    Calc.add_filter(mode='nans')
+    Calc.add_filter(mode='range', colnames=[COLNAMES["H_s_wind"]], ranges=[[0,None]])
+
+    indizes_in = Calc.apply_filters()
+
     df = df.loc[indizes_in]
 
     directional, _ = hc_calc.calc_RWI(df[COLNAMES["H_s_wind"]],
@@ -759,8 +856,12 @@ if 'total' in INPUT["Toggle_Modules"].get("calc_RWI", {}):
     Calc = hc_calc.Calculation()
     df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
 
-    # filter for nans
-    indizes_in = Calc.initilize_filter(mode='nans')
+    # filter for nans and H_s over 0
+    Calc.add_filter(mode='nans')
+    Calc.add_filter(mode='range', colnames=[COLNAMES["H_s"]], ranges=[[0,None]])
+
+    indizes_in = Calc.apply_filters()
+
     df = df.loc[indizes_in]
 
     directional, RWI_max = hc_calc.calc_RWI(df[COLNAMES["H_s"]],
