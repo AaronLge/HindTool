@@ -3,7 +3,7 @@
 
 
 *DataBase*
-path_DataBase				>		"C:/Users/aaron.lange/Desktop/Projekte/HindcastArchive/3_54.4839_5.6368_BSH Offshore/54.4839_5.6368_BSH Offshore.db"
+path_DataBase				>		"C:/Users/aaron.lange/Desktop/Projekte/HindcastArchive/2_54.41_5.95_ABP_Mer/54.41_5.95_ABP_Mer.db"
 colnames_preset				>		None
 
 JBOOST_proj					>		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Tool/HindTool/db_example/proj.lua"					
@@ -36,18 +36,18 @@ datetime_start				>		'1979-01-01 07:00:00'							>	str:	startdatetime in the for
 datetime_end				>		'1981-07-01 07:00:00'							>	str:	enddatetime in the format: "YYYY-MM-DD"
 
 *Toggle_Modules*
-calc_VMHS					>		['wind', 'total', 'swell']									
-calc_HSTP					>		['wind', 'total', 'swell']							
-calc_VMTP					>		['wind', 'total', 'swell']								
-calc_RWI					>		['wind', 'total']								
-calc_Tables					>		['wind', 'swell']											
-calc_WaveBreak_Steep		>		['wind', 'total']										
-calc_AngleDeviation 		>		['dir_v_m', 'dir_T_mean_Wind', 'v_m']						>	angle_orig, angle_deviation, v_m
-calc_Roseplots				>		True									>	 [[angle, magnitude],[angle, magnitude]]
-calc_ExtremeValues			>		True									
+#calc_VMHS					>		['wind', 'total', 'swell']									
+#calc_HSTP					>		['wind', 'total', 'swell']							
+#calc_VMTP					>		['wind', 'total', 'swell']								
+#calc_RWI					>		['wind', 'total']								
+#calc_Tables					>		['wind', 'swell']											
+#calc_WaveBreak_Steep		>		['wind', 'total']										
+#calc_AngleDeviation 		>		['dir_v_m', 'dir_T_mean_Wind', 'v_m']						>	angle_orig, angle_deviation, v_m
+#calc_Roseplots				>		True									>	 [[angle, magnitude],[angle, magnitude]]
+#calc_ExtremeValues			>		True									
 #calc_Validation 			>		['wind', 'swell']											
-calc_SensorEval				>		True
-calc_Weibull				>		[['dir_v_m', 'v_m']]
+#calc_SensorEval				>		True
+#calc_Weibull				>		[['dir_v_m', 'v_m']]
 #calc_ExtremeConture			>		[['H_s', 'T_p', 'dir_v_m']]
 
 plot_VMHS					>		['wind', 'total', 'swell']
@@ -73,25 +73,29 @@ writing_box					>		[17, 22]
 
 
 *ColumNames*
-datetime					>		"date"
-v_m 						>	 	"WindSpeed_1hour_150m"
-dir_v_m 					> 		"WindDirection_1hour_10m"
-T_p							>		"Tp"
-T_p_wind					>		"Tp_Sea"
-T_p_swell					>		"Tp_Swell"
-dir_T_p						>		"PeakWaveDirection"
+datetime					>		"Datetime"
+v_m 						>	 	"Ws,10min,150m"
+dir_v_m 					> 		"Wdir,1hr,10m"
 H_s							>		"Hs"
-H_s_wind					>		"HsWindSea"
-H_s_swell					>		"HsSwell"
-dir_T_mean					>		"MeanWaveDirection"
-dir_T_mean_Wind				>		"MeanWaveDirection_Sea"
-dir_T_mean_Swell			>		"MeanWaveDirection_Swell"
-
+H_max						>		"Hmax"
+T_p							>		"Tp"
+dir_T_p						>		"Pdir"
+H_s_wind					>		"Hs,Sea"
+T_p_wind					>		"Tp,Sea"
+dir_T_mean					>		"Mdir,Sea"
+H_s_swell					>		"Hs,Swell"
+T_p_swell					>		"Tp,Swell"
+dir_T_mean_Swell			>		"Mdir,Swell"
+dir_T_mean_Wind				>		"Mdir,Sea"
+WL							>		"WL"
+dir_curr					>		"Cdir,DA"
+WL_tide						>		"WL,Tid"
+v_curr 						>		"Cs,Surf"
 
 *Aliase*
 datetime					>		"date [UTC]"
-v_m 						>	 	"Wind Speed at 150m [m/s]"
-dir_v_m 					> 		"Wind Direction at 10m [deg]"
+v_m 						>	 	"Wind Speed at 148m [m/s]"
+dir_v_m 					> 		"Wind Direction [deg]"
 H_s							>		"Sign. Wave Height [m]"
 H_max						>		"Maximal Wave Height [m]"
 T_p							>		"Peak Wave Period [s]"
@@ -106,7 +110,8 @@ dir_T_mean_Swell			>		"Mean Wave Direction, Swell [deg]"
 dir_T_mean_Wind				>		"Mean Wave Direction, Wind-sea [deg]" 
 dir_curr					>		"Current Direction [deg]"
 WL_tide						>		"Water Level, Tide [mMSL]"
-v_curr 						>		"Current Speed Surface [m/s]"
+v_curr 						>		"Current Speed [m/s]"
+v_curr_1m					>		"Current Speed, 1m [m/s]"
 
 
 *VMHS_wind*

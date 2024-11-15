@@ -11,7 +11,7 @@
 \\
 \textcolor{gray}{\textbf{\textit{\large Please note that this report is automatically generated using Python and LaTeX.}}}
 
-   
+ 
 \newpage
 
 \tableofcontents

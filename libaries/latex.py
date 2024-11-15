@@ -1,11 +1,9 @@
 
 from libaries import general as gl
-import subprocess
 import os
-import shutil
-import pexpect
-
-
+import subprocess
+import time
+from threading import Thread
 def insertLatexVars(string, replacements):
     """Wrapper for 'gl.alias' function to replace variables in string with replacements.#
         '?' + replacements.keys() as original
@@ -87,126 +85,7 @@ def include_str(main, string, line, replace=False):
     return '\n'.join(lines), line + lines_include
 
 
-# def compile_lualatex(tex_file, pdf_path=None, miktex_lualatex_path='C:/temp/MikTex/miktex/bin/x64/lualatex.exe', biber_path = 'C:/temp/MikTex/miktex/bin/x64/biber.exe'):
-#     # def run_subprocess():
-#     #     command = f"{miktex_lualatex_path} {tex_file} -output-directory {txt_path}"
-#     #     with subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, text=True, cwd=txt_path) as process:
-#     #         try:
-#     #             # Read output line by line
-#     #             while True:
-#     #                 output = process.stdout.readline()
-#     #                 if output:
-#     #                     print(output.strip())  # Print the output
-#     #
-#     #                 # Check for the prompt and send an empty line
-#     #                 if '?' in output:
-#     #                     process.stdin.write('\n')
-#     #                     process.stdin.write('\n')
-#     #                     process.stdin.write('\n')
-#     #                     process.stdin.write('\n')
-#     #
-#     #                     process.stdin.flush()
-#     #
-#     #         except Exception as e:
-#     #             print(f"An error occurred: {e}")
-#
-#     """
-#     Compile a LaTeX document using LuaLaTeX and save the output PDF to a specified location.
-#
-#     Parameters:
-#     tex_files (str): Full path to the LaTeX (.tex) file you want to compile.
-#     output_pdf (str, optional): Full path to save the generated PDF. If not provided, the PDF will be saved
-#                                      in the same directory as the .tex file with the same base name.
-#     miktex_lualatex_path (str, optional): Full path to the LuaLaTeX executable (default is set to MiKTeX's standard location: 'C:/temp/MikTex/miktex/bin/x64/lualatex.exe').
-#
-#     Returns:
-#     str: Path to the generated PDF if successful, or None if compilation fails.
-#     """
-#     run_path = os.path.dirname(os.path.realpath(__file__))
-#     txt_path = os.path.dirname(tex_file)
-#
-#     Main_name = os.path.basename(tex_file)
-#     Main_name = Main_name.removesuffix('.tex')
-#
-#     if pdf_path is None:
-#         output_pdf = txt_path + '\\' + Main_name + '.pdf'
-#
-#     else:
-#         output_pdf = pdf_path
-#         shutil.move(run_path + '\\' + Main_name + '.pdf', output_pdf)
-#     # Step 2: Compile the .tex file using LuaLaTeX binary from MiKTeX
-#     try:
-#         # Extract the directory where the PDF should be output
-#
-#         subprocess.run(
-#             [miktex_lualatex_path, tex_file, '-output-directory', txt_path],
-#             check=True,
-#             cwd=txt_path,
-#             stdout=subprocess.PIPE,
-#             stderr=subprocess.PIPE,
-#         )
-#         #run_subprocess()
-#
-#         # # Run the bibliography tool (e.g., Biber)
-#         # subprocess.run(
-#         #     [biblio_tool_path, Main_name],
-#         #     check=True,
-#         #     cwd=tex_dir,
-#         #     stdout=subprocess.PIPE,
-#         #     stderr=subprocess.PIPE,
-#         #     timeout=timeout
-#         #)
-#     except subprocess.CalledProcessError as e:
-#         print(f"LuaLaTeX compilation failed (maybe): {e}")
-#     try:
-#         subprocess.run(
-#             [biber_path, Main_name, '-output-directory', txt_path],
-#             check=True,
-#             cwd=txt_path,
-#             stdout=subprocess.PIPE,
-#             stderr=subprocess.PIPE,
-#         )
-#         #run_subprocess()
-#     except subprocess.CalledProcessError as e:
-#         print(f"LuaLaTeX compilation failed (maybe): {e}")
-#     try:
-#         subprocess.run(
-#             [miktex_lualatex_path, tex_file, '-output-directory', txt_path],
-#             check=True,
-#             cwd=txt_path,
-#             stdout=subprocess.PIPE,
-#             stderr=subprocess.PIPE,
-#         )
-#         #run_subprocess()
-#
-#     except subprocess.CalledProcessError as e:
-#         print(f"LuaLaTeX compilation failed (maybe): {e}")
-#
-#     try:
-#         subprocess.run(
-#             [miktex_lualatex_path, tex_file, '-output-directory', txt_path],
-#             check=True,
-#             cwd=txt_path,
-#             stdout=subprocess.PIPE,
-#             stderr=subprocess.PIPE,
-#         )
-#         #run_subprocess()
-#
-#     except subprocess.CalledProcessError as e:
-#         print(f"LuaLaTeX compilation failed (maybe): {e}")
-#
-#     # Step 3: Verify if the output PDF was created
-#     if os.path.exists(output_pdf):
-#         print(f"PDF successfully created at: {output_pdf}")
-#         return output_pdf
-#     else:
-#         print(f"PDF was not created, something went wrong.")
-#         return output_pdf
 
-import os
-import subprocess
-import time
-from threading import Thread
 
 
 def compile_lualatex(tex_file, pdf_path=None, miktex_lualatex_path='C:/temp/MikTex/miktex/bin/x64/lualatex.exe', biber_path='C:/temp/MikTex/miktex/bin/x64/biber.exe'):
@@ -238,10 +117,11 @@ def compile_lualatex(tex_file, pdf_path=None, miktex_lualatex_path='C:/temp/MikT
         print(f"LuaLaTeX compilation failed: {e}")
 
     # Run the bibliography tool (Biber)
-    try:
-        run_subprocess([biber_path, main_name, '-output-directory', txt_path], cwd=txt_path)
-    except Exception as e:
-        print(f"Biber execution failed: {e}")
+    for i in range(3):
+        try:
+            run_subprocess([biber_path, main_name, '-output-directory', txt_path], cwd=txt_path)
+        except Exception as e:
+            print(f"Biber execution failed: {e}")
 
     # Run LuaLaTeX two more times for references update
     for i in range(3):

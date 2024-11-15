@@ -1,7 +1,5 @@
-
+\newgeometry{top=3cm, bottom=2cm, left=2cm, right=2cm,headheight=10pt, footskip=0pt}
 \thispagestyle{titlepage} % Use custom footer for the title page
-
-\vspace*{2cm}
 
 \begin{table}[]
     \begin{tabular}{|m{3.5cm}|m{6cm}|m{4cm}|m{1cm}|m{1cm}|m{1cm}|}
@@ -128,14 +126,15 @@
     \end{tabular}
 \end{table}
 
+\vspace{4cm}
 
 \begin{centering}
-\includegraphics[width=0.4\textwidth]{?ClientLogo} \\% Replace with actual image path \\
+\includegraphics[width=0.4\textwidth]{?ClientLogo}  \\
 \end{centering}
 
 \hspace{3.5cm}
 \begin{minipage}{\textwidth}
-\vspace{2cm}
+\vspace{4cm}
 
 \fontsize{14}{20}\selectfont \textbf{?Client} \\
 \fontsize{20}{25}\selectfont \textbf{?ProjectTitle} \\
@@ -143,6 +142,7 @@
 \fontsize{18}{25}\selectfont \textbf{?DocumentType} \\
 \textcolor{JBOGreen}{\fontsize{16}{14.4}\selectfont \textit{\textbf{?DocumentTitle}}}
 \end{minipage}
-
+\newpage
+\restoregeometry
 
 

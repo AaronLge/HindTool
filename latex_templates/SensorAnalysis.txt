@@ -28,6 +28,10 @@ Relevant directional sensor evaluations are shown below.
 
 ?FIG 
 
+\subsubsection{Current direction and current speed occurrence}
+
+%?FIG 
+
 \subsubsection{Wind - Wave Misalignment}
 
 The occurrence probability of the wind direction and wave direction is considered for normal sea state condition. The misalignment of wind and wave direction, based on the wind direction, is illustrated below. 
@@ -37,6 +41,3 @@ The occurrence probability of the wind direction and wave direction is considere
 For the assignment of probabilities to the load situations in the design load case table, the data set is evaluated for each wind speed bin ($\Delta v = 1 [m/s]$), wind direction and wave direction, both with a sector width of 30° (see Appendix). 
 
 
-\subsubsection{Current direction and current speed occurrence}
-
-?FIG 

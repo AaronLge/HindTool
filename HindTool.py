@@ -2893,7 +2893,12 @@ if INPUT["DataOut"]["CSV_out"]:
 
         gl.save_df_list_to_excel(path_csv + f'/Resonance_Compare', [Table_Resonance])
 
+
 # %% plot report tables
+
+
+
+
 if INPUT["DataBase"].get("create_report", {}):
 
     # Read Report Input
@@ -3557,8 +3562,8 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Roseplots_wind_page_1"])
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Roseplots_wind_sea_page_1"])
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Roseplots_swell_sea_page_1"])
-    TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["angle_deviation_scatter_page_1"])
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Roseplots_currents_page_1"])
+    TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["angle_deviation_scatter_page_1"])
 
     # Data correlation
     chapter = "DataCorrelation"
