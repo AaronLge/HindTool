@@ -70,8 +70,6 @@ use_pgf						>		False
 dpi_figures					>		500									>	int: resolution (dots per sqinch) of all pdf's
 writing_box					>		[17, 22]
 
-
-
 *ColumNames*
 datetime					>		"Datetime"
 v_m 						>	 	"Ws,10min,150m"

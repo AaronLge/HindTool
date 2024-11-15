@@ -1,7 +1,7 @@
 *General*
 path_latex_templates 		> 		".\latex_templates"	
-fig_path					>		".\example_output"
-#fig_path					>		
+#extern_content_path			>		".\example_output"
+extern_content_path					>		
 acronym_path				>		"C:/Users/aaron.lange/Desktop/Projekte/Report_Automation/Acronyms.txt"
 
 *Database_Info*
