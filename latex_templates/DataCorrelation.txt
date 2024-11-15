@@ -48,7 +48,7 @@ H_{s, e q}=\left(\frac{\sum_{n} H_{s, n}{ }^{\lambda m} \cdot p(n)}{\sum_{n} p(n
 \end{align}
 
 
-Here, $\lambda$ is chosen to be 1 as wave loads on monopiles are inertia dominated (see also \citelit{Seid14}), whereas $m$ shall be equal to 2 and denotes the power mean exponent. This approach is solely based on the conservation of the wave energy of a sea state or the corresponding spectrum, respectively. The wave energy of a linear sea state is proportional to the square of significant wave height $\left(E \sim H_{S}^{2}\right)$.
+Here, $\lambda$ is chosen to be 1 as wave loads on monopiles are inertia dominated (see also \cite{Seid14}), whereas $m$ shall be equal to 2 and denotes the power mean exponent. This approach is solely based on the conservation of the wave energy of a sea state or the corresponding spectrum, respectively. The wave energy of a linear sea state is proportional to the square of significant wave height $\left(E \sim H_{S}^{2}\right)$.
 
 The calculated condensation curve is adjusted to ensure it forms a monotone increasing function. This means that as wind speeds increase, the $H_{S}$ either increases or remains constant. This is physically obvious but can be calculated differently for high bins due to a lack of data.
 

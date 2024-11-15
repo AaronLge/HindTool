@@ -29,8 +29,7 @@
 \usepackage[
 backend=biber,
 style=numeric,
-sorting=none,
-defernumbers=true % defer numbering until the bibliography sections are printed
+sorting=none
 ]{biblatex}
 
 \usepackage{amsmath} % Ensure this package is included
@@ -65,24 +64,12 @@ defernumbers=true % defer numbering until the bibliography sections are printed
   \usebibmacro{related}%
   \usebibmacro{finentry}}
 
-% Define custom citation formats with prefixes for each section
-\DeclareCiteCommand{\citeguideline}[\mkbibbrackets]
-  {\usebibmacro{prenote}}
-  {\printtext{N\thefield{labelnumber}}}
-  {\multicitedelim}
-  {\usebibmacro{postnote}}
 
-\DeclareCiteCommand{\citedataset}[\mkbibbrackets]
-  {\usebibmacro{prenote}}
-  {\printtext{R\thefield{labelnumber}}}
-  {\multicitedelim}
-  {\usebibmacro{postnote}}
+\DeclareDatamodelEntrytypes{standard}
+\DeclareDatamodelEntryfields[standard]{type,number}
 
-\DeclareCiteCommand{\citelit}[\mkbibbrackets]
-  {\usebibmacro{prenote}}
-  {\printtext{L\thefield{labelnumber}}}
-  {\multicitedelim}
-  {\usebibmacro{postnote}}
+% Add custom prefixes based on the keyword
+\DeclareFieldFormat{labelnumber}{\ifkeyword{guideline}{N#1}{\ifkeyword{dataset}{R#1}{\ifkeyword{lit}{L#1}{#1}}}}
 
 \addbibresource{?BIBDatasets}
 \addbibresource{?BIBLiteratur}

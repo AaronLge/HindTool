@@ -3496,7 +3496,7 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter_main], last_idx = ltx.include_str(TEX[chapter_main], '\\pagestyle{fancy}', last_idx + 1)
 
     # Introduction
-    chapter = 'Introduction'
+    chapter = 'introduction'
     TEX[chapter] = TEMPLATES[chapter]
     TEX[chapter_main], last_idx = ltx.include_include(TEX[chapter_main], chapter, line=last_idx + 1)
     TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Revision_Table_page_1"])
@@ -3525,7 +3525,7 @@ if INPUT["DataBase"].get("create_report", {}):
             key_fig = [index for index in FIGURES.index if FIGURES.loc[index, "filename"] == row["png_name"]][0]
             database = key_fig.replace("DataSorce_", "").replace("_page_1", "")
 
-            FIGURES.loc[key_fig, "caption"] = f'"{database}" Data Set ' + "\\citedataset{" + f"{database}" + "}"
+            FIGURES.loc[key_fig, "caption"] = f'"{database}" Data Set ' + "\\cite{" + f"{database}" + "}"
             TEX["DataBasis"] = ltx.include_TableFig(TEX["DataBasis"], FIGURES.loc[key_fig])
 
     TEX["DataBasis"] = ltx.include_TableFig(TEX["DataBasis"], FIGURES.loc["DataSorce_ResamplingTable_page_1"])

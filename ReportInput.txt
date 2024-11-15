@@ -77,6 +77,6 @@ Approval					>		"FOs"
 Rev_1						>		["01", "01", "30.10.2024", "First Release"]
 
 
-*Introduction*
+*introduction*
 siteSpecific				>		" "
 

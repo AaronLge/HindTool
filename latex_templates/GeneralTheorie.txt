@@ -20,7 +20,7 @@ document.
 
 \subsection{Relevant oceanographic design conditions}
 An overview of the requirements for the oceanographic conditions in the design of offshore substructures, according to
-the load case descriptions in \citeguideline{DNV-ST_0437} and/or \cite{IEC_61400_3_1} is provided below. It is distinguished between normal conditions and
+the load case descriptions in \cite{DNV-ST_0437} and/or \cite{IEC_61400_3_1} is provided below. It is distinguished between normal conditions and
 extreme conditions.
 
 \subsubsection{Normal oceanographic conditions}
@@ -67,7 +67,7 @@ sea states, given in three-dimensional coordinate systems, are superposed.\\
 
 
 Where a wave spectrum will be considerd for normal and extreme conditinos (\ac{ESS}, \ac{NSS}, \ac{SSS}), the irregular sea states are
-described according to the JONSWAP spectrum definitions in \citeguideline{DNV-ST_0437}:
+described according to the JONSWAP spectrum definitions in \cite{DNV-ST_0437}:
 
 \begin{equation}
 S_{J S}(f)=0.3125 \cdot H_s^2 \cdot T_p \cdot\left(\frac{f}{f_p}\right)^{-5} \cdot \exp \left(-1.25 \cdot\left(\frac{f}{f_p}\right)^{-4}\right) \cdot(1-0.287 \cdot \ln \gamma) \cdot \gamma^{\exp \left(-0.5 \cdot\left(\frac{f-f_p}{\sigma \cdot f_p}\right)^2\right)}
