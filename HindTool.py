@@ -2917,13 +2917,389 @@ if INPUT["DataOut"]["CSV_out"]:
         gl.save_df_list_to_excel(path_csv + f'/Database_info', [Meta_data])
 
 # %% report
-if INPUT["DataBase"].get("create_report", {}):
+
+def create_report(path_INPUT, path_INPUT_REPORT, path_content, path_report, path_templates):
+
+    cell_height_tables = 0.8
+
+    INPUT = gl.read_input_txt(path_INPUT)
+    INPUT_REPORT = gl.read_input_txt(path_INPUT_REPORT)
+
+    # crate COLNAME dataframe with Colnames as master
+    COLNAMES_REPORT = pd.DataFrame(index=INPUT["Colnames"].keys())
+    COLNAMES_REPORT["Symbols"] = [INPUT_REPORT["Symbols"][key] if key in INPUT_REPORT["Symbols"] else float('nan') for key in COLNAMES_REPORT.index]
+    COLNAMES_REPORT["Sensor_names"] = [COLNAMES[key] if key in COLNAMES else float('nan') for key in list(COLNAMES_REPORT.index)]
+    COLNAMES_REPORT["Aliase"] = [INPUT["Aliase"][key] if key in INPUT["Aliase"] else float('nan') for key in COLNAMES_REPORT.index]
+    COLNAMES_REPORT["Units"] = [INPUT_REPORT["Units"][key] if key in INPUT_REPORT["Units"] else float('nan') for key in COLNAMES_REPORT.index]
+
+    DATABASE = gl.xlsx2dict(path_content + '/csv_data/Database_info.xlsx')["sheet1"]
+    DATABASE = DATABASE.dropna(axis=1, how="all")
+
+    # connect used databases to sensor
+    for sensor_key, sensor_name in INPUT["ColumNames"].items():
+        for database_name in DATABASE.index():
+            if database_name != 'combined':
+                # Sensor info
+                database_sensors = eval(DATABASE.loc[database_name, "columns"])
+                if sensor_name in database_sensors:
+                    COLNAMES_REPORT.loc[sensor_key, "DataSorce"] = database_name
+
+    # plot database tables
+    temp = DATABASE.drop(columns=["columns", "used"])
+    meta_paras = list(temp.columns())
+    resampling_values = []
+    resampling_colnames = []
+    for database_name in temp.index():
+        database = DATABASE.loc[database_name]
+
+        if database["used"] and database_name != 'combined':
+            meta_values = list(database.values())
+
+            data = np.array([meta_paras, meta_values])
+            data = data.T
+            col_labels = ["Parameter", "Value"]
+            FIG = hc_plt.table(data,
+                               collabels=col_labels,
+                               cell_height=cell_height_tables,
+                               figsize=figsize_fullpage,
+                               datatype='str',
+                               use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+
+
+            gl.save_figs_as_png([FIG], path_out + f'DataSorce_{database_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+            resampling_values.append([database["Time Step"], database["Number of samples"], database["Start Datae"], database["End Datae"]])
+            resampling_colnames.append(database_name)
+
+    # plot resampling table
+    resamling_rowlabels = ["Timestep [s]", "Number of Samples [-]", "Start Date", "End Date"]
+
+    FIG = hc_plt.table(np.array(resamling_values).T,
+                       collabels=resampling_colnames,
+                       rowlabels=resamling_rowlabels,
+                       row_label_name='Parameter',
+                       figsize=figsize_halfpage,
+                       datatype='str',
+                       cell_height=cell_height_tables,
+                       use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+
+    gl.save_figs_as_png([FIG], path_out + f'DataSorce_ResamplingTable', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    # plot database global parameters
+    if INPUT_REPORT["Database_Info"]["db_info_txt"] == 'auto':
+        db_info_path = os.path.dirname(db_path)
+    else:
+        db_info_path = os.path.abspath(INPUT_REPORT["Database_Info"]["db_info_txt"])
+
+    db_info_txt = [f for f in os.listdir(db_info_path) if f.endswith('.txt')][0]
+    DBINFO = gl.read_input_txt(db_info_path + '\\' + db_info_txt)
+
+    parameter = ["Metocean Expert", "Global Area", "Water Depth [m]", "Water Depth Reference", "Longitude", "Latitude"]
+    values = [DBINFO["General"]["Metocean_Expert"],
+              DBINFO["General"]["Global_Area"],
+              DBINFO["General"]["Global_Depth"],
+              '-',
+              f'{DBINFO["General"]["Global_Coordinates"][0]}° E',
+              f'{DBINFO["General"]["Global_Coordinates"][1]}° N']
+
+    FIG = hc_plt.table(np.array([values]).T,
+                       collabels=['Values'],
+                       rowlabels=parameter,
+                       row_label_name='Parameter',
+                       figsize=figsize_halfpage,
+                       datatype='str',
+                       cell_height=cell_height_tables,
+                       use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+
+    gl.save_figs_as_png([FIG], path_out + 'DataSorce_global', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    # plot sensor names
+    data = np.array([COLNAMES_REPORT["Symbols"], COLNAMES_REPORT["Aliase"], COLNAMES_REPORT["DataSorce"], COLNAMES_REPORT["Units"]], )
+    data = data.T
+    col_labels = ["Symbol", "Description", "Data Sorce", "Unit"]
+    FIG = hc_plt.table(data,
+                       collabels=col_labels,
+                       figsize=figsize_fullpage,
+                       cell_height=cell_height_tables,
+                       datatype='str',
+                       cell_width=[1, 3, 1, 1],
+                       use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+
+    gl.save_figs_as_png([FIG], path_out + 'Sensor_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    # plot Plot_names
+    data = np.array([COLNAMES_REPORT["Symbols"], COLNAMES_REPORT["Sensor_names"]])
+    data = data.T
+    col_labels = ["Symbol", "Plot name"]
+    FIG = hc_plt.table(data,
+                       collabels=col_labels,
+                       figsize=figsize_fullpage,
+                       cell_height=cell_height_tables,
+                       datatype='str',
+                       use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+
+    gl.save_figs_as_png([FIG], path_out + 'Sensor_Original', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    # plot vmhs tables
+    columns_table = []
+    col_labels = []
+    row_labels = ['Bin number',
+                  'Method to derive representative value',
+                  'Correction factor on averaged values',
+                  'datapoints evaluated with regression curve',
+                  'Degree of regression curve $n$',
+                  'Shape function f(x)',
+                  'Range of the regression base']
+
+    Input = INPUT["VMHS_wind"]
+
+    new_col = [Input["N_grid"],
+               Input["avrg_method"],
+               Input["average_correction"],
+               f"{100 - Input['cut_reg']}" + "\\%",
+               Input["deg_reg"],
+               'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+               f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
+
+    columns_table.append(new_col)
+    col_labels.append('Wind Sea')
+
+    Input = INPUT["VMHS_swell"]
+
+    new_col = [Input["N_grid"],
+               Input["avrg_method"],
+               Input["average_correction"],
+               f"{100 - Input['cut_reg']}" + "\\%",
+               Input["deg_reg"],
+               'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+               f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
+
+    columns_table.append(new_col)
+    col_labels.append('Swell Sea')
+
+    data = np.array(columns_table)
+    data = data.T
+
+    FIG = hc_plt.table(data,
+                       collabels=col_labels,
+                       rowlabels=row_labels,
+                       row_label_name='Parameters',
+                       figsize=figsize_halfpage,
+                       cell_height=cell_height_tables,
+                       use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+
+    if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_png([FIG], path_out + 'Report_table_VMHS', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_pdf([FIG], path_out + 'Report_table_VMHS', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    # example VMHS parameter
+    columns_table = []
+    col_labels = []
+    Input = INPUT["VMHS_docu"]
+
+    new_col = [Input["N_grid"],
+               Input["avrg_method"],
+               Input["average_correction"],
+               f"{100 - Input['cut_reg']}" + "\\%",
+               Input["deg_reg"],
+               'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+               f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
+
+    columns_table.append(new_col)
+    col_labels.append('Wind Sea')
+
+    data = np.array(columns_table)
+    data = data.T
+
+    FIG = hc_plt.table(data,
+                       collabels=col_labels,
+                       rowlabels=row_labels,
+                       row_label_name='Parameters',
+                       figsize=figsize_halfpage,
+                       cell_height=cell_height_tables * 0.8,
+                       use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+
+    gl.save_figs_as_png([FIG], path_out + 'Report_table_VMHS_example', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    # plot hstp tables
+    columns_table = []
+    col_labels = []
+    row_labels = ['Selected quantiles',
+                  'Frequency bandwidth for selected correlation',
+                  'Bin number',
+                  'Method to derive representative value',
+                  'datapoints evaluated with regression curve',
+                  'Degree of regression curve $n$',
+                  'Shape function $f(x)$',
+                  'Range of the regression base']
+
+    Input = INPUT["HSTP_wind"]
+
+    new_col = [f"[{Input['percentiles'][0]}\\% .. {Input['percentiles'][1]}\\%]" if Input['quantile'] else "none",
+               f"[{Input['quant_up']} .. {Input['quant_low']}]" if Input['quantile'] else "none",
+               Input["N_grid"],
+               Input["avrg_method"],
+               f"{100 - Input['cut_reg']}" + " \\%",
+               Input["deg_reg"],
+               'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+               f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
+
+    columns_table.append(new_col)
+    col_labels.append('Wind Sea')
+
+    new_col = [f"[{Input['percentiles'][0]}\\% .. {Input['percentiles'][1]}\\%]" if Input['quantile'] else "none",
+               f"[{Input['quant_up']} .. {Input['quant_low']}]" if Input['quantile'] else "none",
+               Input["N_grid"],
+               Input["avrg_method"],
+               f"{100 - Input['cut_reg']}" + " \\%",
+               Input["deg_reg"],
+               'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+               f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
+    columns_table.append(new_col)
+    col_labels.append('Swell Sea')
+
+    data = np.array(columns_table)
+    data = data.T
+
+    FIG = hc_plt.table(data,
+                       collabels=col_labels,
+                       rowlabels=row_labels,
+                       row_label_name='Parameters',
+                       figsize=figsize_halfpage,
+                       datatype='str',
+                       cell_height=cell_height_tables,
+                       use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+
+    gl.save_figs_as_png([FIG], path_out + 'Report_table_HSTP', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    # plot T_return Tables
+    T_return_xlsx = [f for f in os.listdir(path_report_content + "\\csv_data") if "ExtremeValues_T_return" in f]
+    T_return_xlsx_path = [path_report_content + "\\csv_data\\" + f for f in T_return_xlsx]
+    T_return_keyword = [f.replace("ExtremeValues_T_return_", "").replace(".xlsx", "") for f in T_return_xlsx]
+
+    for xlsx_path, keyword in zip(T_return_xlsx_path, T_return_keyword):
+        T_return_data = gl.xlsx2dict(xlsx_path)
+
+    T_R_omni = T_return_data["omnidirectional"]
+    T_R_omni.iloc[:, 1:] = gl.round_to_significant_digit(T_R_omni.values[:, 1:], 3).astype(float)
+    new_order = ['T_Return', 'down', 'middle', 'up']
+    T_R_omni = T_R_omni[new_order]
+
+    FIG = hc_plt.table(T_R_omni.values,
+                       collabels=['T Return [years]', 'lower band', 'gumbel distribution', 'upper band'],
+                       rowlabels=None,
+                       row_label_name=None,
+                       figsize=figsize_halfpage,
+                       datatype='str',
+                       cell_height=cell_height_tables,
+                       use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+
+    if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_png([FIG], path_out + f'T_return_table_{keyword}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_pdf([FIG], path_out + f'T_return_table_{keyword}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    # plot Extreme Parameter Table
+    points_xlsx = [f for f in os.listdir(path_report_content + "\\csv_data") if "ExtremeValues_points_" in f]
+    points_xlsx_path = [path_report_content + "\\csv_data\\" + f for f in points_xlsx]
+    points_keyword = [f.replace("ExtremeValues_points_", "").replace(".xlsx", "") for f in points_xlsx]
+
+    for xlsx_path, keyword in zip(points_xlsx_path, points_keyword):
+        data = gl.xlsx2dict(xlsx_path)
+    data_omni = data["omnidirectional"]
+    row_labels = ["Number of extreme values", "Samples per year (n)", "Window offset", "Extrapolation method"]
+    Values = [len(data_omni), "1", INPUT["ExtremeValues"]["time_window_offset"], "gumbel"]
+
+    FIG = hc_plt.table(np.array([Values]).T,
+                       collabels=['Values'],
+                       rowlabels=row_labels,
+                       row_label_name='Parameter',
+                       figsize=figsize_halfpage,
+                       datatype='str',
+                       cell_height=cell_height_tables,
+                       use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+
+    if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_png([FIG], path_out + f'Extreme_Parameter_table_{keyword}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_pdf([FIG], path_out + f'Extreme_Parameter_table_{keyword}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+    # plot resonance compare tables
+    resonance_xlsx = [f for f in os.listdir(path_report_content + "\\csv_data") if "Resonance_Compare" in f]
+    resonance_xlsx_path = [path_report_content + "\\csv_data\\" + f for f in resonance_xlsx]
+
+    data = gl.xlsx2dict(resonance_xlsx_path[0])
+    data = data[list(data.keys())[0]]
+    col_labels = [COLNAMES_REPORT.loc["H_s_wind", "Symbols"] + " " + COLNAMES_REPORT.loc["H_s_wind", "Units"],
+                  COLNAMES_REPORT.loc["T_p_wind", "Symbols"] + " " + COLNAMES_REPORT.loc["T_p_wind", "Units"],
+                  COLNAMES_REPORT.loc["dir_v_m", "Symbols"] + " " + COLNAMES_REPORT.loc["dir_v_m", "Units"],
+                  "Magnitude" + "[$\\sqrt{m^2 / Hz}$] or [Nm]"]
+
+    row_labels = list(data.index)
+    Values = data.values
+
+    FIG = hc_plt.table(Values,
+                       collabels=col_labels,
+                       rowlabels=row_labels,
+                       row_label_name='Method',
+                       figsize=figsize_halfpage,
+                       datatype='str',
+                       cell_height=cell_height_tables,
+                       formater='.3f',
+                       cell_width=[2, 1, 1, 1, 2],
+                       use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+
+    if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_png([FIG], path_out + f'Resonance_compare', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_pdf([FIG], path_out + f'Resonance_compare', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    # Revision Table
+    col_labels = ["Rev. JBO", "Rev. Employer", "Date", "Description"]
+
+    Revisions = [INPUT_REPORT["RevisionTable"][rev] for rev in INPUT_REPORT["RevisionTable"].keys()]
+
+    FIG = hc_plt.table(Revisions,
+                       collabels=col_labels,
+                       rowlabels=None,
+                       row_label_name='Parameters',
+                       figsize=figsize_fullpage,
+                       cell_height=0.7,
+                       cell_width=[1, 1, 2, 3],
+                       use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+
+    if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_png([FIG], path_out + f'Revision_Table', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_pdf([FIG], path_out + f'Revision_Table', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    # Weibull parameters
+    data = gl.xlsx2dict(path_report_content + "\\csv_data\\Weibull.xlsx")["Sheet1"]
+
+    FIG = hc_plt.table(data.values,
+                       collabels=["k [1]", "loc [m/s]", "A [m/s]", "mean [m/s]", "std [m/s]", "occurence [\\%]"],
+                       rowlabels=data.index,
+                       row_label_name='directional set [deg]',
+                       figsize=figsize_fullpage,
+                       cell_height=0.7,
+                       formater=".3f",
+                       use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+
+    if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_png([FIG], path_out + f'Weibull_table', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+    if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+        gl.save_figs_as_pdf([FIG], path_out + f'Weibull_table', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+        if INPUT["DataBase"].get("create_report", {}):
 
     # Read Report Input
-    try:
-        INPUT_REPORT = gl.read_input_txt(INPUT["DataBase"]["Report_Input"])
-    except:
-        print("please specify Report_Input")
+    INPUT_REPORT = gl.read_input_txt(INPUT["DataBase"]["Report_Input"])
 
     # Create Report Output
     path_report = path_out + "report"
@@ -2934,16 +3310,15 @@ if INPUT["DataBase"].get("create_report", {}):
     except Exception as e:
         print(f"An error occurred: {e}")
 
-    # crate COLNAME dataframe with symbols as master
-    COLNAMES_REPORT = pd.DataFrame(index=INPUT_REPORT["Symbols"].keys())
-    COLNAMES_REPORT["Symbols"] = INPUT_REPORT["Symbols"].values()
-    COLNAMES_REPORT["Sensor_names"] = [COLNAMES[key] if key in COLNAMES else float('nan') for key in list(COLNAMES_REPORT.index)]
-    COLNAMES_REPORT["Aliase"] = [INPUT["Aliase"][key] if key in INPUT["Aliase"] else float('nan') for key in COLNAMES_REPORT.index]
-    COLNAMES_REPORT["Units"] = [INPUT_REPORT["Units"][key] if key in INPUT_REPORT["Units"] else float('nan') for key in COLNAMES_REPORT.index]
-
-    # create tables if not loading from extern figure sorce
+    # determine Sorce
     if INPUT_REPORT["General"]["extern_content_path"] is not None:
         path_report_content = os.path.abspath(INPUT_REPORT["General"]["extern_content_path"])
+    else:
+        path_report_content = os.path.abspath(path_out)
+
+
+    # load Database
+
     else:
         path_report_content = os.path.abspath(path_out)
 
@@ -2952,390 +3327,6 @@ if INPUT["DataBase"].get("create_report", {}):
 
         # INSERT DATABASE READ FROM XLSX!
 
-        for sensor_key, sensor_name in INPUT["ColumNames"].items():
-            for datasorce_key_raw in datasorce_keys_raw:
-                datasorce_key_clean = datasorce_key_raw.replace('Hind_raw_', '')
-                if sensor_name in datasorce_cols[datasorce_key_raw]:
-                    DATABASE.loc[datasorce_key_clean, "used"] = True
-                    COLNAMES_REPORT.loc[sensor_key, "DataSorce"] = datasorce_key_clean
-
-        resamling_values = []
-        resampling_colnames = []
-
-            gl.xlsx2dict(xlsx_path)
-            if DATABASE.loc[dataset_name, "used"] or dataset_name == 'Combined':
-
-                DATABASE.loc[dataset_name, "png_name"] = f'DataSorce_{dataset_name}_page_1.png'
-                DATABASE.loc[dataset_name, "Time"
-
-                for dataset_para, dataset_value in dataset_contents.items():
-                    if dataset_value is not None:
-                        meta_para.append(dataset_para)
-                        meta_value.append(dataset_value)
-
-                data = np.array([meta_para, meta_value])
-                data = data.T
-                col_labels = ["Parameter", "Value"]
-                FIG = hc_plt.table(data,
-                                   collabels=col_labels,
-                                   cell_height=cell_height_tables,
-                                   figsize=figsize_fullpage,
-                                   datatype='str',
-                                   use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
-
-                if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-                    gl.save_figs_as_png([FIG], path_out + f'DataSorce_{dataset_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-                if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-                    gl.save_figs_as_pdf([FIG], path_out + f'DataSorce_{dataset_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-        # plot resampling table
-        resamling_rowlabels = ["Timestep [s]", "Number of Samples [-]", "Start Date", "End Date"]
-
-        FIG = hc_plt.table(np.array(resamling_values).T,
-                           collabels=resampling_colnames,
-                           rowlabels=resamling_rowlabels,
-                           row_label_name='Parameter',
-                           figsize=figsize_halfpage,
-                           datatype='str',
-                           cell_height=cell_height_tables,
-                           use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
-
-        if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_png([FIG], path_out + f'DataSorce_ResamplingTable', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-        if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_pdf([FIG], path_out + f'DataSorce_ResamplingTable', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-        # plot database global parameters
-        if INPUT_REPORT["Database_Info"]["db_info_txt"] == 'auto':
-            db_info_path = os.path.dirname(db_path)
-            db_info_txt = [f for f in os.listdir(db_info_path) if f.endswith('.txt')][0]
-            DBINFO = gl.read_input_txt(db_info_path + '\\' + db_info_txt)
-
-            parameter = ["Metocean Expert", "Global Area", "Water Depth [m]", "Water Depth Reference", "Longitude", "Latitude"]
-            values = [DBINFO["General"]["Metocean_Expert"],
-                      DBINFO["General"]["Global_Area"],
-                      DBINFO["General"]["Global_Depth"],
-                      '-',
-                      f'{DBINFO["General"]["Global_Coordinates"][0]}° E',
-                      f'{DBINFO["General"]["Global_Coordinates"][1]}° N']
-
-            FIG = hc_plt.table(np.array([values]).T,
-                               collabels=['Values'],
-                               rowlabels=parameter,
-                               row_label_name='Parameter',
-                               figsize=figsize_halfpage,
-                               datatype='str',
-                               cell_height=cell_height_tables,
-                               use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
-
-            if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-                gl.save_figs_as_png([FIG], path_out + 'DataSorce_global', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-            if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-                gl.save_figs_as_pdf([FIG], path_out + 'DataSorce_global', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-        # plot sensor names
-        data = np.array([COLNAMES_REPORT["Symbols"], COLNAMES_REPORT["Aliase"], COLNAMES_REPORT["DataSorce"], COLNAMES_REPORT["Units"]], )
-        data = data.T
-        col_labels = ["Symbol", "Description", "Data Sorce", "Unit"]
-        FIG = hc_plt.table(data,
-                           collabels=col_labels,
-                           figsize=figsize_fullpage,
-                           cell_height=cell_height_tables,
-                           datatype='str',
-                           cell_width=[1, 3, 1, 1],
-                           use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
-
-        if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_png([FIG], path_out + 'Sensor_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-        if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_pdf([FIG], path_out + 'Sensor_names', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-        # plot Plot_names
-        data = np.array([COLNAMES_REPORT["Symbols"], COLNAMES_REPORT["Sensor_names"]])
-        data = data.T
-        col_labels = ["Symbol", "Plot name"]
-        FIG = hc_plt.table(data,
-                           collabels=col_labels,
-                           figsize=figsize_fullpage,
-                           cell_height=cell_height_tables,
-                           datatype='str',
-                           use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
-
-        if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_png([FIG], path_out + 'Sensor_Original', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-        if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_pdf([FIG], path_out + 'Sensor_Original', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-        # plot vmhs tables
-        columns_table = []
-        col_labels = []
-        row_labels = ['Bin number',
-                      'Method to derive representative value',
-                      'Correction factor on averaged values',
-                      'datapoints evaluated with regression curve',
-                      'Degree of regression curve $n$',
-                      'Shape function f(x)',
-                      'Range of the regression base']
-
-        Input = INPUT["VMHS_wind"]
-
-        new_col = [Input["N_grid"],
-                   Input["avrg_method"],
-                   Input["average_correction"],
-                   f"{100 - Input['cut_reg']}" + "\\%",
-                   Input["deg_reg"],
-                   'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-                   f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
-
-        columns_table.append(new_col)
-        col_labels.append('Wind Sea')
-
-        Input = INPUT["VMHS_swell"]
-
-        new_col = [Input["N_grid"],
-                   Input["avrg_method"],
-                   Input["average_correction"],
-                   f"{100 - Input['cut_reg']}" + "\\%",
-                   Input["deg_reg"],
-                   'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-                   f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
-
-        columns_table.append(new_col)
-        col_labels.append('Swell Sea')
-
-        data = np.array(columns_table)
-        data = data.T
-
-        FIG = hc_plt.table(data,
-                           collabels=col_labels,
-                           rowlabels=row_labels,
-                           row_label_name='Parameters',
-                           figsize=figsize_halfpage,
-                           cell_height=cell_height_tables,
-                           use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
-
-        if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_png([FIG], path_out + 'Report_table_VMHS', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-        if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_pdf([FIG], path_out + 'Report_table_VMHS', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-        # example VMHS parameter
-        columns_table = []
-        col_labels = []
-        Input = INPUT["VMHS_docu"]
-
-        new_col = [Input["N_grid"],
-                   Input["avrg_method"],
-                   Input["average_correction"],
-                   f"{100 - Input['cut_reg']}" + "\\%",
-                   Input["deg_reg"],
-                   'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-                   f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
-
-        columns_table.append(new_col)
-        col_labels.append('Wind Sea')
-
-        data = np.array(columns_table)
-        data = data.T
-
-        FIG = hc_plt.table(data,
-                           collabels=col_labels,
-                           rowlabels=row_labels,
-                           row_label_name='Parameters',
-                           figsize=figsize_halfpage,
-                           cell_height=cell_height_tables*0.8,
-                           use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
-
-        if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_png([FIG], path_out + 'Report_table_VMHS_example', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-        if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_pdf([FIG], path_out + 'Report_table_VMHS_example', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-        # plot hstp tables
-        columns_table = []
-        col_labels = []
-        row_labels = ['Selected quantiles',
-                      'Frequency bandwidth for selected correlation',
-                      'Bin number',
-                      'Method to derive representative value',
-                      'datapoints evaluated with regression curve',
-                      'Degree of regression curve $n$',
-                      'Shape function $f(x)$',
-                      'Range of the regression base']
-
-        Input = INPUT["HSTP_wind"]
-
-        new_col = [f"[{Input['percentiles'][0]}\\% .. {Input['percentiles'][1]}\\%]" if Input['quantile'] else "none",
-                   f"[{Input['quant_up']} .. {Input['quant_low']}]" if Input['quantile'] else "none",
-                   Input["N_grid"],
-                   Input["avrg_method"],
-                   f"{100 - Input['cut_reg']}" + " \\%",
-                   Input["deg_reg"],
-                   'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-                   f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
-
-        columns_table.append(new_col)
-        col_labels.append('Wind Sea')
-
-        new_col = [f"[{Input['percentiles'][0]}\\% .. {Input['percentiles'][1]}\\%]" if Input['quantile'] else "none",
-                   f"[{Input['quant_up']} .. {Input['quant_low']}]" if Input['quantile'] else "none",
-                   Input["N_grid"],
-                   Input["avrg_method"],
-                   f"{100 - Input['cut_reg']}" + " \\%",
-                   Input["deg_reg"],
-                   'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-                   f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
-        columns_table.append(new_col)
-        col_labels.append('Swell Sea')
-
-        data = np.array(columns_table)
-        data = data.T
-
-        FIG = hc_plt.table(data,
-                           collabels=col_labels,
-                           rowlabels=row_labels,
-                           row_label_name='Parameters',
-                           figsize=figsize_halfpage,
-                           datatype='str',
-                           cell_height=cell_height_tables,
-                           use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
-
-        if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_png([FIG], path_out + 'Report_table_HSTP', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-        if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_pdf([FIG], path_out + 'Report_table_HSTP', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-        # plot T_return Tables
-        T_return_xlsx = [f for f in os.listdir(path_report_content + "\\csv_data") if "ExtremeValues_T_return" in f]
-        T_return_xlsx_path = [path_report_content + "\\csv_data\\" + f for f in T_return_xlsx]
-        T_return_keyword = [f.replace("ExtremeValues_T_return_", "").replace(".xlsx", "") for f in T_return_xlsx]
-
-        for xlsx_path, keyword in zip(T_return_xlsx_path, T_return_keyword):
-
-            T_return_data = gl.xlsx2dict(xlsx_path)
-
-            T_R_omni = T_return_data["omnidirectional"]
-            T_R_omni.iloc[:, 1:] = gl.round_to_significant_digit(T_R_omni.values[:, 1:], 3).astype(float)
-            new_order = ['T_Return', 'down', 'middle', 'up']
-            T_R_omni = T_R_omni[new_order]
-
-            FIG = hc_plt.table(T_R_omni.values,
-                               collabels=['T Return [years]', 'lower band', 'gumbel distribution', 'upper band'],
-                               rowlabels=None,
-                               row_label_name=None,
-                               figsize=figsize_halfpage,
-                               datatype='str',
-                               cell_height=cell_height_tables,
-                               use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
-
-            if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-                gl.save_figs_as_png([FIG], path_out + f'T_return_table_{keyword}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-            if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-                gl.save_figs_as_pdf([FIG], path_out + f'T_return_table_{keyword}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-        # plot Extreme Parameter Table
-        points_xlsx = [f for f in os.listdir(path_report_content + "\\csv_data") if "ExtremeValues_points_" in f]
-        points_xlsx_path = [path_report_content + "\\csv_data\\" + f for f in points_xlsx]
-        points_keyword = [f.replace("ExtremeValues_points_", "").replace(".xlsx", "") for f in points_xlsx]
-
-        for xlsx_path, keyword in zip(points_xlsx_path, points_keyword):
-
-            data = gl.xlsx2dict(xlsx_path)
-            data_omni = data["omnidirectional"]
-            row_labels = ["Number of extreme values", "Samples per year (n)", "Window offset", "Extrapolation method"]
-            Values = [len(data_omni), "1", INPUT["ExtremeValues"]["time_window_offset"], "gumbel"]
-
-            FIG = hc_plt.table(np.array([Values]).T,
-                               collabels=['Values'],
-                               rowlabels=row_labels,
-                               row_label_name='Parameter',
-                               figsize=figsize_halfpage,
-                               datatype='str',
-                               cell_height=cell_height_tables,
-                               use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
-
-            if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-                gl.save_figs_as_png([FIG], path_out + f'Extreme_Parameter_table_{keyword}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-            if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-                gl.save_figs_as_pdf([FIG], path_out + f'Extreme_Parameter_table_{keyword}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-        # plot resonance compare tables
-        resonance_xlsx = [f for f in os.listdir(path_report_content + "\\csv_data") if "Resonance_Compare" in f]
-        resonance_xlsx_path = [path_report_content + "\\csv_data\\" + f for f in resonance_xlsx]
-
-        data = gl.xlsx2dict(resonance_xlsx_path[0])
-        data = data[list(data.keys())[0]]
-        col_labels = [COLNAMES_REPORT.loc["H_s_wind", "Symbols"] + " " + COLNAMES_REPORT.loc["H_s_wind", "Units"],
-                      COLNAMES_REPORT.loc["T_p_wind", "Symbols"] + " " + COLNAMES_REPORT.loc["T_p_wind", "Units"],
-                      COLNAMES_REPORT.loc["dir_v_m", "Symbols"] + " " + COLNAMES_REPORT.loc["dir_v_m", "Units"],
-                      "Magnitude" + "[$\\sqrt{m^2 / Hz}$] or [Nm]"]
-
-        row_labels = list(data.index)
-        Values = data.values
-
-        FIG = hc_plt.table(Values,
-                           collabels=col_labels,
-                           rowlabels=row_labels,
-                           row_label_name='Method',
-                           figsize=figsize_halfpage,
-                           datatype='str',
-                           cell_height=cell_height_tables,
-                           formater='.3f',
-                           cell_width=[2, 1, 1, 1, 2],
-                           use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
-
-        if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_png([FIG], path_out + f'Resonance_compare', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-        if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_pdf([FIG], path_out + f'Resonance_compare', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-        # Revision Table
-        col_labels = ["Rev. JBO", "Rev. Employer", "Date", "Description"]
-
-        Revisions = [INPUT_REPORT["RevisionTable"][rev] for rev in INPUT_REPORT["RevisionTable"].keys()]
-
-        FIG = hc_plt.table(Revisions,
-                           collabels=col_labels,
-                           rowlabels=None,
-                           row_label_name='Parameters',
-                           figsize=figsize_fullpage,
-                           cell_height=0.7,
-                           cell_width=[1, 1, 2, 3],
-                           use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
-
-        if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_png([FIG], path_out + f'Revision_Table', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-        if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_pdf([FIG], path_out + f'Revision_Table', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-        # Weibull parameters
-        data = gl.xlsx2dict(path_report_content + "\\csv_data\\Weibull.xlsx")["Sheet1"]
-
-        FIG = hc_plt.table(data.values,
-                           collabels=["k [1]", "loc [m/s]", "A [m/s]", "mean [m/s]", "std [m/s]", "occurence [\\%]"],
-                           rowlabels=data.index,
-                           row_label_name='directional set [deg]',
-                           figsize=figsize_fullpage,
-                           cell_height=0.7,
-                           formater=".3f",
-                           use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
-
-        if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_png([FIG], path_out + f'Weibull_table', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-        if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_pdf([FIG], path_out + f'Weibull_table', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
     # load latex Templates
     path_templates = os.path.abspath(INPUT_REPORT["General"]["path_latex_templates"])
@@ -3347,12 +3338,12 @@ if INPUT["DataBase"].get("create_report", {}):
     for path, name in zip(template_paths, templates_names):
         with open(path, 'r', encoding='utf-8') as file:
             TEMPLATES[name] = file.read()
-    
+
     png_files = [f for f in os.listdir(path_report_content) if f.endswith('.png')]
     png_paths = [os.path.join(path_report_content, f) for f in os.listdir(path_report_content) if f.endswith('.png')]
     png_names = [name.removesuffix('.png') for name in png_files]
     png_width = [0.5 if 'Roseplots' in png_name else 1 for png_name in png_names]
-    
+
     FIGURES = pd.DataFrame(columns=["filename", "path", "caption", "width"])
     FIGURES["filename"] = png_files
     FIGURES["width"] = png_width
