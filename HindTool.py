@@ -2895,10 +2895,6 @@ if INPUT["DataOut"]["CSV_out"]:
 
 
 # %% plot report tables
-
-
-
-
 if INPUT["DataBase"].get("create_report", {}):
 
     # Read Report Input
