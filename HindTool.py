@@ -470,7 +470,6 @@ for sea_type in sea_types:
         Calc.result = hc_calc.calc_tables(vmtp.result, vm_grid, vm_data)
         DATA_OUT["table_vmtp"][sea_type] = Calc
 
-
 # RWI
 toggle_modules = ["calc_RWI"]
 column_names_dict = {
@@ -744,7 +743,7 @@ for sea_type, column_names in validation_column_names_dict.items():
             Calc.basedata = {"dbname": db_path,
                              "tablename": Input['table_name'],
                              "colnames_ini": df.keys,
-                             "db_timeframe": [df.index[0], df.index[1]],
+                             "db_timeframe": [df.index[0], df.index[-1]],
                              "N_rows": len(df),
                              "sample_rate": gl.median_sample_rate(df.index),
                              "indizes": df.index}
@@ -1880,7 +1879,7 @@ if INPUT["Toggle_Modules"].get("plot_AngleDeviation", {}):
 
                 FIG_Tables.append(temp)
             else:
-                title = f"Misalignment to {Calc.result[0].colnames['ang_orig']}" + " \n " + f"over {Calc.result[1].colnames['ang_comp']}"
+                title = f"Misalignment of {INPUT['Aliase'][INPUT['toggle_Modules']['calc_AngleDeviation'][1]]}" + " \n " + f"to {INPUT['Aliase'][INPUT['toggle_Modules']['calc_AngleDeviation'][0]]}"
                 title = gl.alias(title, COLNAMES, INPUT["Aliase"])
                 x_label = gl.alias(Seg.colnames['ang_orig'], COLNAMES, INPUT["Aliase"])
                 tile_scatter = hc_plt.Tile(i, x_label=x_label, y_label='deviation [°]',
@@ -1921,7 +1920,7 @@ if INPUT["Toggle_Modules"].get("plot_Roseplots", {}) and INPUT["Toggle_Modules"]
     Tiles_multi = []
 
     for Roseplot_name, Calc in DATA_OUT["Roseplot"].items():
-        titel = f'Roseplot {Calc.basedata["colnames_ini"][1]} over' + "\n" + f'{Calc.basedata["colnames_ini"][0]}'
+        titel = f'{Calc.basedata["colnames_ini"][1]} over' + "\n" + f'{Calc.basedata["colnames_ini"][0]}'
 
         titel = gl.alias(titel, COLNAMES, INPUT["Aliase"])
         radial = Calc.result["table"].div(Calc.basedata['N_rows'] / 100)
@@ -2114,8 +2113,8 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and INPUT["Toggle_Modul
             tile_curr.add_scatter(scatter)
 
             if Seg.result["meta"]["intervall_mode"] == 'std':
-                upper_lim_label = 'upper band ($\\text{mean} + \sigma$)'
-                lower_lim_label = 'lower band ($\text{mean} - \sigma$)'
+                upper_lim_label = 'upper bound ($\\text{mean} + \sigma$)'
+                lower_lim_label = 'lower bound ($\text{mean} - \sigma$)'
 
             if Seg.result["meta"]["intervall_mode"] == 'percentile':
                 upper_lim_label = 'upper band (95-percentile)'
@@ -2556,7 +2555,7 @@ if INPUT["Toggle_Modules"].get("plot_SensorEval", {}):
 
         for i, Seg in enumerate(Calc.result):
 
-            titel = f'Histogram with binsize={Seg.result["bin_size"]}, ' + titels[i]
+            titel = f'Histogram with binsize = {Seg.result["bin_size"]}, ' + titels[i]
 
             Seg.indizes = pd.to_datetime(Seg.indizes)
 
@@ -2576,7 +2575,7 @@ if INPUT["Toggle_Modules"].get("plot_SensorEval", {}):
             # tile timeseries
             df = Calc.load_from_db(colnames_ini=True, indizes=Seg.indizes)
             x = df[Seg.colnames['x']].values
-            titel = f'Timeseries with min={gl.round_to_significant_digit([min(x)], 3)[0]}' + r" $\vert$ " + f'max={gl.round_to_significant_digit([max(x)], 3)[0]}' + r" $\vert$ " + f'standard deviation={round(np.std(x), 4)}, ' + titels[i]
+            titel = f'Timeseries with min = {gl.round_to_significant_digit([min(x)], 3)[0]}' + r" $\vert$ " + f'max = {gl.round_to_significant_digit([max(x)], 3)[0]}' + r" $\vert$ " + f'standard deviation = {round(np.std(x), 4)}, ' + titels[i]
 
             tile_time = hc_plt.Tile(i, x_label='date', y_label=gl.alias(Seg.colnames['x'], COLNAMES, INPUT["Aliase"]), title=titel)
 
@@ -2618,7 +2617,7 @@ if INPUT["Toggle_Modules"].get("plot_Weibull", {}):
 
         for i, Seg in enumerate(Calc.result):
 
-            titel = f'Weibull fit with binsize={Seg.result["bin_size"]}, ' + "\n" + titels[i]
+            titel = f'Weibull fit with binsize = {Seg.result["bin_size"]}, ' + "\n" + titels[i]
 
             Seg.indizes = pd.to_datetime(Seg.indizes)
 
@@ -2643,7 +2642,7 @@ if INPUT["Toggle_Modules"].get("plot_Weibull", {}):
 
             textbox_data = pd.DataFrame(data=[[key, round(Seg.result["weibull_params"][key], 2)] for key in Seg.result["weibull_params"].keys()])
 
-            textbox_params = hc_plt.Textbox(data=textbox_data, corner1=[0.6, 0.95], corner2=[0.9, 0.45], header=False, orientation_h='left')
+            textbox_params = hc_plt.Textbox(data=textbox_data, corner1=[0.5, 0.95], corner2=[1, 0.45], header=False, orientation_h='left')
             tile_curr.add_textbox(textbox_params)
 
             if Seg.angles is not None:
@@ -2930,7 +2929,6 @@ if INPUT["DataBase"].get("create_report", {}):
         with open(path, 'r', encoding='utf-8') as file:
             TEMPLATES[name] = file.read()
 
-
     # load figures in Dataframe (from output dir or optional dir)
     if INPUT_REPORT["General"]["fig_path"] is not None:
         path_figs = os.path.abspath(INPUT_REPORT["General"]["fig_path"])
@@ -2969,7 +2967,7 @@ if INPUT["DataBase"].get("create_report", {}):
         if DATABASE.loc[dataset_name, "used"] or dataset_name == 'Combined':
 
             DATABASE.loc[dataset_name, "png_name"] = f'DataSorce_{dataset_name}_page_1.png'
-            DATABASE.loc[dataset_name, "Time Step"] = dataset_contents["Time Step"]
+            DATABASE.loc[dataset_name, "Time Step"] = f'{dataset_contents["Time Step"]} s'
             DATABASE.loc[dataset_name, "Start Date"] = dataset_contents["Start Date"]
             DATABASE.loc[dataset_name, "End Date"] = dataset_contents["End Date"]
             DATABASE.loc[dataset_name, "Number of Samples"] = dataset_contents["Number of samples"]
@@ -3030,10 +3028,10 @@ if INPUT["DataBase"].get("create_report", {}):
         db_info_txt = [f for f in os.listdir(db_info_path) if f.endswith('.txt')][0]
         DBINFO = gl.read_input_txt(db_info_path + '\\' + db_info_txt)
 
-        parameter = ["Metocean Expert", "Global Area", "Water Depth [m]", "Water Depth Reference", "Longitude", "Latitude"]
+        parameter = ["Metocean Expert", "Global Area", "Water Depth ", "Water Depth Reference", "Longitude", "Latitude"]
         values = [DBINFO["General"]["Metocean_Expert"],
                   DBINFO["General"]["Global_Area"],
-                  DBINFO["General"]["Global_Depth"],
+                  f'{DBINFO["General"]["Global_Depth"]} m',
                   '-',
                   f'{DBINFO["General"]["Global_Coordinates"][0]}° E',
                   f'{DBINFO["General"]["Global_Coordinates"][1]}° N']
@@ -3106,8 +3104,8 @@ if INPUT["DataBase"].get("create_report", {}):
                Input["average_correction"],
                f"{100 - Input['cut_reg']}" + "\\%",
                Input["deg_reg"],
-               'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-               f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
+               '-' if Input['cut_reg'] == 100 else 'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+               '-' if Input['cut_reg'] == 100 else f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
 
     columns_table.append(new_col)
     col_labels.append('Wind Sea')
@@ -3117,10 +3115,10 @@ if INPUT["DataBase"].get("create_report", {}):
     new_col = [Input["N_grid"],
                Input["avrg_method"],
                Input["average_correction"],
-               f"{100 - Input['cut_reg']}" + "\\%",
+               f"{100 - Input['cut_reg']}" + " \\%",
                Input["deg_reg"],
-               'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-               f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
+               '-' if Input['cut_reg'] == 100 else 'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+               '-' if Input['cut_reg'] == 100 else f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
 
     columns_table.append(new_col)
     col_labels.append('Swell Sea')
@@ -3150,7 +3148,7 @@ if INPUT["DataBase"].get("create_report", {}):
     new_col = [Input["N_grid"],
                Input["avrg_method"],
                Input["average_correction"],
-               f"{100 - Input['cut_reg']}" + "\\%",
+               f"{100 - Input['cut_reg']}" + " \\%",
                Input["deg_reg"],
                'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
                f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
@@ -3182,7 +3180,7 @@ if INPUT["DataBase"].get("create_report", {}):
                   'Frequency bandwidth for selected correlation',
                   'Bin number',
                   'Method to derive representative value',
-                  'datapoints evaluated with regression curve',
+                  'Datapoints evaluated with regression curve',
                   'Degree of regression curve $n$',
                   'Shape function $f(x)$',
                   'Range of the regression base']
@@ -3195,8 +3193,8 @@ if INPUT["DataBase"].get("create_report", {}):
                Input["avrg_method"],
                f"{100 - Input['cut_reg']}" + " \\%",
                Input["deg_reg"],
-               'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-               f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
+               '-' if Input['cut_reg'] == 100 else 'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+               '-' if Input['cut_reg'] == 100 else f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
 
     columns_table.append(new_col)
     col_labels.append('Wind Sea')
@@ -3207,8 +3205,8 @@ if INPUT["DataBase"].get("create_report", {}):
                Input["avrg_method"],
                f"{100 - Input['cut_reg']}" + " \\%",
                Input["deg_reg"],
-               'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-               f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
+               '-' if Input['cut_reg'] == 100 else 'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+               '-' if Input['cut_reg'] == 100 else f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
     columns_table.append(new_col)
     col_labels.append('Swell Sea')
 
@@ -3368,12 +3366,13 @@ if INPUT["DataBase"].get("create_report", {}):
 
     # captions
     FIGURES.loc["DataSorce_global_page_1", "caption"] = "General databasis parameters"
+    FIGURES.loc["DataSorce_ResamplingTable_page_1", "caption"] = "Timestep, number of samples and timeframe of the individual and combined databasis"
     FIGURES.loc["Sensor_names_page_1", "caption"] = "Sensor overview"
-    FIGURES.loc["Roseplots_wind_page_1", "caption"] = "Roseplot windspeed"
-    FIGURES.loc["Roseplots_wind_sea_page_1", "caption"] = "Roseplot wind sea"
-    FIGURES.loc["Roseplots_swell_sea_page_1", "caption"] = "Roseplot swell sea"
-    FIGURES.loc["angle_deviation_scatter_page_1", "caption"] = "Angle Missaligment"
-    FIGURES.loc["Roseplots_currents_page_1", "caption"] = "Roseplot currents"
+    FIGURES.loc["Roseplots_wind_page_1", "caption"] = "Directional analysis windspeed"
+    FIGURES.loc["Roseplots_wind_sea_page_1", "caption"] = "Directional analysis wind sea"
+    FIGURES.loc["Roseplots_swell_sea_page_1", "caption"] = "Directional analysis swell sea"
+    FIGURES.loc["angle_deviation_scatter_page_1", "caption"] = "Angle misaligment"
+    FIGURES.loc["Roseplots_currents_page_1", "caption"] = "Directional analysis currents"
     FIGURES.loc["Report_table_VMHS_page_1", "caption"] = "Condensation parameter wind speed versus significant wave height"
     FIGURES.loc["Report_table_HSTP_page_1", "caption"] = "Condensation parameter significant wave height versus peak period"
     FIGURES.loc["VMHS_wind_page_3", "caption"] = "Condensation of significant wave height over wind speed, wind sea, omnidirectional"
@@ -3437,7 +3436,7 @@ if INPUT["DataBase"].get("create_report", {}):
     pic = "Map"
     FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
     FIGURES.loc[pic, "path"] = INPUT_REPORT["Database_Info"]["map_path"]
-    FIGURES.loc[pic, "caption"] = "Location"
+    FIGURES.loc[pic, "caption"] = "Overview map"
     FIGURES.loc[pic, "width"] = 1
 
     # constant images (theory)
@@ -3510,7 +3509,6 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Status_table"])
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Map"])
 
-
     TEX[chapter] = ltx.insertLatexVars(TEX[chapter], INPUT_REPORT[chapter])
 
     # Data Basis
@@ -3553,7 +3551,7 @@ if INPUT["DataBase"].get("create_report", {}):
     temp_list = []
     for sensor_key in INPUT["SensorEval"]["Sensors"]:
         sensor_alias = COLNAMES_REPORT["Aliase"][sensor_key]
-        FIGURES.loc[f"SensorEval_{sensor_key}_page_1", "caption"] = f'Timeseries and Histogram of Sensor: {sensor_alias}'
+        FIGURES.loc[f"SensorEval_{sensor_key}_page_1", "caption"] = f'Timeseries and histogram of sensor: {sensor_alias}'
         temp = "\\subsubsection{Sensor: " + f"{sensor_alias}" + "} \n ?FIG" + "\n \\clearpage"
         temp = ltx.include_Fig(temp, FIGURES.loc[f"SensorEval_{sensor_key}_page_1"])
         temp_list.append(temp)
@@ -3649,9 +3647,9 @@ if INPUT["DataBase"].get("create_report", {}):
         FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_2", "caption"] = f"Comparison of real and theoretical extreme values of {sensor_group_name_clean}, directional distribution B"
 
         FIGURES.loc[[
-            f"Extreme_T_return_{sensor_group_name}_page_1"], "caption"] = f"Return periods of extreme values of {sensor_group_name_clean} with extrapolation, , directional distribution A"
+            f"Extreme_T_return_{sensor_group_name}_page_1"], "caption"] = f"Return periods of extreme values of {sensor_group_name_clean} with extrapolation, directional distribution A"
         FIGURES.loc[[
-            f"Extreme_T_return_{sensor_group_name}_page_2"], "caption"] = f"Return periods of extreme values of {sensor_group_name_clean} with extrapolation, , directional distribution B"
+            f"Extreme_T_return_{sensor_group_name}_page_2"], "caption"] = f"Return periods of extreme values of {sensor_group_name_clean} with extrapolation, directional distribution B"
 
         temp = ltx.include_Fig(template, FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_3"])
         temp = ltx.include_Fig(temp, FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_3"])

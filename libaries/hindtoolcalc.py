@@ -1692,7 +1692,7 @@ def calc_VMTP(vmhs, hstp, vm_points=None, fill_range=False):
         else:
             vm_grid = None
 
-        Vm_res, TP_res = cross_correlation(VM_grid.values, HS_values,HS_grid.values, TP_values, fill_range=vm_grid)
+        Vm_res, TP_res = cross_correlation(VM_grid.values, HS_values, HS_grid.values, TP_values, fill_range=vm_grid)
 
         vmtp_curr_data['x'] = Vm_res
         vmtp_curr_data['mean result plot'] = TP_res

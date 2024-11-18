@@ -1,21 +1,23 @@
 \section{Data Basis}
-Here the underlying databasis is analysed. General information is shown in table \ref{tab:DataSorce_global_page_1}:
+Here the underlying databasis is analysed. General information is shown in Table \ref{tab:DataSorce_global_page_1}:
 
 ?TABLE
 
 \subsection{Data set overview}
 
-Meta information of the time series data sets considered in this document are specified below in detail. A quality assurance including potential resampling or correction has been conducted. Analysed sensors in the data sets are tabulated in section \ref{sec:Sensor_Analysis}. \\
+Meta information of the time series data sets considered in this document are specified below in detail. A quality assurance including potential resampling or correction has been conducted. Analysed sensors in the data sets are tabulated in Section \ref{sec:Sensor_Analysis}. \\
 
 ?DATABASIS
 
 
 \subsection{Data resampling} 
-The timestep of ?CombinedTimestep is chosen to be the timestep for all calculation. Deviating timesteps must be sampled down to be added. For this, the mean of all measurements corresponding to one timestep of is used.
-If the timeframes of the datasets are different, the timframe containing all data from the different databasis is choosen in the resampling step to keep all data. For the calculations, only the data present in all relevent databasis are loaded. In the table below the sampling rates and the resulting numbers of samples as well as the timeframes of the original and the combined datasets are listed.
+The timestep of ?CombinedTimestep is chosen for all calculations. Deviating timesteps must be sampled down to be processed. For this, the mean of all measurements corresponding to one timestep of is used.
+Even if the timeframes of the datasets are differing, all available data is resampled. For the individual calculations, on the other hand, only the data present in all needed databasis are loaded. \\
+\\
+In Table \ref{fig:DataSorce_ResamplingTable_page_1} below the sampling rates and the resulting numbers of samples as well as the timeframes of the original and the combined datasets are listed.
 
 ?TABLE
 
 \subsection{Filtering routines}
 All rows containing 'nan' values in one of the relevant sensors are excluded from this specific calculation.  
-Also, if the separated wind sea component is used, extra filtering is necessary in case of the wind-wave missalignment. Because of the separation process of wind sea and swell, some components can be zero if there is no separable wind sea component. In this case, the wave period is zero as well and the wave direction can’t be determined anymore and is set to 0°, which distorts the angle misalignment evaluations. For this reason, these sea states are excluded. 
+Also, if the separated wind sea component is used, extra filtering is necessary. Because of the separation process of wind sea and swell sea, some components can be zero or negative due to there beeig no relevant separable wind sea component. In this case, the wave period is zero as well and also the wave direction can’t be determined anymore and is set to 0°. This distorts the angle misalignment evaluations as well as the data condensation. For this reason, these sea states are excluded. 

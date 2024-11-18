@@ -802,7 +802,7 @@ def plot_rosebar(radial_data, r_bins, angles, r_max=None, plot=None, figsize=Non
         cbar = plt.colorbar(cmappable,
                             ax=axis,
                             pad=0.15,
-                            shrink=0.7,
+                            shrink=0.8,
                             spacing='proportional')
 
         cbar.set_ticks(ticks=bar_ticks, labels=[f"{tick:.15g}" for tick in r_bins], fontsize=7)

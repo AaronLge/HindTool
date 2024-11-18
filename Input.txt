@@ -1,4 +1,11 @@
-########## INPUT FILE FOR HINDCAST TOOL #############
+
+#██╗░░██╗██╗███╗░░██╗██████╗░████████╗░█████╗░░█████╗░██╗░░░░░
+#██║░░██║██║████╗░██║██╔══██╗╚══██╔══╝██╔══██╗██╔══██╗██║░░░░░
+#███████║██║██╔██╗██║██║░░██║░░░██║░░░██║░░██║██║░░██║██║░░░░░
+#██╔══██║██║██║╚████║██║░░██║░░░██║░░░██║░░██║██║░░██║██║░░░░░
+#██║░░██║██║██║░╚███║██████╔╝░░░██║░░░╚█████╔╝╚█████╔╝███████╗
+#╚═╝░░╚═╝╚═╝╚═╝░░╚══╝╚═════╝░░░░╚═╝░░░░╚════╝░░╚════╝░╚══════╝
+
 	#FOR FORMATNG RULES SEE: ./Tips_Readme/Input_template.txt
 
 
@@ -45,10 +52,10 @@ datetime_end				>		'1981-07-01 07:00:00'							>	str:	enddatetime in the format:
 #calc_AngleDeviation 		>		['dir_v_m', 'dir_T_mean_Wind', 'v_m']						>	angle_orig, angle_deviation, v_m
 #calc_Roseplots				>		True									>	 [[angle, magnitude],[angle, magnitude]]
 #calc_ExtremeValues			>		True									
-#calc_Validation 			>		['wind', 'swell']											
-#calc_SensorEval				>		True
+calc_Validation 			>		['wind', 'swell']											
+#calc_SensorEval			>		True
 #calc_Weibull				>		[['dir_v_m', 'v_m']]
-#calc_ExtremeConture			>		[['H_s', 'T_p', 'dir_v_m']]
+#calc_ExtremeConture		>		[['H_s', 'T_p', 'dir_v_m']]
 
 plot_VMHS					>		['wind', 'total', 'swell']
 plot_HSTP					>		['wind', 'swell', 'total']
@@ -94,24 +101,24 @@ v_curr 						>		"Cs,Surf"
 
 *Aliase*
 datetime					>		"date [UTC]"
-v_m 						>	 	"Wind Speed at 148m [m/s]"
-dir_v_m 					> 		"Wind Direction [deg]"
-H_s							>		"Sign. Wave Height [m]"
-H_max						>		"Maximal Wave Height [m]"
-T_p							>		"Peak Wave Period [s]"
-dir_T_p						>		"Peak Wave Direction [deg]"
-H_s_wind					>		"Sign. Wave Height, Wind-Sea [m]"
-T_p_wind					>		"Peak Wave Period, Wind-Sea [s]"
-dir_T_mean					>		"Mean Wave Direction [deg]"
-H_s_swell					>		"Sign. Wave Height, Swell [m]"
-T_p_swell					>		"Peak Wave Period, Swell [s]"
-WL							>		"Water Level [mMSL]"
-dir_T_mean_Swell			>		"Mean Wave Direction, Swell [deg]"
-dir_T_mean_Wind				>		"Mean Wave Direction, Wind-sea [deg]" 
-dir_curr					>		"Current Direction [deg]"
-WL_tide						>		"Water Level, Tide [mMSL]"
-v_curr 						>		"Current Speed [m/s]"
-v_curr_1m					>		"Current Speed, 1m [m/s]"
+v_m 						>	 	"Wind speed at 148m [m/s]"
+dir_v_m 					> 		"Wind direction [deg]"
+H_s							>		"Sign. wave height [m]"
+H_max						>		"Maximal wave height [m]"
+T_p							>		"Peak wave Period [s]"
+dir_T_p						>		"Peak wave direction [deg]"
+H_s_wind					>		"Sign. wave height, wind sea [m]"
+T_p_wind					>		"Peak wave period, wind sea [s]"
+dir_T_mean					>		"Mean wave direction [deg]"
+H_s_swell					>		"Sign. wave height, swell sea [m]"
+T_p_swell					>		"Peak wave period, swell sea [s]"
+WL							>		"Water level [mMSL]"
+dir_T_mean_Swell			>		"Mean wave direction, swell sea [deg]"
+dir_T_mean_Wind				>		"Mean wave direction, wind sea [deg]" 
+dir_curr					>		"Current firection [deg]"
+WL_tide						>		"Water level, tide [mMSL]"
+v_curr 						>		"Current speed [m/s]"
+v_curr_1m					>		"Current speed, 1m [m/s]"
 
 
 *VMHS_wind*
@@ -253,7 +260,7 @@ filter_by					>		["H_s_wind", "T_p_wind"]
 margin						>		[[0, 100], [0, 100]]
 
 *ExtremeValues*
-sensors_Wind				>		['dir_v_m','v_m']
+sensors_Wind_speed				>		['dir_v_m','v_m']
 #sensors_Water_level			>		[None,'WL']
 #sensors_Wave_height			>		['dir_T_mean','H_max']
 

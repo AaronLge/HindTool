@@ -5,8 +5,8 @@
 The following conventions for coordinate systems directionalities are defined:
 
 \begin{itemize}
-    \item All directions stated are relative to the ``Grid North''            direction \rightarrow NORTH = 0{\textdegree}.
-    \item Positive clockwise rotation \rightarrow EAST = +90{\textdegree}.
+    \item All directions stated are relative to the ``Grid North''            direction \rightarrow  NORTH = 0{\textdegree}.
+    \item Positive clockwise rotation \rightarrow  EAST = +90{\textdegree}.
     \item Wind and wave directions are always defined as ``coming      from''. \\ 
         Example: 0{\textdegree} wave direction \rightarrow waves are coming from North, going towards South.
     \item Current directions are always defined as ``going towards''. \\
@@ -27,28 +27,26 @@ extreme conditions.
 The below normal conditions are relevant:
 
 \begin{itemize}
-\item long-term~distribution~of~water~levels (normal water level range)
-\item long-term~distribution~of~currents (normal current model)
-\item long-term~omni-directional~and~directional~distribution~of~3-hourly significant wave height and associated
-peak~wave~period, condensed to wind speed bins
-\item occurrence probability of wind- and wave direction (wind-wave misalignment)
+	\item long-term~distribution~of~water~levels (normal water level range)
+	\item long-term~distribution~of~currents (normal current model)
+	\item long-term~omni-directional~and~directional~distribution~of~1-hourly significant wave height and associated
+	peak~wave~period, condensed to wind speed bins
+	\item occurrence probability of wind- and wave direction (wind-wave misalignment)
 \end{itemize}
+
 \subsubsection{Extreme oceanographic conditions}
 The below extreme conditions are relevant:
 
 \begin{itemize}
-\item storm~surge,~50-year~and~1-year~return~period (highest and lowest still~water~level
-\item current~speed,~50-year~and~1-year~return~period
-\item 3-hourly~significant~wave~height,~50-year~and~1-year~return~period (extreme sea state)
-\item wave~peak~period,~associated~with~extreme significant wave height (extreme sea state)
-\item 3-hourly~maximum~individual~wave~height,~50-year~and~1-year~return~period
-\item design~wave~period~range~associated~with~50-year~and~1-year~return~period
-\item 3-hourly~maximum~crest~elevation,~50-year~and~1-year~return~period
-\item breaking~wave~probability
-\item 3-hourly~significant~wave~height and associated period for resonant sea state conditions 
-\item 3-hourly~significant~wave~height and associated period severe sea state conditions, for 50-year return period,
-evaluated for each wind speed bin
+	\item storm~surge,~50-year~and~5-year~return~period (highest and lowest still~water~level)
+	\item current~speed,~50-year~and~5-year~return~period
+	\item 1-hourly~significant~wave~height,~50-year~and~5-year~return~period (extreme sea state)
+	\item 1-hourly~maximum~individual~wave~height,~50-year~and~5-year~return~period
+	\item 1-hourly~maximum~crest~elevation,~50-year~and~5-year~return~period
+	\item breaking~wave~probability
+	\item 1-hourly~significant~wave~height and associated period for resonant sea state conditions 
 \end{itemize}
+
 \subsection{Sea state and wave spectrum information}
 Derivations of sea state parameter for normal conditions can be performed for: 
 
@@ -61,10 +59,7 @@ energy.
 \item \textbf{total sea:} no differentiation between wind sea and wave sea
 \end{itemize}
 Wind and swell sea states are considered as independent of each other. The water-surface elevations of both sea states
-are superposed. The water-particle kinematics are modelled in a three-dimensional coordinate system in order to respect
-the wave-propagation directions of both sea states which may differ. Afterwards the water-particle kinematics for both
-sea states, given in three-dimensional coordinate systems, are superposed.\\
-
+are superposed.\\
 
 Where a wave spectrum will be considerd for normal and extreme conditinos (\ac{ESS}, \ac{NSS}, \ac{SSS}), the irregular sea states are
 described according to the JONSWAP spectrum definitions in \cite{DNV-ST_0437}:
@@ -73,4 +68,4 @@ described according to the JONSWAP spectrum definitions in \cite{DNV-ST_0437}:
 S_{J S}(f)=0.3125 \cdot H_s^2 \cdot T_p \cdot\left(\frac{f}{f_p}\right)^{-5} \cdot \exp \left(-1.25 \cdot\left(\frac{f}{f_p}\right)^{-4}\right) \cdot(1-0.287 \cdot \ln \gamma) \cdot \gamma^{\exp \left(-0.5 \cdot\left(\frac{f-f_p}{\sigma \cdot f_p}\right)^2\right)}
 \end{equation}
 
-with significant wave height $H_s$, peak period $T_p$ , peak frequency $f_p=\frac{1}{T_p}$. The peak-enhancement factor $\gamma$ and spectral width parameter $\sigma$ is also applied according to \citeguideline{DNV-ST_0437}. 
+with significant wave height $H_s$, peak period $T_p$ , peak frequency $f_p=\frac{1}{T_p}$. The peak-enhancement factor $\gamma$ and spectral width parameter $\sigma$ is also applied according to \cite{DNV-ST_0437}. 
