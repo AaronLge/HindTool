@@ -31,6 +31,8 @@ This document describes the marine assessment of metocean hindcast data to deter
 offshore wind project. The evaluated design parameter shall fulfil the requirements for a preliminary design phase of
 substructure and foundation.
 
+?FIG
+
 \newpage
 
 \printacronyms[name=Abbreviations \& definitions  ]

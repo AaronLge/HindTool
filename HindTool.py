@@ -3433,6 +3433,13 @@ if INPUT["DataBase"].get("create_report", {}):
     FIGURES.loc["angle_deviation_table_page_12", "caption"] = "Angle deviation Section 12"
     FIGURES.loc["Revision_Table_page_1", "caption"] = None
 
+    # map
+    pic = "Map"
+    FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
+    FIGURES.loc[pic, "path"] = INPUT_REPORT["Database_Info"]["map_path"]
+    FIGURES.loc[pic, "caption"] = "Location"
+    FIGURES.loc[pic, "width"] = 1
+
     # constant images (theory)
     pic = "VMTP_theory"
     FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
@@ -3501,6 +3508,8 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter_main], last_idx = ltx.include_include(TEX[chapter_main], chapter, line=last_idx + 1)
     TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Revision_Table_page_1"])
     TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Status_table"])
+    TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Map"])
+
 
     TEX[chapter] = ltx.insertLatexVars(TEX[chapter], INPUT_REPORT[chapter])
 
