@@ -8,6 +8,7 @@ colnames_preset				>		None
 
 JBOOST_proj					>		"I:/2024/A/24A526_Shell_Concept_Design/03_Lasten/00_Conceptual_Design/05_JBOOST/2024-11-19_EF_FLS/proj.lua"					
 JBOOST_input				>		"I:/2024/A/24A526_Shell_Concept_Design/03_Lasten/00_Conceptual_Design/05_JBOOST/2024-11-19_EF_FLS/Input JBOOST Shell_N9p2.lua"
+
 create_report				>		True
 Report_Input				>		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/Shell_Hindcast/ReportInput.txt"
 
@@ -19,8 +20,8 @@ d_from_proj					> 		True
 d							>		42.28
 
 *DataOut*
-path_out					>		'C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/Shell_Hindcast/'								>	str:	path for output-files, it is created if it doesent exist
-dir_name					>		'Data_Out'									>	str or none:	if str, name of the folder created in the path_out (Attention, can overwrite old foulders), if None, name is given, including a timestamp (recommended)
+path_out					>		'C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/Shell_Hindcast/'	>	str:	path for output-files, it is created if it doesent exist
+dir_name					>		'Data_Out_2'									>	str or none:	if str, name of the folder created in the path_out (Attention, can overwrite old foulders), if None, name is given, including a timestamp (recommended)
 CSV_out						>		True 									>	bool:	if True, export of all calculated data in "path_out/dirname/csv_data"
 CSV_deep					>		False											
 
@@ -31,22 +32,22 @@ width_angle					>		15										>	int:	width of angle slice, only used when mode_
 angle_start					>		-15										>	int:	starting angle 
 
 *Filter*
-timeframe					>		True									>	bool:	if True, choose timeframe specified below
-datetime_start				>		'2000-01-01 07:00:00'							>	str:	startdatetime in the format: "YYYY-MM-DD"
-datetime_end				>		'2001-07-01 07:00:00'							>	str:	enddatetime in the format: "YYYY-MM-DD"
+timeframe					>		False									>	bool:	if True, choose timeframe specified below
+datetime_start				>		'1979-01-01 07:00:00'							>	str:	startdatetime in the format: "YYYY-MM-DD"
+datetime_end				>		'1981-07-01 07:00:00'							>	str:	enddatetime in the format: "YYYY-MM-DD"
 
 *Toggle_Modules*
-#calc_VMHS					>		['wind', 'total', 'swell']									
-#calc_HSTP					>		['wind', 'total', 'swell']							
-#calc_VMTP					>		['wind', 'total', 'swell']								
+#calc_VMHS					>		['wind', 'swell']									
+#calc_HSTP					>		['wind', 'swell']							
+#calc_VMTP					>		['wind', 'swell']								
 #calc_RWI					>		['wind', 'total']								
-#calc_Tables					>		['wind', 'swell']											
+#calc_Tables				>		['wind', 'swell']											
 #calc_WaveBreak_Steep		>		['wind', 'total']										
 #calc_AngleDeviation 		>		['dir_v_m', 'dir_T_mean_Wind', 'v_m']						>	angle_orig, angle_deviation, v_m
 #calc_Roseplots				>		True									>	 [[angle, magnitude],[angle, magnitude]]
-#calc_ExtremeValues			>		True									
-#calc_Validation 			>		['wind']											
-#calc_SensorEval				>		True
+#alc_ExtremeValues			>		True									
+#calc_Validation 			>		['wind','swell']											
+calc_SensorEval				>		True
 #calc_Weibull				>		[['dir_v_m', 'v_m']]
 #calc_ExtremeConture			>		[['H_s', 'T_p', 'dir_v_m']]
 
@@ -62,11 +63,11 @@ plot_ExtremeValues			>		True
 plot_Validation 			>		['wind', 'swell']
 plot_SensorEval				>		True
 plot_Weibull				>		True
-plot_condensation_example	>		True
-plot_report_tables			>		True
+#plot_condensation_example	>		True
+#plot_report_tables			>		True
 
 plot_as						>		["png"]
-use_pgf						>		True
+use_pgf						>		False
 dpi_figures					>		500									>	int: resolution (dots per sqinch) of all pdf's
 writing_box					>		[17, 22]
 
@@ -87,26 +88,26 @@ dir_T_mean					>		"MeanWaveDirection"
 dir_T_mean_Wind				>		"MeanWaveDirection_Sea"
 dir_T_mean_Swell			>		"MeanWaveDirection_Swell"
 
-
 *Aliase*
 datetime					>		"date [UTC]"
-v_m 						>	 	"Wind Speed at 150m [m/s]"
-dir_v_m 					> 		"Wind Direction at 10m [deg]"
-H_s							>		"Sign. Wave Height [m]"
-H_max						>		"Maximal Wave Height [m]"
-T_p							>		"Peak Wave Period [s]"
-dir_T_p						>		"Peak Wave Direction [deg]"
-H_s_wind					>		"Sign. Wave Height, Wind-Sea [m]"
-T_p_wind					>		"Peak Wave Period, Wind-Sea [s]"
-dir_T_mean					>		"Mean Wave Direction [deg]"
-H_s_swell					>		"Sign. Wave Height, Swell [m]"
-T_p_swell					>		"Peak Wave Period, Swell [s]"
-WL							>		"Water Level [mMSL]"
-dir_T_mean_Swell			>		"Mean Wave Direction, Swell [deg]"
-dir_T_mean_Wind				>		"Mean Wave Direction, Wind-sea [deg]" 
-dir_curr					>		"Current Direction [deg]"
-WL_tide						>		"Water Level, Tide [mMSL]"
-v_curr 						>		"Current Speed Surface [m/s]"
+v_m 						>	 	"Wind speed at 148m [m/s]"
+dir_v_m 					> 		"Wind direction [deg]"
+H_s							>		"Sign. wave height [m]"
+H_max						>		"Maximal wave height [m]"
+T_p							>		"Peak wave Period [s]"
+dir_T_p						>		"Peak wave direction [deg]"
+H_s_wind					>		"Sign. wave height, wind sea [m]"
+T_p_wind					>		"Peak wave period, wind sea [s]"
+dir_T_mean					>		"Mean wave direction [deg]"
+H_s_swell					>		"Sign. wave height, swell sea [m]"
+T_p_swell					>		"Peak wave period, swell sea [s]"
+WL							>		"Water level [mMSL]"
+dir_T_mean_Swell			>		"Mean wave direction, swell sea [deg]"
+dir_T_mean_Wind				>		"Mean wave direction, wind sea [deg]" 
+dir_curr					>		"Current firection [deg]"
+WL_tide						>		"Water level, tide [mMSL]"
+v_curr 						>		"Current speed [m/s]"
+v_curr_1m					>		"Current speed, 1m [m/s]"
 
 
 *VMHS_wind*
@@ -115,7 +116,7 @@ deg_reg						>		3									>	int: 	degree used for regression
 model_reg					>		'poly'									>	str: 	method used for regression ('poly' : polynominal, 'sqrt' : squareroot), see documentation
 cut_reg						>		95										>	float: 	percentage calculated with mean-values, the top (100 - cut_reg)% by regression
 weighting_reg				>		0										>	float:	weighting of regression by number of data-points in bin, 1: full weighting 0: no weighting
-zone_reg 					>		[0,None]								>	list: 	range from which calculating the regression function is determined, if[.. , None], the upper limit is the maximal found value (from the current angle-section)
+zone_reg 					>		[10,None]								>	list: 	range from which calculating the regression function is determined, if[.. , None], the upper limit is the maximal found value (from the current angle-section)
 zone_line					> 		[0, None] 								>	zone: 	zone, in which the regression (or mean) plot is shown (or displayed in the tables), if [.. , None]  the upper limit is the maximal found value, excuding values under n_bin (from the current angle-section)
 bin_min						>		0 										>	int:	mininmal number of Datapoints in one bin to include the bin in any calculation
 average_correction			>		1
@@ -212,14 +213,14 @@ rot_r_label					> 		0										>	float:	roation of r-lables in degree
 
 
 *Validation_wind*
-from_DB						> 		False
+from_DB						> 		True
 table_name					>		"DEL_config_1"							
 nodes_to_load				>		['501']							> bei None: 'all'
 scatter_configs				>		['IDLING node 501']
 
 
 *Validation_swell*
-from_DB						> 		False
+from_DB						> 		True
 table_name					>		"DEL_config_2"
 nodes_to_load				>		['501']
 scatter_configs				>		['IDLING node 501']
@@ -230,13 +231,13 @@ total_sea					>		[['dir_T_mean', 'H_s']]
 swell_sea					>		[['dir_T_mean_Swell', 'H_s_swell']]	
 wind_sea					>		[['dir_T_mean_Wind', 'H_s_wind']]
 
-#currents					>		[['dir_curr', 'v_curr']]
+currents					>		[]
 
 *RWI*
 gamma						>		'torset'
 
 *SensorEval*
-Sensors 					>		['v_m','H_s','T_p','H_s_wind','T_p_wind','H_s_swell','T_p_swell']
+Sensors 					>		['v_m']
 
 
 *AngleDeviation*
@@ -252,7 +253,7 @@ sensors_Wind				>		['dir_v_m','v_m']
 #sensors_Wave_height			>		['dir_T_mean','H_max']
 
 time_window_offset			>		0.5
-N_itter						>		100			
+N_itter						>		1000			
 perc_up						>		95	
 perc_down					>		5
 conf_inter_mode				>		'percentile'							> percentile oder std

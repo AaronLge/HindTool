@@ -1,6 +1,6 @@
 *General*
 path_latex_templates 		> 		".\latex_templates"	
-fig_path					>		".\example_output"
+fig_path					>		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/Shell_Hindcast/Data_Out"
 #fig_path					>		
 acronym_path				>		"C:/Users/aaron.lange/Desktop/Projekte/Report_Automation/Acronyms.txt"
 
@@ -10,7 +10,7 @@ map_path					>		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/Shell_Hi
 
 
 *Biblografy*
-BIBDatasets                 >		"C:/Users/aaron.lange/Desktop/Projekte/HindcastArchive/2_54.41_5.95_ABP_Mer/datasets.bib"
+BIBDatasets                 >		"C:/Users/aaron.lange/Desktop/Projekte/HindcastArchive/3_54.4839_5.6368_BSH Offshore/datasets.bib"
 BIBLiteratur				>		"C:/Users/aaron.lange/Desktop/Projekte/Report_Automation/Literature.bib"
 BIBGuidelines				>		"C:/Users/aaron.lange/Desktop/Projekte/Report_Automation/TechnicalGuidelines.bib"
 
@@ -82,3 +82,74 @@ Rev_1						>		["01", "01", "30.10.2024", "First Release"]
 *Introduction*
 siteSpecific				>		" "
 
+*Captions*
+FIGUDataSorce_global_page_1 				>  "General databasis parameters"
+DataSorce_ResamplingTable_page_1 			>  "Timestep, number of samples and timeframe of the individual and combined databasis"
+Sensor_names_page_1 						>  "Sensor overview"													
+Roseplots_wind_page_1  						>  "Directional analysis windspeed"
+Roseplots_wind_sea_page_1  					>  "Directional analysis wind sea"
+Roseplots_swell_sea_page_1  				>  "Directional analysis swell sea"
+angle_deviation_scatter_page_1  			>  "Angle misaligment"
+Roseplots_currents_page_1  					>  "Directional analysis currents"
+Report_table_VMHS_page_1  					>  "Condensation parameter wind speed versus significant wave height"
+Report_table_HSTP_page_1  					>  "Condensation parameter significant wave height versus peak period"
+VMHS_wind_page_3  							>  "Condensation of significant wave height over wind speed, wind sea, omnidirectional"
+VMHS_swell_page_3  							>  "Condensation of significant wave height over wind speed, swell sea, omnidirectional"
+VMHS_wind_page_1  							>  "Condensation of significant wave height over wind speed, wind sea, directional distribution A"
+VMHS_wind_page_2  							>  "Condensation of significant wave height over wind speed, wind sea, directional distribution B"
+VMHS_swell_page_1  							>  "Condensation of significant wave height over wind speed, swell sea, directional distribution A"
+VMHS_swell_page_2  							>  "Condensation of significant wave height over wind speed, swell sea, directional distribution B"
+HSTP_wind_page_3  							>  "Condensation of peak wave period over significant wave height, wind sea, omnidirectional"
+HSTP_swell_page_3  							>  "Condensation of peak wave period over significant wave height, swell sea, omnidirectional"
+HSTP_wind_page_1  							>  "Condensation of peak wave period over significant wave height, wind sea, directional distribution A"
+HSTP_wind_page_2  							>  "Condensation of peak wave period over significant wave height, wind sea, directional distribution B"
+HSTP_swell_page_1  							>  "Condensation of peak wave period over significant wave height, swell sea, directional distribution A"
+HSTP_swell_page_2  							>  "Condensation of peak wave period over significant wave height, swell sea, directional distribution B"
+table_vmhs_wind_page_1  					>  "Condensed significant wave height data, directional distribution, wind sea"
+table_vmhs_swell_page_1  					>  "Condensed significant wave height data, directional distribution, swell sea"
+table_vmtp_wind_page_1  					>  "Condensed peak wave period data, directional distribution, wind sea"
+table_vmtp_swell_page_1  					>  "Condensed peak wave period data, directional distribution, swell sea"
+VMTP_wind_page_3  							>  "Condensation of peak wave period over wind speed, wind sea, omnidirectional"
+Valid_scatter_wind_page_3  					>  "Bending DEL for each sea state in hindcast data set, wind sea, omnidirectional"
+Valid_scatter_swell_page_3  				>  "Bending DEL for each sea state in hindcast data set, swell sea, omnidirectional"
+Valid_line_wind_page_3  					>  "Validation of condensation, wind sea, omnidirectional"
+Valid_line_swell_page_3 					>  "Validation of condensation, swell sea, omnidirectional"
+Valid_line_wind_page_1 						>  "Validation of condensation, wind sea, directional distribution A"
+Valid_line_wind_page_2  					>  "Validation of condensation, wind sea, directional distribution B"
+Valid_line_swell_page_1  					>  "Validation of condensation, swell sea, directional distribution A"
+Valid_line_swell_page_2  					>  "Validation of condensation, swell sea, directional distribution B"
+Valid_scatter_wind_page_1  					>  "Bending DEL for each sea state in hindcast data set, wind sea, directional distribution A"
+Valid_scatter_wind_page_2  					>  "Bending DEL for each sea state in hindcast data set, wind sea, directional distribution B"
+Valid_scatter_swell_page_1  				>  "Bending DEL for each sea state in hindcast data set, swell sea, directional distribution A"
+Valid_scatter_swell_page_2  				>  "Bending DEL for each sea state in hindcast data set, swell sea, directional distribution B"
+RWI_wind_page_3  							>  "Resonance Wave Intensity (RWI), wind sea, omnidirectional"
+RWI_wind_page_1  							>  "Resonance Wave Intensity (RWI), wind sea, directional distribution A"
+RWI_wind_page_2  							>  "Resonance Wave Intensity (RWI), wind sea, directional distribution B"
+Resonance_compare_page_1  					>  "Comparison of most severe seastate detemined by RWI and DEL"
+WaveBreak_wind_page_3  						>  "Sea states with breaking waves, wind sea, omnidirectional"
+WaveBreak_wind_page_1  						>  "Sea states with breaking waves, wind sea, directional distribution A"
+WaveBreak_wind_page_2  						>  "Sea states with breaking waves, wind sea, directional distribution B"
+Weibull_v_m over dir_v_m_page_3  			>  "Weibull fit, omnidirectional"
+Weibull_v_m over dir_v_m_page_1  			>  "Weibull fit, directional distribution A"
+Weibull_v_m over dir_v_m_page_2  			>  "Weibull fit, directional distribution B"
+Weibull_table_page_1  						>  "Weibull fit, parameters"
+VMHS_example_page_1  						>  "Example of condensation of significant wave height over wind speed, wind sea, omnidirectional"
+Report_table_VMHS_example_page_1  			>  "Condensation parameter wind speed versus significant wave height for the example"
+Sensor_Original_page_1 						>  "Sensor names in databasis"
+angle_deviation_table_page_1  				>  "Angle deviation Section 1"
+angle_deviation_table_page_2  				>  "Angle deviation Section 2"
+angle_deviation_table_page_3  				>  "Angle deviation Section 3"
+angle_deviation_table_page_4  				>  "Angle deviation Section 4"
+angle_deviation_table_page_5  				>  "Angle deviation Section 5"
+angle_deviation_table_page_6  				>  "Angle deviation Section 6"
+angle_deviation_table_page_7  				>  "Angle deviation Section 7"
+angle_deviation_table_page_8  				>  "Angle deviation Section 8"
+angle_deviation_table_page_9  				>  "Angle deviation Section 9"
+angle_deviation_table_page_10  				>  "Angle deviation Section 10"
+angle_deviation_table_page_11  				>  "Angle deviation Section 11"
+angle_deviation_table_page_12  				>  "Angle deviation Section 12"
+Revision_Table_page_1  						>  None
+Map											>  
+
+*FigureWidth*
+Roseplots_currents_page_1					> 1

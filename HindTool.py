@@ -1875,7 +1875,7 @@ if INPUT["Toggle_Modules"].get("plot_AngleDeviation", {}):
 
                 FIG_Tables.append(temp)
             else:
-                title = f"Misalignment of {INPUT['Aliase'][INPUT['toggle_Modules']['calc_AngleDeviation'][1]]}" + " \n " + f"to {INPUT['Aliase'][INPUT['toggle_Modules']['calc_AngleDeviation'][0]]}"
+                title = f"Misalignment of {INPUT['Aliase'][INPUT['Toggle_Modules']['calc_AngleDeviation'][1]]}" + " \n " + f"to {INPUT['Aliase'][INPUT['Toggle_Modules']['calc_AngleDeviation'][0]]}"
                 title = gl.alias(title, COLNAMES, INPUT["Aliase"])
                 x_label = gl.alias(Seg.colnames['ang_orig'], COLNAMES, INPUT["Aliase"])
                 tile_scatter = hc_plt.Tile(i, x_label=x_label, y_label='deviation [°]',
@@ -2293,7 +2293,7 @@ if 'wind' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
                                              orientation_v='center',
                                              header=False)
 
-                tile_curr.add_textbox(Textbox_DEL, zorder=9)
+                tile_curr.add_textbox(Textbox_DEL)
                 Tiles_omni.append(tile_curr)
 
         FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
@@ -2469,7 +2469,7 @@ if 'swell' in INPUT["Toggle_Modules"].get("plot_Validation", {}):
                                              orientation_v='center',
                                              header=False)
 
-                tile_curr.add_textbox(Textbox_DEL, zorder=-1)
+                tile_curr.add_textbox(Textbox_DEL)
                 Tiles_omni.append(tile_curr)
 
         FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
@@ -2930,9 +2930,9 @@ if INPUT["DataBase"].get("create_report", {}):
     except Exception as e:
         print(f"An error occurred: {e}")
 
-    # crate COLNAME dataframe with symbols as master
-    COLNAMES_REPORT = pd.DataFrame(index=INPUT_REPORT["Symbols"].keys())
-    COLNAMES_REPORT["Symbols"] = INPUT_REPORT["Symbols"].values()
+    # crate COLNAME dataframe with Colnames as master
+    COLNAMES_REPORT = pd.DataFrame(index=INPUT["ColumNames"].keys())
+    COLNAMES_REPORT["Symbols"] = [INPUT_REPORT["Symbols"][key] if key in INPUT_REPORT["Symbols"] else float('nan') for key in COLNAMES_REPORT.index]
     COLNAMES_REPORT["Sensor_names"] = [COLNAMES[key] if key in COLNAMES else float('nan') for key in list(COLNAMES_REPORT.index)]
     COLNAMES_REPORT["Aliase"] = [INPUT["Aliase"][key] if key in INPUT["Aliase"] else float('nan') for key in COLNAMES_REPORT.index]
     COLNAMES_REPORT["Units"] = [INPUT_REPORT["Units"][key] if key in INPUT_REPORT["Units"] else float('nan') for key in COLNAMES_REPORT.index]
@@ -3378,78 +3378,14 @@ if INPUT["DataBase"].get("create_report", {}):
 
     FIGURES["caption"] = [name.replace('_', '-') for name in png_names]
 
-    # figure captions
     FIGURES.index = png_names
-
-    FIGURES.loc["Roseplots_currents_page_1", "width"] = 1
 
     # captions
     FIGURES.loc["DataSorce_global_page_1", "caption"] = "General databasis parameters"
-    FIGURES.loc["DataSorce_ResamplingTable_page_1", "caption"] = "Timestep, number of samples and timeframe of the individual and combined databasis"
-    FIGURES.loc["Sensor_names_page_1", "caption"] = "Sensor overview"
-    FIGURES.loc["Roseplots_wind_page_1", "caption"] = "Directional analysis windspeed"
-    FIGURES.loc["Roseplots_wind_sea_page_1", "caption"] = "Directional analysis wind sea"
-    FIGURES.loc["Roseplots_swell_sea_page_1", "caption"] = "Directional analysis swell sea"
-    FIGURES.loc["angle_deviation_scatter_page_1", "caption"] = "Angle misaligment"
-    FIGURES.loc["Roseplots_currents_page_1", "caption"] = "Directional analysis currents"
-    FIGURES.loc["Report_table_VMHS_page_1", "caption"] = "Condensation parameter wind speed versus significant wave height"
-    FIGURES.loc["Report_table_HSTP_page_1", "caption"] = "Condensation parameter significant wave height versus peak period"
-    FIGURES.loc["VMHS_wind_page_3", "caption"] = "Condensation of significant wave height over wind speed, wind sea, omnidirectional"
-    FIGURES.loc["VMHS_swell_page_3", "caption"] = "Condensation of significant wave height over wind speed, swell sea, omnidirectional"
-    FIGURES.loc["VMHS_wind_page_1", "caption"] = "Condensation of significant wave height over wind speed, wind sea, directional distribution A"
-    FIGURES.loc["VMHS_wind_page_2", "caption"] = "Condensation of significant wave height over wind speed, wind sea, directional distribution B"
-    FIGURES.loc["VMHS_swell_page_1", "caption"] = "Condensation of significant wave height over wind speed, swell sea, directional distribution A"
-    FIGURES.loc["VMHS_swell_page_2", "caption"] = "Condensation of significant wave height over wind speed, swell sea, directional distribution B"
-    FIGURES.loc["HSTP_wind_page_3", "caption"] = "Condensation of peak wave period over significant wave height, wind sea, omnidirectional"
-    FIGURES.loc["HSTP_swell_page_3", "caption"] = "Condensation of peak wave period over significant wave height, swell sea, omnidirectional"
-    FIGURES.loc["HSTP_wind_page_1", "caption"] = "Condensation of peak wave period over significant wave height, wind sea, directional distribution A"
-    FIGURES.loc["HSTP_wind_page_2", "caption"] = "Condensation of peak wave period over significant wave height, wind sea, directional distribution B"
-    FIGURES.loc["HSTP_swell_page_1", "caption"] = "Condensation of peak wave period over significant wave height, swell sea, directional distribution A"
-    FIGURES.loc["HSTP_swell_page_2", "caption"] = "Condensation of peak wave period over significant wave height, swell sea, directional distribution B"
-    FIGURES.loc["table_vmhs_wind_page_1", "caption"] = "Condensed significant wave height data, directional distribution, wind sea"
-    FIGURES.loc["table_vmhs_swell_page_1", "caption"] = "Condensed significant wave height data, directional distribution, swell sea"
-    FIGURES.loc["table_vmtp_wind_page_1", "caption"] = "Condensed peak wave period data, directional distribution, wind sea"
-    FIGURES.loc["table_vmtp_swell_page_1", "caption"] = "Condensed peak wave period data, directional distribution, swell sea"
-    FIGURES.loc["VMTP_wind_page_3", "caption"] = "Condensation of peak wave period over wind speed, wind sea, omnidirectional"
-    FIGURES.loc["Valid_scatter_wind_page_3", "caption"] = "Bending DEL for each sea state in hindcast data set, wind sea, omnidirectional"
-    FIGURES.loc["Valid_scatter_swell_page_3", "caption"] = "Bending DEL for each sea state in hindcast data set, swell sea, omnidirectional"
-    FIGURES.loc["Valid_line_wind_page_3", "caption"] = "Validation of condensation, wind sea, omnidirectional"
-    FIGURES.loc["Valid_line_swell_page_3", "caption"] = "Validation of condensation, swell sea, omnidirectional"
-    FIGURES.loc["Valid_line_wind_page_1", "caption"] = "Validation of condensation, wind sea, directional distribution A"
-    FIGURES.loc["Valid_line_wind_page_2", "caption"] = "Validation of condensation, wind sea, directional distribution B"
-    FIGURES.loc["Valid_line_swell_page_1", "caption"] = "Validation of condensation, swell sea, directional distribution A"
-    FIGURES.loc["Valid_line_swell_page_2", "caption"] = "Validation of condensation, swell sea, directional distribution B"
-    FIGURES.loc["Valid_scatter_wind_page_1", "caption"] = "Bending DEL for each sea state in hindcast data set, wind sea, directional distribution A"
-    FIGURES.loc["Valid_scatter_wind_page_2", "caption"] = "Bending DEL for each sea state in hindcast data set, wind sea, directional distribution B"
-    FIGURES.loc["Valid_scatter_swell_page_1", "caption"] = "Bending DEL for each sea state in hindcast data set, swell sea, directional distribution A"
-    FIGURES.loc["Valid_scatter_swell_page_2", "caption"] = "Bending DEL for each sea state in hindcast data set, swell sea, directional distribution B"
-    FIGURES.loc["RWI_wind_page_3", "caption"] = "Resonance Wave Intensity (RWI), wind sea, omnidirectional"
-    FIGURES.loc["RWI_wind_page_1", "caption"] = "Resonance Wave Intensity (RWI), wind sea, directional distribution A"
-    FIGURES.loc["RWI_wind_page_2", "caption"] = "Resonance Wave Intensity (RWI), wind sea, directional distribution B"
-    FIGURES.loc["Resonance_compare_page_1", "caption"] = "Comparison of most severe seastate detemined by RWI and DEL"
-    FIGURES.loc["WaveBreak_wind_page_3", "caption"] = "Sea states with breaking waves, wind sea, omnidirectional"
-    FIGURES.loc["WaveBreak_wind_page_1", "caption"] = "Sea states with breaking waves, wind sea, directional distribution A"
-    FIGURES.loc["WaveBreak_wind_page_2", "caption"] = "Sea states with breaking waves, wind sea, directional distribution B"
-    FIGURES.loc["Weibull_v_m over dir_v_m_page_3", "caption"] = "Weibull fit, omnidirectional"
-    FIGURES.loc["Weibull_v_m over dir_v_m_page_1", "caption"] = "Weibull fit, directional distribution A"
-    FIGURES.loc["Weibull_v_m over dir_v_m_page_2", "caption"] = "Weibull fit, directional distribution B"
-    FIGURES.loc["Weibull_table_page_1", "caption"] = "Weibull fit, parameters"
-    FIGURES.loc["VMHS_example_page_1", "caption"] = "Example of condensation of significant wave height over wind speed, wind sea, omnidirectional"
-    FIGURES.loc["Report_table_VMHS_example_page_1", "caption"] = "Condensation parameter wind speed versus significant wave height for the example"
-    FIGURES.loc["Sensor_Original_page_1", "caption"] = "Sensor names in databasis"
-    FIGURES.loc["angle_deviation_table_page_1", "caption"] = "Angle deviation Section 1"
-    FIGURES.loc["angle_deviation_table_page_2", "caption"] = "Angle deviation Section 2"
-    FIGURES.loc["angle_deviation_table_page_3", "caption"] = "Angle deviation Section 3"
-    FIGURES.loc["angle_deviation_table_page_4", "caption"] = "Angle deviation Section 4"
-    FIGURES.loc["angle_deviation_table_page_5", "caption"] = "Angle deviation Section 5"
-    FIGURES.loc["angle_deviation_table_page_6", "caption"] = "Angle deviation Section 6"
-    FIGURES.loc["angle_deviation_table_page_7", "caption"] = "Angle deviation Section 7"
-    FIGURES.loc["angle_deviation_table_page_8", "caption"] = "Angle deviation Section 8"
-    FIGURES.loc["angle_deviation_table_page_9", "caption"] = "Angle deviation Section 9"
-    FIGURES.loc["angle_deviation_table_page_10", "caption"] = "Angle deviation Section 10"
-    FIGURES.loc["angle_deviation_table_page_11", "caption"] = "Angle deviation Section 11"
-    FIGURES.loc["angle_deviation_table_page_12", "caption"] = "Angle deviation Section 12"
-    FIGURES.loc["Revision_Table_page_1", "caption"] = None
+
+    for indx in FIGURES.index:
+        if indx in INPUT_REPORT["Captions"].keys():
+            FIGURES.loc[indx, "caption"] = INPUT_REPORT["Captions"][indx]
 
     # map
     pic = "Map"
@@ -3491,9 +3427,6 @@ if INPUT["DataBase"].get("create_report", {}):
 
     FIGURES.loc[:, "path"] = [string.replace("\\", "/") for string in FIGURES.loc[:, "path"]]
 
-    FIGURES.loc[:, "path"] = [string.replace("\\", "/") for string in FIGURES.loc[:, "path"]]
-    # load templates
-
     # Crete TEX content
     TEX = {}
 
@@ -3521,7 +3454,7 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter_main], last_idx = ltx.include_str(TEX[chapter_main], '\\pagestyle{fancy}', last_idx + 1)
 
     # Introduction
-    chapter = 'introduction'
+    chapter = 'Introduction'
     TEX[chapter] = TEMPLATES[chapter]
     TEX[chapter_main], last_idx = ltx.include_include(TEX[chapter_main], chapter, line=last_idx + 1)
     TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Revision_Table_page_1"])
@@ -3548,7 +3481,7 @@ if INPUT["DataBase"].get("create_report", {}):
     # include Databasis Tables of used Databasis
     for index, row in DATABASE.iterrows():
         if row["used"]:
-            key_fig = [index for index in FIGURES.index if FIGURES.loc[index, "filename"] == row["png_name"]][0]
+            key_fig = [indx for indx in FIGURES.index if FIGURES.loc[indx, "filename"] == row["png_name"]][0]
             database = key_fig.replace("DataSorce_", "").replace("_page_1", "")
 
             FIGURES.loc[key_fig, "caption"] = f'"{database}" Data Set ' + "\\cite{" + f"{database}" + "}"
@@ -3581,11 +3514,11 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter], _ = ltx.include_str(TEX[chapter], sensor_illustration, keyword[0], replace=True)
 
     # include directional information
-    TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Roseplots_wind_page_1"])
-    TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Roseplots_wind_sea_page_1"])
-    TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Roseplots_swell_sea_page_1"])
-    TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Roseplots_currents_page_1"])
-    TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["angle_deviation_scatter_page_1"])
+    TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Roseplots_wind_page_1"] if "Roseplots_wind_page_1" in FIGURES.index else None)
+    TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Roseplots_wind_sea_page_1"] if "Roseplots_wind_sea_page_1" in FIGURES.index else None)
+    TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Roseplots_swell_sea_page_1"] if "Roseplots_swell_sea_page_1" in FIGURES.index else None)
+    TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Roseplots_currents_page_1"] if "Roseplots_currents_page_1" in FIGURES.index else None)
+    TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["angle_deviation_scatter_page_1"] if "angle_deviation_scatter_page_1" in FIGURES.index else None)
 
     # Data correlation
     chapter = "DataCorrelation"

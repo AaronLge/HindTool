@@ -219,17 +219,32 @@ class Calculation:
                 titles.append(header)
         return titles
 
-    def load_from_db(self, column_names=None, applie_filt=True, colnames_ini=False, indizes=None,**kwargs):
-        """wrapper for export_df_from_sql in general lib, takes db_name and tablename from Calculation information, applies filter if it is there"""
+    def load_from_db(self, column_names=None, applie_filt=True, colnames_ini=False, indizes=None):
+        """wrapper for export_df_from_sql in general lib, takes db_name and tablename from Calcul,ation information, applies filter if it is there"""
         if colnames_ini:
             column_names = self.basedata["colnames_ini"]
 
-        df = gl.export_df_from_sql(self.basedata["dbname"], self.basedata["tablename"], column_names=column_names, indizes=indizes)
-
         if (self.filters is None) or not applie_filt:
-            df = df[df.index.isin(self.basedata["indizes"])]
+            indizes_full = self.basedata["indizes"]
+
         else:
-            df = df.loc[self.apply_filters()]
+            indizes_full = self.apply_filters()
+
+        if indizes is not None:
+            indx_not_there = set(indizes) - set(indizes_full)
+
+            if len(indx_not_there) > 0:
+                print(f"indizes {indx_not_there} requested but not in dataset, they are excluded")
+
+            indx_requested = set(indizes) & set(indizes_full)
+            indx_requested = list(indx_requested)
+
+        else:
+            indx_requested = indizes_full
+
+        indx_requested = sorted(indx_requested)
+
+        df = gl.export_df_from_sql(self.basedata["dbname"], self.basedata["tablename"], column_names=column_names, indizes=indx_requested)
 
         return df
 
