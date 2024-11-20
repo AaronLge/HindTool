@@ -126,13 +126,13 @@
     \end{tabular}
 \end{table}
 
-\vspace{4cm}
+\vspace{6cm}
 
 \begin{centering}
-\includegraphics[width=0.4\textwidth]{?ClientLogo}  \\
+\includegraphics[width=0.2\textwidth]{?ClientLogo}  \\
 \end{centering}
 
-\hspace{3.5cm}
+\hspace{2cm}
 \begin{minipage}{\textwidth}
 \vspace{2cm}
 

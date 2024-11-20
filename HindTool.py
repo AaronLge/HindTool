@@ -2888,6 +2888,29 @@ if INPUT["DataOut"]["CSV_out"]:
 
         gl.save_df_list_to_excel(path_csv + f'/Resonance_Compare', [Table_Resonance])
 
+    #db_info
+    if True:
+        # plot databases
+        Meta_data = gl.export_df_from_sql(db_path, 'Hind_MetaData')
+
+        # add datasorce reference
+        datasorce_cols = gl.export_colnames_from_db(db_path)
+        hind_keys = [col.replace("Hind_raw_", "") for col in datasorce_cols.keys() if "Hind_raw" in col]
+
+        for col in datasorce_cols:
+            if "Hind_raw" in col:
+                key = col.replace("Hind_raw_", "")
+
+                # add colnames to dataset
+                Meta_data.loc[key, "columns"] = str(datasorce_cols[col])
+
+                # flag if is beeing used based on colnames in INPUT
+                if any(element in datasorce_cols[col] for element in list(INPUT["ColumNames"].values())):
+                    Meta_data.loc[key, "used"] = True
+                else:
+                    Meta_data.loc[key, "used"] = False
+
+        gl.save_df_list_to_excel(path_csv + f'/Database_info', [Meta_data])
 
 # %% plot report tables
 if INPUT["DataBase"].get("create_report", {}):
