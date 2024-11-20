@@ -126,15 +126,14 @@
     \end{tabular}
 \end{table}
 
-\vspace{6cm}
-
 \begin{centering}
+\vspace*{1.5cm}
 \includegraphics[width=0.2\textwidth]{?ClientLogo}  \\
+\vspace*{1.5cm}
 \end{centering}
 
-\hspace{2cm}
+\hspace{3.5cm}
 \begin{minipage}{\textwidth}
-\vspace{2cm}
 
 \fontsize{14}{20}\selectfont \textbf{?Client} \\
 \fontsize{20}{25}\selectfont \textbf{?ProjectTitle} \\

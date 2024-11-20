@@ -85,9 +85,6 @@ def include_str(main, string, line, replace=False):
     return '\n'.join(lines), line + lines_include
 
 
-
-
-
 def compile_lualatex(tex_file, pdf_path=None, miktex_lualatex_path='C:/temp/MikTex/miktex/bin/x64/lualatex.exe', biber_path='C:/temp/MikTex/miktex/bin/x64/biber.exe'):
     def press_return_periodically(process):
         # Function to send newline every second to simulate "return"
@@ -117,7 +114,7 @@ def compile_lualatex(tex_file, pdf_path=None, miktex_lualatex_path='C:/temp/MikT
         print(f"LuaLaTeX compilation failed: {e}")
 
     # Run the bibliography tool (Biber)
-    for i in range(3):
+    for i in range(1):
         try:
             run_subprocess([biber_path, main_name, '-output-directory', txt_path], cwd=txt_path)
         except Exception as e:
@@ -138,6 +135,7 @@ def compile_lualatex(tex_file, pdf_path=None, miktex_lualatex_path='C:/temp/MikT
         print("PDF was not created, something went wrong.")
         return None
 
+
 def include_Fig(string, FigInfo):
     figure_template = ("\\begin{figure}[H] \n "
                        "\\includegraphics[width=?FIGURE_WIDTH\\textwidth]{?FIGURE_PATH} \n "
@@ -145,20 +143,25 @@ def include_Fig(string, FigInfo):
                        "\\label{fig:?FIGURE_NAME} \n"
                        "\\end{figure}")
 
-    figure_latex = gl.alias(figure_template,
-                            {"1": "?FIGURE_PATH",
-                             "2": "?CAPTION",
-                             "3": "?FIGURE_NAME",
-                             "4": "?FIGURE_WIDTH"},
-                            {"1": FigInfo["path"],
-                             "2": FigInfo["caption"],
-                             "3": FigInfo.name,
-                             "4": f"{FigInfo['width']}"})
+    if FigInfo is not None:
+        figure_latex = gl.alias(figure_template,
+                                {"1": "?FIGURE_PATH",
+                                 "2": "?CAPTION",
+                                 "3": "?FIGURE_NAME",
+                                 "4": "?FIGURE_WIDTH"},
+                                {"1": FigInfo["path"],
+                                 "2": FigInfo["caption"],
+                                 "3": FigInfo.name,
+                                 "4": f"{FigInfo['width']}"})
+
+    else:
+        figure_latex = '\n'
 
     lines = find_keyword(string, '?FIG')
     string_out, _ = include_str(string, figure_latex, line=lines[0], replace=True)
 
     return string_out
+
 
 def include_MultiFig(string, FigInfo):
 
@@ -169,6 +172,9 @@ def include_MultiFig(string, FigInfo):
                        "\\end{figure}")
 
     temp = []
+
+    FigInfo = [info for info in FigInfo if info is not None]
+    fig_string = ""
 
     for Fig in FigInfo:
         figure_latex = gl.alias(figure_template,
@@ -189,6 +195,7 @@ def include_MultiFig(string, FigInfo):
 
     return string_out
 
+
 def include_TableFig(string, FigInfo):
     figure_template = ("\\begin{figure}[H] \n "
                        "\\captionsetup{type=table} \n"
@@ -202,28 +209,31 @@ def include_TableFig(string, FigInfo):
                        "\\label{tab:?FIGURE_NAME} \n"
                        "\\end{figure}")
 
+    if FigInfo is not None:
 
-    if FigInfo["caption"] is None:
+        if FigInfo["caption"] is None:
 
-        figure_latex = gl.alias(figure_template_no_cap,
-                                {"1": "?FIGURE_PATH",
-                                 "3": "?FIGURE_NAME",
-                                 "4": "?FIGURE_WIDTH"},
-                                {"1": FigInfo["path"],
-                                 "3": FigInfo.name,
-                                 "4": f"{FigInfo['width']}"})
+            figure_latex = gl.alias(figure_template_no_cap,
+                                    {"1": "?FIGURE_PATH",
+                                     "3": "?FIGURE_NAME",
+                                     "4": "?FIGURE_WIDTH"},
+                                    {"1": FigInfo["path"],
+                                     "3": FigInfo.name,
+                                     "4": f"{FigInfo['width']}"})
+        else:
+
+            figure_latex = gl.alias(figure_template,
+                                    {"1": "?FIGURE_PATH",
+                                     "2": "?CAPTION",
+                                     "3": "?FIGURE_NAME",
+                                     "4": "?FIGURE_WIDTH"},
+                                    {"1": FigInfo["path"],
+                                     "2": FigInfo["caption"],
+                                     "3": FigInfo.name,
+                                     "4": f"{FigInfo['width']}"})
+
     else:
-
-        figure_latex = gl.alias(figure_template,
-                                {"1": "?FIGURE_PATH",
-                                 "2": "?CAPTION",
-                                 "3": "?FIGURE_NAME",
-                                 "4": "?FIGURE_WIDTH"},
-                                {"1": FigInfo["path"],
-                                 "2": FigInfo["caption"],
-                                 "3": FigInfo.name,
-                                 "4": f"{FigInfo['width']}"})
-
+        figure_latex = '\\'
 
     lines = find_keyword(string, '?TABLE')
     string_out, _ = include_str(string, figure_latex, line=lines[0], replace=True)

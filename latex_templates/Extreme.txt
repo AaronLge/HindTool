@@ -52,8 +52,8 @@ For finding the confidence intervals, another numerical method is applied ("inte
 
 $$
 \begin{aligned}
-\text{upper bound:} x_{j,+\sigma}=x_{j, \text{mid}}+\sigma_{j} \\
-\text{lower bound:} x_{j,-\sigma}=x_{j, \text{mid}}-\sigma_{j}
+\text{upper bound:\qquad  x_{j,+\sigma}=x_{j, \text{mid}}+\sigma_{j} \\
+\text{lower bound:\qquad} x_{j,-\sigma}=x_{j, \text{mid}}-\sigma_{j}
 \end{aligned}
 $$
 
