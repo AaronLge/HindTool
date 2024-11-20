@@ -68,6 +68,9 @@ class Calculation:
 
         if timeframe is not None:
             df = df.loc[timeframe[0]:timeframe[1]]
+            if len(df) == 0:
+                print("   no data found in timeframe")
+                return
 
         self.basedata["dbname"] = db_path
         self.basedata["tablename"] = table_name

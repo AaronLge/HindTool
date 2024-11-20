@@ -748,10 +748,6 @@ for sea_type, column_names in validation_column_names_dict.items():
                              "sample_rate": gl.median_sample_rate(df.index),
                              "indizes": df.index}
 
-        # Apply filters
-        Calc.add_filter(mode='nans', colnames='all')
-        df = df.loc[Calc.apply_filters()]
-
         print(f"   processing calculated/loaded DEL data and comparing to condensed data in tables")
         result = hc_calc.calc_Validation(df,
                                          df_data[column_names[3]],
