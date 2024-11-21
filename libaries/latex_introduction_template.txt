@@ -1,0 +1,43 @@
+\section*{Revision index}
+?TABLE
+?TABLE
+
+\\
+\\
+\\
+\\
+\\
+\\
+
+\textcolor{gray}{\textbf{\textit{\large Please note that this report is automatically generated using Python and LaTeX.}}}
+
+ 
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\section{Introduction}
+\subsection{General}
+
+?IntroductionText
+
+
+\subsection{Document purpose}
+
+?DocumentPurposeText
+
+?FIG
+
+\newpage
+
+\printacronyms[name=Abbreviations \& definitions  ]
+
+\newpage
+
+\section{References}
+
+\printbibliography[keyword={guideline},title={Technical guidelines and standards}]
+\printbibliography[keyword={dataset},title={Project-specific documents}]
+\printbibliography[keyword={lit},title={Literature}]
