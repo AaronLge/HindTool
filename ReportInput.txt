@@ -10,9 +10,9 @@ map_path					>		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/Shell_Hi
 
 
 *Biblografy*
-BIBDatasets                 >		"C:/Users/aaron.lange/Desktop/Projekte/HindcastArchive/3_54.4839_5.6368_BSH Offshore/datasets.bib"
-BIBLiteratur				>		"C:/Users/aaron.lange/Desktop/Projekte/Report_Automation/Literature.bib"
-BIBGuidelines				>		"C:/Users/aaron.lange/Desktop/Projekte/Report_Automation/TechnicalGuidelines.bib"
+bib_1                 		>		"C:/Users/aaron.lange/Desktop/Projekte/HindcastArchive/3_54.4839_5.6368_BSH Offshore/datasets.bib"
+bib_2						>		"C:/Users/aaron.lange/Desktop/Projekte/Report_Automation/Literature.bib"
+bib_3						>		"C:/Users/aaron.lange/Desktop/Projekte/Report_Automation/TechnicalGuidelines.bib"
 
 
 *Symbols*
@@ -65,18 +65,19 @@ Client						>		r"Intern"
 ClientLogo					>		r"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/Shell_Hindcast/Shell-Logo.png"
 EmployerNumber				>		"01"
 RefNumber					>		"99Z999-JBO-TNHDCD-EN-3001"
-DocumentStatus				>		"DRA"
-RevisionJBO					>		"01"
-RevisionEmployer			>		"01"
-RevisionDate				>		"14.09.2023"
-RevisionDescription			>		"first Draft"
+DocumentStatus				>		'auto'
+RevisionJBO					>		'auto'
+RevisionEmployer			>		'auto'
+RevisionDate				>		'auto'
+RevisionDescription			>		'auto'
 DocumentAuthor				>		"ALa"
-QualityCheck				>		"FOs"
+QualityCheck				>		"SKe"
 Approval					>		"FOs"
 
 
 *RevisionTable*
 Rev_1						>		["01", "01", "30.10.2024", "First Release"]
+
 
 
 *Introduction*
