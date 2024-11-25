@@ -10,7 +10,7 @@ For each directional set a Weibull distribution (\cite{Gumb58}) is fitted for th
 p(x, k, A)=\frac{k}{A}\left(\frac{x}{A}\right)^{k-1} e^{-\left(\frac{V}{A}\right)^k}
 \end{align}
 
-\ref{tab:Weibull_v_m over dir_v_m_page_2} shows the omnidirectional and \ref{tab:Weibull_v_m over dir_v_m_page_1} and \ref{tab:Weibull_v_m over dir_v_m_page_2} the directional distribution of the weibull analysis. 
+\ref{fig:Weibull_v_m over dir_v_m_page_2} shows the omnidirectional and \ref{fig:Weibull_v_m over dir_v_m_page_1} and \ref{fig:Weibull_v_m over dir_v_m_page_2} the directional distribution of the weibull analysis. 
 
 ?FIG
 

@@ -36,11 +36,15 @@ substructure and foundation.
 \newpage
 
 \printacronyms[name=Abbreviations \& definitions  ]
+\markboth{ABBREVIATIONS \& DEFINITIONS}{ABBREVIATIONS \& DEFINITIONS}
 
 \newpage
 
 \section{References}
 
-\printbibliography[keyword={guideline},title={Technical guidelines and standards}]
-\printbibliography[keyword={dataset},title={Project-specific documents}]
-\printbibliography[keyword={lit},title={Literature}]
+\printbibliography[keyword={guideline},title={ \large Technical guidelines and standards}]
+\printbibliography[keyword={dataset},title={\large Project-specific documents}]
+\printbibliography[keyword={lit},title={\large Literature}]
+
+\markboth{\thesection\quad REFERENCES}{\thesection\quad REFERENCES}
+

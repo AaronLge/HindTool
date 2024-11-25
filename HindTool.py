@@ -774,7 +774,7 @@ if INPUT["Toggle_Modules"].get("calc_SensorEval", {}):
         df = Calc.initilize_from_db(db_path, table_name, [colname_data], timeframe=timeframe)
 
         # Apply filters
-        Calc.add_filter(mode='nans', colnames='all')
+        Calc.add_filter(mode='nans')
         df = df.loc[Calc.apply_filters()]
 
         #  directional = hc_calc.calc_histogram(df[column_names[0]],
@@ -2025,7 +2025,7 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and INPUT["Toggle_Modul
                                                           f'intervall algorithm: {Seg.result["meta"]["intervall_algorithm"]}, '
                                                           f'itterations: {Seg.result["meta"]["N_itter"]}')
             tile_curr = hc_plt.Tile(i,
-                                    x_label='Anual Maxima of' + '\n' + gl.alias(Seg.colnames['x'], COLNAMES, INPUT["Aliase"]),
+                                    x_label='Annual Maxima of' + '\n' + gl.alias(Seg.colnames['x'], COLNAMES, INPUT["Aliase"]),
                                     y_label='Theoretical Maxima (gumbel)',
                                     title=title)
 
@@ -3121,7 +3121,7 @@ if INPUT["DataBase"].get("create_report", {}):
     new_col = [Input["N_grid"],
                Input["avrg_method"],
                Input["average_correction"],
-               f"{100 - Input['cut_reg']}" + "\\%",
+               f"{100 - Input['cut_reg']}" + " \\%",
                Input["deg_reg"],
                '-' if Input['cut_reg'] == 100 else 'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
                '-' if Input['cut_reg'] == 100 else f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
@@ -3258,6 +3258,8 @@ if INPUT["DataBase"].get("create_report", {}):
 
         T_R_omni = T_return_data["omnidirectional"]
         T_R_omni.iloc[:, 1:] = gl.round_to_significant_digit(T_R_omni.values[:, 1:], 3).astype(float)
+        T_R_omni.iloc[:, 0] = T_R_omni.values[:, 0].astype(int)
+
         new_order = ['T_Return', 'down', 'middle', 'up']
         T_R_omni = T_R_omni[new_order]
 
@@ -3425,7 +3427,7 @@ if INPUT["DataBase"].get("create_report", {}):
     FIGURES.loc[pic, "caption"] = None
     FIGURES.loc[pic, "width"] = 0.4
 
-    FIGURES.loc[:, "path"] = [string.replace("\\", "/") for string in FIGURES.loc[:, "path"]]
+    FIGURES.loc[:, "path"] = [string.replace("\\", "/") for string in FIGURES.loc[:, "path"] if type(string) is str]
 
     # Crete TEX content
     TEX = {}
@@ -3562,6 +3564,8 @@ if INPUT["DataBase"].get("create_report", {}):
 
     # Normal Conditons
     chapter = "NormalConditions"
+    FIGURES.loc["Weibull_table_page_1", "caption"] = f"Weibull fit of {COLNAMES_REPORT.loc['v_m', 'Aliase']}"
+
     TEX[chapter] = TEMPLATES[chapter]
     TEX[chapter_main], _ = ltx.include_include(TEX[chapter_main], chapter)
 
@@ -3581,6 +3585,7 @@ if INPUT["DataBase"].get("create_report", {}):
     sensors = [INPUT["ExtremeValues"][key] for key in INPUT["ExtremeValues"].keys() if 'sensors' in key]
     sensor_group_names = [key.replace("sensors_", '') for key in INPUT["ExtremeValues"].keys() if 'sensors' in key]
 
+    temp_list = []
     for sensor, sensor_group_name in zip(sensors, sensor_group_names):
         sensor_name = COLNAMES_REPORT.loc[sensor[1], "Aliase"]
         sensor_group_name_clean = sensor_group_name.replace('_', ' ')
@@ -3612,8 +3617,10 @@ if INPUT["DataBase"].get("create_report", {}):
         temp = ltx.include_MultiFig(temp, [FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_1"], FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_2"]])
         temp = ltx.include_MultiFig(temp, [FIGURES.loc[f"Extreme_T_return_{sensor_group_name}_page_1"], FIGURES.loc[f"Extreme_T_return_{sensor_group_name}_page_2"]])
 
+        temp_list.append(temp)
+    temp_list = '\n'.join(temp_list)
     index = ltx.find_keyword(TEX[chapter], '?DATAEVALUATION')[0]
-    TEX[chapter], _ = ltx.include_str(TEX[chapter], temp, line=index, replace=True)
+    TEX[chapter], _ = ltx.include_str(TEX[chapter], temp_list, line=index, replace=True)
 
     # resonant seastate
     chapter = "Resonant"

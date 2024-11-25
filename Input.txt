@@ -3,7 +3,7 @@
 
 
 *DataBase*
-path_DataBase				>		"C:/Users/aaron.lange/Desktop/Projekte/HindcastArchive/3_54.4839_5.6368_BSH Offshore/54.4839_5.6368_BSH Offshore.db"
+path_DataBase				>		"C:/Users/aaron.lange/Desktop/Projekte/HindcastArchive/3_54.4839_5.6368_DHI/54.4839_5.6368_DHI.db"
 colnames_preset				>		None
 
 JBOOST_proj					>		"I:/2024/A/24A526_Shell_Concept_Design/03_Lasten/00_Conceptual_Design/05_JBOOST/2024-11-19_EF_FLS/proj.lua"					
@@ -21,7 +21,7 @@ d							>		42.28
 
 *DataOut*
 path_out					>		'C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/Shell_Hindcast/'	>	str:	path for output-files, it is created if it doesent exist
-dir_name					>		'Data_Out_2'									>	str or none:	if str, name of the folder created in the path_out (Attention, can overwrite old foulders), if None, name is given, including a timestamp (recommended)
+dir_name					>		'Data_Out_4'									>	str or none:	if str, name of the folder created in the path_out (Attention, can overwrite old foulders), if None, name is given, including a timestamp (recommended)
 CSV_out						>		True 									>	bool:	if True, export of all calculated data in "path_out/dirname/csv_data"
 CSV_deep					>		False											
 
@@ -40,34 +40,34 @@ datetime_end				>		'1981-07-01 07:00:00'							>	str:	enddatetime in the format:
 #calc_VMHS					>		['wind', 'swell']									
 #calc_HSTP					>		['wind', 'swell']							
 #calc_VMTP					>		['wind', 'swell']								
-#calc_RWI					>		['wind', 'total']								
-#calc_Tables				>		['wind', 'swell']											
-#calc_WaveBreak_Steep		>		['wind', 'total']										
-#calc_AngleDeviation 		>		['dir_v_m', 'dir_T_mean_Wind', 'v_m']						>	angle_orig, angle_deviation, v_m
+#calc_RWI					>		['wind']								
+#calc_Tables					>		['wind', 'swell']											
+#calc_WaveBreak_Steep		>		['wind']										
+calc_AngleDeviation 		>		['dir_v_m', 'dir_T_peak', 'v_m']						>	angle_orig, angle_deviation, v_m
 #calc_Roseplots				>		True									>	 [[angle, magnitude],[angle, magnitude]]
-#alc_ExtremeValues			>		True									
+#calc_ExtremeValues			>		True									
 #calc_Validation 			>		['wind','swell']											
-calc_SensorEval				>		True
+#calc_SensorEval				>		True
 #calc_Weibull				>		[['dir_v_m', 'v_m']]
-#calc_ExtremeConture			>		[['H_s', 'T_p', 'dir_v_m']]
-
-plot_VMHS					>		['wind', 'total', 'swell']
-plot_HSTP					>		['wind', 'swell', 'total']
-plot_VMTP					>		['wind', 'swell', 'total']
-plot_RWI					>		['wind', 'total']
-plot_BreakSteep				>		['wind', 'total']
-plot_Tables					>		['wind', 'swell', 'total']
-plot_AngleDeviation			>		True
-plot_Roseplots				>		True
-plot_ExtremeValues			>		True
-plot_Validation 			>		['wind', 'swell']
-plot_SensorEval				>		True
-plot_Weibull				>		True
+##calc_ExtremeConture			>		[['H_s', 'T_p', 'dir_v_m']]
+#
+#plot_VMHS					>		['wind', 'total', 'swell']
+#plot_HSTP					>		['wind', 'swell', 'total']
+#plot_VMTP					>		['wind', 'swell', 'total']
+#plot_RWI					>		['wind', 'total']
+#plot_BreakSteep				>		['wind', 'total']
+#plot_Tables					>		['wind', 'swell', 'total']
+#plot_AngleDeviation			>		True
+#plot_Roseplots				>		True
+#plot_ExtremeValues			>		True
+#plot_Validation 			>		['wind', 'swell']
+#plot_SensorEval				>		True
+#plot_Weibull				>		True
 #plot_condensation_example	>		True
 #plot_report_tables			>		True
 
 plot_as						>		["png"]
-use_pgf						>		False
+use_pgf						>		True
 dpi_figures					>		500									>	int: resolution (dots per sqinch) of all pdf's
 writing_box					>		[17, 22]
 
@@ -87,10 +87,12 @@ H_s_swell					>		"HsSwell"
 dir_T_mean					>		"MeanWaveDirection"
 dir_T_mean_Wind				>		"MeanWaveDirection_Sea"
 dir_T_mean_Swell			>		"MeanWaveDirection_Swell"
+dir_T_peak_Sea				>		"PeakWaveDirection_Sea"
+dir_T_peak			>		"PeakWaveDirection"
 
 *Aliase*
 datetime					>		"date [UTC]"
-v_m 						>	 	"Wind speed at 148m [m/s]"
+v_m 						>	 	"Wind speed at 150m [m/s]"
 dir_v_m 					> 		"Wind direction [deg]"
 H_s							>		"Sign. wave height [m]"
 H_max						>		"Maximal wave height [m]"
@@ -116,7 +118,7 @@ deg_reg						>		3									>	int: 	degree used for regression
 model_reg					>		'poly'									>	str: 	method used for regression ('poly' : polynominal, 'sqrt' : squareroot), see documentation
 cut_reg						>		95										>	float: 	percentage calculated with mean-values, the top (100 - cut_reg)% by regression
 weighting_reg				>		0										>	float:	weighting of regression by number of data-points in bin, 1: full weighting 0: no weighting
-zone_reg 					>		[10,None]								>	list: 	range from which calculating the regression function is determined, if[.. , None], the upper limit is the maximal found value (from the current angle-section)
+zone_reg 					>		[0,None]								>	list: 	range from which calculating the regression function is determined, if[.. , None], the upper limit is the maximal found value (from the current angle-section)
 zone_line					> 		[0, None] 								>	zone: 	zone, in which the regression (or mean) plot is shown (or displayed in the tables), if [.. , None]  the upper limit is the maximal found value, excuding values under n_bin (from the current angle-section)
 bin_min						>		0 										>	int:	mininmal number of Datapoints in one bin to include the bin in any calculation
 average_correction			>		1
@@ -237,20 +239,20 @@ currents					>		[]
 gamma						>		'torset'
 
 *SensorEval*
-Sensors 					>		['v_m']
+Sensors 					>		['v_m','H_s','T_p','H_s_wind','T_p_wind','H_s_swell','T_p_swell']
 
 
 *AngleDeviation*
-v_m_zone					>		[0.5,None]
+v_m_zone					>		[-0.5,None]
 v_m_step					>		1
 N_angle_comp_sec			>		12										>   float:	Vm-step, starting from the lower limit as the edge of the bin, middle-Points are displayed in Table
 filter_by					>		["H_s_wind", "T_p_wind"]
-margin						>		[[1, 100], [1, 100]]
+margin						>		[[0, 100], [0, 100]]
 
 *ExtremeValues*
 sensors_Wind				>		['dir_v_m','v_m']
 #sensors_Water_level			>		[None,'WL']
-#sensors_Wave_height			>		['dir_T_mean','H_max']
+sensors_Wave_height			>		['dir_T_mean','H_s']
 
 time_window_offset			>		0.5
 N_itter						>		1000			

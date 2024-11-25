@@ -155,7 +155,7 @@ def include_Fig(string, FigInfo):
                                  "4": f"{FigInfo['width']}"})
 
     else:
-        figure_latex = '\n'
+        figure_latex = '\n \\ \\ \\ no data available  \\ \\ \\ \n'
 
     lines = find_keyword(string, '?FIG')
     string_out, _ = include_str(string, figure_latex, line=lines[0], replace=True)

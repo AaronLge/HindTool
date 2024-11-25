@@ -58,7 +58,7 @@ v_curr 						>		r"[m/s]"
 
 *DocumentMeta*
 DocumentType 				>		r"Technical Note"
-DocumentTitle				>		r"Hindcast Evaluation for Monopile \newline Design"
+DocumentTitle				>		r"Hindcast Evaluation for Monopile Design"
 ProjectTitle				>		r"Offshore Wind Farm"
 ProjectSubtitle				>		r"pipapo"
 Client						>		r"Intern"
@@ -80,7 +80,7 @@ Rev_1						>		["01", "01", "30.10.2024", "First Release"]
 
 
 *Introduction*
-siteSpecific				>		" "
+siteSpecific				>		"The investigated project site is discribed in \ref{MetConditions} and the data provided for the points 9.x is used. The assumed monopile substructure parameters can be found in \cite{Structure}."
 
 *Captions*
 FIGUDataSorce_global_page_1 				>  "General databasis parameters"
