@@ -2025,7 +2025,7 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and INPUT["Toggle_Modul
                                                           f'intervall algorithm: {Seg.result["meta"]["intervall_algorithm"]}, '
                                                           f'itterations: {Seg.result["meta"]["N_itter"]}')
             tile_curr = hc_plt.Tile(i,
-                                    x_label='Annual Maxima of' + '\n' + gl.alias(Seg.colnames['x'], COLNAMES, INPUT["Aliase"]),
+                                    x_label='Annual maximum values of' + '\n' + gl.alias(Seg.colnames['x'], COLNAMES, INPUT["Aliase"]),
                                     y_label='Theoretical Maxima (gumbel)',
                                     title=title)
 
@@ -3122,9 +3122,9 @@ if INPUT["DataBase"].get("create_report", {}):
                Input["avrg_method"],
                Input["average_correction"],
                f"{100 - Input['cut_reg']}" + " \\%",
-               Input["deg_reg"],
+               '-' if Input['cut_reg'] == 100 else f"{Input['deg_reg']}",
                '-' if Input['cut_reg'] == 100 else 'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-               '-' if Input['cut_reg'] == 100 else f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
+               '-' if Input['cut_reg'] == 100 else f"[{Input['zone_reg'][0]} ... {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
 
     columns_table.append(new_col)
     col_labels.append('Wind Sea')
@@ -3135,9 +3135,9 @@ if INPUT["DataBase"].get("create_report", {}):
                Input["avrg_method"],
                Input["average_correction"],
                f"{100 - Input['cut_reg']}" + " \\%",
-               Input["deg_reg"],
+               '-' if Input['cut_reg'] == 100 else f"{Input['deg_reg']}",
                '-' if Input['cut_reg'] == 100 else 'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-               '-' if Input['cut_reg'] == 100 else f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
+               '-' if Input['cut_reg'] == 100 else f"[{Input['zone_reg'][0]} ... {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
 
     columns_table.append(new_col)
     col_labels.append('Swell Sea')
@@ -3168,9 +3168,9 @@ if INPUT["DataBase"].get("create_report", {}):
                Input["avrg_method"],
                Input["average_correction"],
                f"{100 - Input['cut_reg']}" + " \\%",
-               Input["deg_reg"],
+               '-' if Input['cut_reg'] == 100 else f"{Input['deg_reg']}",
                'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-               f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
+               f"[{Input['zone_reg'][0]} ... {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
 
     columns_table.append(new_col)
     col_labels.append('Wind Sea')
@@ -3205,27 +3205,36 @@ if INPUT["DataBase"].get("create_report", {}):
                   'Range of the regression base']
 
     Input = INPUT["HSTP_wind"]
+    # Set quantile bounds if applicable
+    if Input.get("quantile_relative") is not None:
+        Input["quant_up"] = INPUT["Structure"]["f_0"] - INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
+        Input["quant_low"] = INPUT["Structure"]["f_0"] + INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
 
-    new_col = [f"[{Input['percentiles'][0]}\\% .. {Input['percentiles'][1]}\\%]" if Input['quantile'] else "none",
-               f"[{Input['quant_up']} .. {Input['quant_low']}]" if Input['quantile'] else "none",
+    new_col = [f"[{Input['percentiles'][0]}\\% ... {Input['percentiles'][1]}\\%]" if Input['quantile'] else "-",
+               f"[{Input['quant_up']} Hz ... {Input['quant_low']} Hz]" if Input['quantile'] else "-",
                Input["N_grid"],
                Input["avrg_method"],
                f"{100 - Input['cut_reg']}" + " \\%",
-               Input["deg_reg"],
+               '-' if Input['cut_reg'] == 100 else f"{Input['deg_reg']}",
                '-' if Input['cut_reg'] == 100 else 'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-               '-' if Input['cut_reg'] == 100 else f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
+               '-' if Input['cut_reg'] == 100 else f"[{Input['zone_reg'][0]} ... {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
 
     columns_table.append(new_col)
     col_labels.append('Wind Sea')
 
-    new_col = [f"[{Input['percentiles'][0]}\\% .. {Input['percentiles'][1]}\\%]" if Input['quantile'] else "none",
-               f"[{Input['quant_up']} .. {Input['quant_low']}]" if Input['quantile'] else "none",
+    Input = INPUT["HSTP_swell"]
+    if Input.get("quantile_relative") is not None:
+        Input["quant_up"] = INPUT["Structure"]["f_0"] - INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
+        Input["quant_low"] = INPUT["Structure"]["f_0"] + INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
+
+    new_col = [f"[{Input['percentiles'][0]}\\% ... {Input['percentiles'][1]}\\%]" if Input['quantile'] else "-",
+               f"[{Input['quant_up']} Hz ... {Input['quant_low']} Hz]" if Input['quantile'] else "-",
                Input["N_grid"],
                Input["avrg_method"],
                f"{100 - Input['cut_reg']}" + " \\%",
-               Input["deg_reg"],
+               '-' if Input['cut_reg'] == 100 else f"{Input['deg_reg']}",
                '-' if Input['cut_reg'] == 100 else 'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-               '-' if Input['cut_reg'] == 100 else f"[{Input['zone_reg'][0]} .. {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
+               '-' if Input['cut_reg'] == 100 else f"[{Input['zone_reg'][0]} ... {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
     columns_table.append(new_col)
     col_labels.append('Swell Sea')
 
@@ -3310,9 +3319,10 @@ if INPUT["DataBase"].get("create_report", {}):
 
     data = gl.xlsx2dict(resonance_xlsx_path[0])
     data = data[list(data.keys())[0]]
+    data = data.loc[:, data.columns[[0, 1, 3]]]  # skip angle
+
     col_labels = [COLNAMES_REPORT.loc["H_s_wind", "Symbols"] + " " + COLNAMES_REPORT.loc["H_s_wind", "Units"],
                   COLNAMES_REPORT.loc["T_p_wind", "Symbols"] + " " + COLNAMES_REPORT.loc["T_p_wind", "Units"],
-                  COLNAMES_REPORT.loc["dir_v_m", "Symbols"] + " " + COLNAMES_REPORT.loc["dir_v_m", "Units"],
                   "Magnitude" + "[$\\sqrt{m^2 / Hz}$] or [Nm]"]
 
     row_labels = list(data.index)
@@ -3326,7 +3336,7 @@ if INPUT["DataBase"].get("create_report", {}):
                        datatype='str',
                        cell_height=cell_height_tables,
                        formater='.3f',
-                       cell_width=[2, 1, 1, 1, 2],
+                       cell_width=[2, 1, 1, 2],
                        use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
@@ -3359,7 +3369,7 @@ if INPUT["DataBase"].get("create_report", {}):
     data = gl.xlsx2dict(path_figs + "\\csv_data\\Weibull.xlsx")["Sheet1"]
 
     FIG = hc_plt.table(data.values,
-                       collabels=["k [1]", "loc [m/s]", "A [m/s]", "mean [m/s]", "std [m/s]", "occurence [\\%]"],
+                       collabels=["k [-]", "loc [m/s]", "A [m/s]", "mean [m/s]", "std [m/s]", "occurence [\\%]"],
                        rowlabels=data.index,
                        row_label_name='directional set [deg]',
                        figsize=figsize_fullpage,
@@ -3381,13 +3391,6 @@ if INPUT["DataBase"].get("create_report", {}):
     FIGURES["caption"] = [name.replace('_', '-') for name in png_names]
 
     FIGURES.index = png_names
-
-    # captions
-    FIGURES.loc["DataSorce_global_page_1", "caption"] = "General databasis parameters"
-
-    for indx in FIGURES.index:
-        if indx in INPUT_REPORT["Captions"].keys():
-            FIGURES.loc[indx, "caption"] = INPUT_REPORT["Captions"][indx]
 
     # map
     pic = "Map"
@@ -3427,7 +3430,16 @@ if INPUT["DataBase"].get("create_report", {}):
     FIGURES.loc[pic, "caption"] = None
     FIGURES.loc[pic, "width"] = 0.4
 
+    # captions
+   # FIGURES.loc["DataSorce_global_page_1", "caption"] = "General databasis parameters"
+
+    for indx in FIGURES.index:
+        if indx in INPUT_REPORT["Captions"].keys():
+            FIGURES.loc[indx, "caption"] = INPUT_REPORT["Captions"][indx]
+
+
     FIGURES.loc[:, "path"] = [string.replace("\\", "/") for string in FIGURES.loc[:, "path"] if type(string) is str]
+
 
     # Crete TEX content
     TEX = {}
@@ -3496,6 +3508,12 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter] = TEMPLATES[chapter]
     TEX[chapter_main], last_idx = ltx.include_include(TEX[chapter_main], chapter, line=last_idx + 1)
 
+    if INPUT["RWI"]["gamma"] == 'torset':
+        TEX[chapter] = ltx.insertLatexVars(TEX[chapter], {"Jonswap_gamma": INPUT_REPORT["GeneralTheorie"]["gamma_toreset"]})
+
+    if INPUT["RWI"]["gamma"] == 'default':
+        TEX[chapter] = ltx.insertLatexVars(TEX[chapter], {"Jonswap_gamma": INPUT_REPORT["GeneralTheorie"]["gamma_default"]})
+
     # Sensors
     chapter = "SensorAnalysis"
     TEX[chapter_main], _ = ltx.include_include(TEX[chapter_main], chapter)
@@ -3522,7 +3540,6 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Roseplots_currents_page_1"] if "Roseplots_currents_page_1" in FIGURES.index else None)
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["angle_deviation_scatter_page_1"] if "angle_deviation_scatter_page_1" in FIGURES.index else None)
 
-    # Data correlation
     chapter = "DataCorrelation"
     TEX[chapter] = TEMPLATES[chapter]
     TEX[chapter_main], _ = ltx.include_include(TEX[chapter_main], chapter)
@@ -3597,16 +3614,16 @@ if INPUT["DataBase"].get("create_report", {}):
         FIGURES.loc[[f"Extreme_T_return_{sensor_group_name}_page_3"], "caption"] = f"Return periods of extreme values of {sensor_group_name_clean} with extrapolation, omnidirectional"
         FIGURES.loc[f"T_return_table_{sensor_group_name}_page_1", "caption"] = f"Return periods of {sensor_group_name_clean}"
 
-        FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_1", "caption"] = f"Extreme Values of {sensor_group_name_clean}, directional distribution A"
-        FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_2", "caption"] = f"Extreme Values of {sensor_group_name_clean}, directional distribution B"
+        FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_1", "caption"] = f"Extreme Values of {sensor_group_name_clean}, directional distribution part A"
+        FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_2", "caption"] = f"Extreme Values of {sensor_group_name_clean}, directional distribution part B"
 
         FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_1", "caption"] = f"Comparison of real and theoretical extreme values of {sensor_group_name_clean}, directional distribution A"
         FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_2", "caption"] = f"Comparison of real and theoretical extreme values of {sensor_group_name_clean}, directional distribution B"
 
         FIGURES.loc[[
-            f"Extreme_T_return_{sensor_group_name}_page_1"], "caption"] = f"Return periods of extreme values of {sensor_group_name_clean} with extrapolation, directional distribution A"
+            f"Extreme_T_return_{sensor_group_name}_page_1"], "caption"] = f"Return periods of extreme values of {sensor_group_name_clean} with extrapolation, directional distribution part A"
         FIGURES.loc[[
-            f"Extreme_T_return_{sensor_group_name}_page_2"], "caption"] = f"Return periods of extreme values of {sensor_group_name_clean} with extrapolation, directional distribution B"
+            f"Extreme_T_return_{sensor_group_name}_page_2"], "caption"] = f"Return periods of extreme values of {sensor_group_name_clean} with extrapolation, directional distribution part B"
 
         temp = ltx.include_Fig(template, FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_3"])
         temp = ltx.include_Fig(temp, FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_3"])
@@ -3633,7 +3650,7 @@ if INPUT["DataBase"].get("create_report", {}):
 
     TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Resonance_compare_page_1"])
 
-    TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc[f"RWI_wind_page_1"], FIGURES.loc[f"RWI_wind_page_2"]])
+#    TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc[f"RWI_wind_page_1"], FIGURES.loc[f"RWI_wind_page_2"]])
 
     # BreakingWaves
     chapter = "BreakingWaves"
@@ -3656,8 +3673,7 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Report_table_VMHS_example_page_1"])
     TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Sensor_Original_page_1"])
 
-    TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc[f"angle_deviation_table_page_1"],
-                                                       FIGURES.loc[f"angle_deviation_table_page_1"],
+    TEX[chapter] = ltx.include_MultiTab(TEX[chapter],[FIGURES.loc[f"angle_deviation_table_page_1"],
                                                        FIGURES.loc[f"angle_deviation_table_page_2"],
                                                        FIGURES.loc[f"angle_deviation_table_page_3"],
                                                        FIGURES.loc[f"angle_deviation_table_page_4"],

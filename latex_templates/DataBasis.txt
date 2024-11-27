@@ -11,7 +11,7 @@ Meta information of the time series data sets considered in this document are sp
 
 
 \subsection{Data resampling} 
-The timestep of ?CombinedTimestep is chosen for all calculations. Deviating timesteps must be sampled down to be processed. For this, the mean of all measurements corresponding to one timestep of is used.
+The timestep of ?CombinedTimestep is chosen for all calculations. Deviating timesteps must be sampled down to be processed. For this, the mean of all measurements corresponding to to this timeframe is used.
 Even if the timeframes of the datasets are differing, all available data is resampled. For the individual calculations, on the other hand, only the data present in all needed databasis are loaded. \\
 \\
 In Table \ref{tab:DataSorce_ResamplingTable_page_1} below the sampling rates and the resulting numbers of samples as well as the timeframes of the original and the combined datasets are listed.

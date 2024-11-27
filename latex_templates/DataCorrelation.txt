@@ -77,8 +77,7 @@ The equivalent peak period $T_p$ vs. significant wave height $H_s$ is condensed 
 \end{itemize}
 
 
-The assignment of the quantile functions to the respective periods is dependent on the expected 1st natural period bandwidth of the global configuration ($f_{low}$ and $f_{up}$) of the first global bending mode $f_0$.
-Using this approach, peak periods outside the period bandwidth are chosen closer to the first bending mode period (slightly conservative), while the best estimate fit is applied in the specified bandwidth. 
+The assignment of the quantile functions to the respective periods is dependent on the expected 1st natural period bandwidth of the global configuration ($f_{low}$ and $f_{up}$) of the first global bending mode $f_0$. Using this approach, peak periods outside the period bandwidth are chosen closer to the first bending mode period (slightly conservative), while the best estimate fit is applied in the specified bandwidth. 
 
 ?TABLE
 
@@ -100,7 +99,7 @@ For this, the function $H_{s}\left(v_{m}\right)$ (\ref{fig:VMTP_theory}, left) i
 ?FIG
 
 \subsubsection{Summary tables of normal sea state conditions}
-For the final condensation of the sea state-parameters the $H_s$ and $T_p$ values are determined using the $H_s(V_s)$ and $T_p(V_m)$ correlations. Therefore, the (mostly finer gridded) correlations found before are used to interpolate the data on the desired $v_m$ - grid. The values are only calculated in the $v_m$ - range with data given. Bins inside the evaluated limits with zero datapoints are greyed out. The results are displayed in the Tables \ref{tab:table_vmhs_wind_page_1} and \ref{tab:table_vmtp_wind_page_1} for wind sea and Tables \ref{tab:table_vmhs_swell_page_1} and \ref{tab:table_vmtp_swell_page_1} for swell sea. 
+For the final condensation of the sea state-parameters the $H_s$ and $T_p$ values are determined using the $H_s(v_m)$ and $T_p(v_m)$ correlations. Therefore, the (mostly finer gridded) correlations found before are used to interpolate the data on the desired $v_m$ - grid. The values are only calculated in the $v_m$ - range with data given. Bins inside the evaluated limits with zero datapoints are greyed out. The results are displayed in the Tables \ref{tab:table_vmhs_wind_page_1} and \ref{tab:table_vmtp_wind_page_1} for wind sea and Tables \ref{tab:table_vmhs_swell_page_1} and \ref{tab:table_vmtp_swell_page_1} for swell sea. 
 
 ?TABLE
 ?TABLE
@@ -110,22 +109,27 @@ For the final condensation of the sea state-parameters the $H_s$ and $T_p$ value
 \subsection{Proof of condensation method}
 \label{sec:condensation_method}
 
-The proof of the condensation method for normal sea state parameter is provided in this section in detail. A reference structural \ac{FE} model (\cite{Structure}) of the intended \ac{WTG} and foundation configuration has been set up for this purpose. Using a frequency domain approach, \acp{DEL} of the bending moment at decisive elevations are calculated for each individual sea state sample in the data set.
+The proof of the condensation method for normal sea state parameter is provided in this section in detail. A reference structural \ac{FE} model (\cite{Structure}) of the intended \ac{WTG} and foundation configuration has been set up for this purpose. Using a frequency domain approach, DEL's of the bending moment at decisive elevations are calculated for each individual sea state sample in the data set.
 \\
 \\
- \acp{DEL} are applied to equate the fatigue damage represented by rainflow cycle counted data to that caused by a single stress range repeating at a single frequency. The method is based on the Miner's rule. The damage equivalent load is given by the following formula:
+ DEL's are applied to equate the fatigue damage represented by rainflow cycle counted data to that caused by a single stress range repeating at a single frequency. The method is based on the Miner's rule. The damage equivalent load is given by the following formula:
 
 \begin{align}
 L_{N}(m)=\sqrt[m]{\frac{\sum_{i=1}^{k} L_{i}^{m} n_{i}}{N}}
 \end{align}
 
 where:\\
-\quad $ L_{N} $ \quad is the equivalent stress for $N$ cycles in the specified design life\\
-\quad $ L_{i} $ \quad is the stress range bin $i$\\
-\quad $ n_{i} $ \quad is the number of rain flow cycles at stress range bin $i$\\
-\quad $ k $ \quad  is the number of bins\\
-\quad $ m $ \quad  is the negative inverse of the slope on the material's Woehler curve (m is also referred to as the S-N curve slope) \\
-\quad $ N $ \quad  is the reference number of cycle repetitions \\
+
+\begin{itemize}[label={}]
+
+	\item $ L_{N} $ \quad is the equivalent stress for $N$ cycles in the specified design life\\
+	\item $ L_{i} $ \quad is the stress range bin $i$\\
+	\item $ n_{i} $ \quad is the number of rain flow cycles at stress range bin $i$\\
+	\item $ k $ \quad  is the number of bins\\
+	\item $ m $ \quad  is the negative inverse of the slope on the material's Woehler curve ($m$ is also referred to as the S-N curve slope) \\
+	\item $ N $ \quad  is the reference number of cycle repetitions \\
+
+\end{itemize}
 
 The stress, $L_{i}$ depends upon the geometry of the structure. It is assumed that stress is proportional to load, therefore it is acceptable to use load instead of stress in the above equation.
 \\

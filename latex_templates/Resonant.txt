@@ -3,21 +3,20 @@
 
 Dynamic sea state resonance shall be analysed especially for low frequent wind turbine configurations. The identification of the sea state that creates highest excitation loads can be performed in two ways.\\
 \\
-\begin{itemize} 
-\item a) Dynamic fatigue loads are proportional to $\sqrt{S_{\zeta \zeta}\left(\omega_{0}\right)}$, where $S_{\zeta \zeta\left(\omega_{0}\right)}$ is the spectral energy of the wave spectrum at first eigenfrequency (see Figure \ref{fig:RWI_wind_page_3}). This can be derived from frequency domain calculations for a narrow band response, which is a good approximation in case dynamic excitation is significant. It is denoted as (\ac{RWI}).\\
+\begin{itemize}[label={}]
+\item a) Dynamic fatigue loads are proportional to $\sqrt{S_{\zeta \zeta}\left(\omega_{0}\right)}$, where $S_{\zeta \zeta\left(\omega_{0}\right)}$ is the spectral energy of the wave spectrum at first eigenfrequency (see Figure \ref{fig:RWI_wind_page_3}). This can be derived from frequency domain calculations for a narrow band response, which is a good approximation in case dynamic excitation is significant. It is denoted as \ac{RWI}.\\
 \end{itemize}
 
 ?FIG 
 
-\begin{itemize} 
+\begin{itemize}[label={}]
 
-\item b) Assessment of frequency domain \ac{DEL} of the bending moment at mudline for idling conditions using modal superposition.\\
+\item b) Assessment of frequency domain \ac{DEL} of the bending moment at seabed level for idling conditions using modal superposition.\\
 \end{itemize}
 
 ?FIG
 
-A comparison of the most \acp{SSS} is shown in Table \ref{tab:Resonance_compare_page_1} and the results for every wind sea sector is shown in Figure \ref{fig:RWI_wind_page_1} and \ref{fig:RWI_wind_page_2}. 
+A comparison of the derived sea state parameters of both approaches is shown in Table \ref{tab:Resonance_compare_page_1} and the results for every wind sea sector is shown in Figure \ref{fig:RWI_wind_page_1} and \ref{fig:RWI_wind_page_2}. 
 
 ?TABLE 
 
-?MULTIFIG

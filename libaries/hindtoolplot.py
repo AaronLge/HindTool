@@ -891,6 +891,7 @@ def table(data,  **kwargs):
     cell_width = kwargs.get('cell_width', None)
     cell_width_unit = kwargs.get('cell_width_unit', 'relative')
     use_pgf = kwargs.get('use_pgf', False)
+    simple_zero = kwargs.get('simple_zero', True)
 
     rcParams['font.family'] = 'sans-serif'
     rcParams['font.sans-serif'] = 'Arial'
@@ -1024,7 +1025,7 @@ def table(data,  **kwargs):
                 if np.isnan(float(CELLS[i, j])):
                     if nans is not None:
                         table[(i, j)].get_text().set_text(nans)
-                if float(CELLS[i, j]) == 0:
+                if float(CELLS[i, j]) == 0 and simple_zero:
                     if null is not None:
                         table[(i, j)].get_text().set_text(null)
 
@@ -1468,7 +1469,7 @@ def plot_table_condesation(Segments, figsize=(8.268, 11.693), titel=None):
 
     vm = Segments.result[0].result["vm"].values
 
-    FIG = table(DATA, collabels=columns, rowlabels=vm, titel=titel, grey=GREY, row_label_name='v_m in [m/s]', formater=".2f", figsize=figsize)
+    FIG = table(DATA, collabels=columns, simple_zero=False, rowlabels=vm, titel=titel, grey=GREY, row_label_name='v_m in [m/s]', formater=".2f", figsize=figsize)
 
     return FIG
 

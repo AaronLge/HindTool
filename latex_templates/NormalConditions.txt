@@ -7,7 +7,7 @@ In this section, the normal conditons are calculated.
 For each directional set a Weibull distribution (\cite{Gumb58}) is fitted for the parameters shape parameter $k$, the scale parameter $A$ and the horizontal displacement $loc$ with the log likelihood method (see Table \ref{tab:Weibull_table_page_1}. The Weibull distribution is described with:
 
 \begin{align}
-p(x, k, A)=\frac{k}{A}\left(\frac{x}{A}\right)^{k-1} e^{-\left(\frac{V}{A}\right)^k}
+p(x, k, A, loc)=\frac{k}{A}\left(\frac{x-loc}{A}\right)^{k-1} e^{-\left(\frac{x-loc}{A}\right)^k}
 \end{align}
 
 \ref{fig:Weibull_v_m over dir_v_m_page_2} shows the omnidirectional and \ref{fig:Weibull_v_m over dir_v_m_page_1} and \ref{fig:Weibull_v_m over dir_v_m_page_2} the directional distribution of the weibull analysis. 

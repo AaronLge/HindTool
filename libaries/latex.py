@@ -4,6 +4,7 @@ import os
 import subprocess
 import time
 from threading import Thread
+
 def insertLatexVars(string, replacements):
     """Wrapper for 'gl.alias' function to replace variables in string with replacements.#
         '?' + replacements.keys() as original
@@ -155,7 +156,7 @@ def include_Fig(string, FigInfo):
                                  "4": f"{FigInfo['width']}"})
 
     else:
-        figure_latex = '\n \\ \\ \\ no data available  \\ \\ \\ \n'
+        figure_latex = 'No data available. \n'
 
     lines = find_keyword(string, '?FIG')
     string_out, _ = include_str(string, figure_latex, line=lines[0], replace=True)
@@ -195,6 +196,39 @@ def include_MultiFig(string, FigInfo):
 
     return string_out
 
+
+def include_MultiTab(string, FigInfo):
+
+    figure_template = ("\\begin{figure}[H] \n "
+                       "\\captionsetup{type=table} \n"
+                       "\\caption{ \\textit{?CAPTION}} \n "
+                       "\\includegraphics[width=?FIGURE_WIDTH\\textwidth ]{?FIGURE_PATH} \n "
+                       "\\label{tab:?FIGURE_NAME} \n"
+                       "\\end{figure}")
+
+    temp = []
+
+    FigInfo = [info for info in FigInfo if info is not None]
+    fig_string = ""
+
+    for Fig in FigInfo:
+        figure_latex = gl.alias(figure_template,
+                                {"1": "?FIGURE_PATH",
+                                 "2": "?CAPTION",
+                                 "3": "?FIGURE_NAME",
+                                 "4": "?FIGURE_WIDTH"},
+                                {"1": Fig["path"],
+                                 "2": Fig["caption"],
+                                 "3": Fig.name,
+                                 "4": f"{Fig['width']}"})
+
+        temp.append(figure_latex)
+        fig_string = "\n".join(temp)
+
+    lines = find_keyword(string, '?MULTITAB')
+    string_out, _ = include_str(string, fig_string, line=lines[0], replace=True)
+
+    return string_out
 
 def include_TableFig(string, FigInfo):
     figure_template = ("\\begin{figure}[H] \n "

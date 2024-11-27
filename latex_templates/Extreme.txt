@@ -17,7 +17,7 @@ P_{G u m b}=\exp \left(-\exp \left(-\frac{x-\mu} {\beta}\right)\right) \\
 \end{align}
 
 
-where the standard deviation is denoted as $\sigma$, the mean value as $\bar{x}$ and the Euler-Mascheroni constant $\gamma \approx 0.5772$ . The theoretical probability $P_{th}$ is calculated as the quantile of each of the $N$ (sorted) datapoints, following the Gumbel distribution, by using the formula:
+where the standard deviation is denoted as $\sigma$, the mean value as $\bar{x}$ and the Euler-Mascheroni constant $\gamma \approx 0.5772$. The theoretical probability $P_{th}$ is calculated as the quantile of each of the $N$ (sorted) datapoints, following the Gumbel distribution, by using the formula:
 
 \begin{align}
     P_{t h}=\frac{n-0.5}{N}, n=1 \ldots N

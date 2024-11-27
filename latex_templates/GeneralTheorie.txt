@@ -20,7 +20,7 @@ document.
 
 \subsection{Relevant oceanographic design conditions}
 An overview of the requirements for the oceanographic conditions in the design of offshore substructures, according to
-the load case descriptions in \cite{DNV-ST_0437} and/or \cite{IEC_61400_3_1} is provided below. It is distinguished between normal conditions and
+the load case descriptions in \cite{DNV-ST_0437} and/or \cite{IEC_61400_3_1}, is provided below. It is distinguished between normal conditions and
 extreme conditions.
 
 \subsubsection{Normal oceanographic conditions}
@@ -38,11 +38,11 @@ The below normal conditions are relevant:
 The below extreme conditions are relevant:
 
 \begin{itemize}
-	\item storm~surge,~50-year~and~5-year~return~period (highest and lowest still~water~level)
-	\item current~speed,~50-year~and~5-year~return~period
-	\item 1-hourly~significant~wave~height,~50-year~and~5-year~return~period (extreme sea state)
-	\item 1-hourly~maximum~individual~wave~height,~50-year~and~5-year~return~period
-	\item 1-hourly~maximum~crest~elevation,~50-year~and~5-year~return~period
+	\item storm~surge,~50-year, 10-year~and~5-year~return~period (highest and lowest still~water~level)
+	\item current~speed,~50-year, 10-year~and~5-year~return~period
+	\item 1-hourly~significant~wave~height,~50-year, 10-year~and~5-year~return~period (extreme sea state)
+	\item 1-hourly~maximum~individual~wave~height,~50-year, 10-year~and~5-year~return~period
+	\item 1-hourly~maximum~crest~elevation,~50-year, 10year~and~5-year~return~period
 	\item breaking~wave~probability
 	\item 1-hourly~significant~wave~height and associated period for resonant sea state conditions 
 \end{itemize}
@@ -64,8 +64,14 @@ are superposed.\\
 Where a wave spectrum will be considerd for normal and extreme conditinos (\ac{ESS}, \ac{NSS}, \ac{SSS}), the irregular sea states are
 described according to the JONSWAP spectrum definitions in \cite{DNV-ST_0437}:
 
+
 \begin{equation}
 S_{J S}(f)=0.3125 \cdot H_s^2 \cdot T_p \cdot\left(\frac{f}{f_p}\right)^{-5} \cdot \exp \left(-1.25 \cdot\left(\frac{f}{f_p}\right)^{-4}\right) \cdot(1-0.287 \cdot \ln \gamma) \cdot \gamma^{\exp \left(-0.5 \cdot\left(\frac{f-f_p}{\sigma \cdot f_p}\right)^2\right)}
 \end{equation}
 
-with significant wave height $H_s$, peak period $T_p$ , peak frequency $f_p=\frac{1}{T_p}$. The peak-enhancement factor $\gamma$ and spectral width parameter $\sigma$ is also applied according to \cite{DNV-ST_0437}. 
+with significant wave height $H_s$, peak period $T_p$ , peak frequency $f_p=\frac{1}{T_p}$. The peak-enhancement factor $\gamma$ and spectral width parameter $\sigma$ is applied according to \cite{DNV-ST_0437}.  
+
+
+$\sigma$ is defined as $\sigma = 0.07$ for $f < f_p$ and $\sigma = 0.09$ for $f > f_p$. 
+
+?Jonswap_gamma
