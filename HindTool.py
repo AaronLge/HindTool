@@ -2595,6 +2595,23 @@ if INPUT["DataBase"].get("create_report", {}):
     png_names = [name.removesuffix('.png') for name in png_files]
     png_width = [0.5 if 'Roseplots' in png_name else 1 for png_name in png_names]
 
+
+    FIGURES = pd.DataFrame(columns=["filename", "path", "caption", "width"])
+    FIGURES["filename"] = png_files
+    FIGURES["width"] = png_width
+    FIGURES["path"] = png_paths
+
+    FIGURES["caption"] = [name.replace('_', '-') for name in png_names]
+
+    FIGURES.index = png_names
+
+    # captions
+    FIGURES.loc["DataSorce_global_page_1", "caption"] = "General databasis parameters"
+
+    for indx in FIGURES.index:
+        if indx in INPUT_REPORT["Captions"].keys():
+            FIGURES.loc[indx, "caption"] = INPUT_REPORT["Captions"][indx]
+
     # map
     pic = "Map"
     FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
@@ -2640,49 +2657,24 @@ if INPUT["DataBase"].get("create_report", {}):
         if indx in INPUT_REPORT["Captions"].keys():
             FIGURES.loc[indx, "caption"] = INPUT_REPORT["Captions"][indx]
 
-
-    FIGURES.loc[:, "path"] = [string.replace("\\", "/") for string in FIGURES.loc[:, "path"] if type(string) is str]
-
+    FIGURES.loc[:, "path"] = [string.replace("\\", "/") for string in FIGURES.loc[:, "path"]]
 
     # Crete TEX content
     TEX = {}
 
-    # main
-    chapter_main = 'main'
-    TEX[chapter_main] = ltx.insertLatexVars(TEMPLATES[chapter_main], INPUT_REPORT["DocumentMeta"])
+    Revision_data = [INPUT_REPORT["DocumentMeta"][key] for key in INPUT_REPORT["DocumentMeta"].keys()]
+    Revisions = pd.DataFrame(data=Revision_data, columns=["Rev. JBO", "Rev. Employer", "Date", "Description"])
 
-    if INPUT_REPORT["Biblografy"]["BIBDatasets"] == 'auto':
-        INPUT_REPORT["Biblografy"]["BIBDatasets"] = os.path.abspath(db_path) + "/datasets.bib"
+    Biblografys = [INPUT_REPORT["DocumentMeta"][key] for key in INPUT_REPORT["DocumentMeta"].keys()]
 
-    TEX[chapter_main] = ltx.insertLatexVars(TEX[chapter_main], INPUT_REPORT["Biblografy"])
-
-    # load acronyms
-    with open(INPUT_REPORT["General"]["acronym_path"], 'r') as f:
-        acros = f.read()
-
-    TEX[chapter_main] = ltx.insertLatexVars(TEX[chapter_main], {"ACRONYMS": acros})
-
-    # Titlepage
-    chapter = 'titlepage'
-
-    TEX[chapter] = ltx.insertLatexVars(TEMPLATES[chapter], INPUT_REPORT["DocumentMeta"])
-    TEX[chapter_main], last_idx = ltx.include_include(TEX[chapter_main], chapter)
-
-    TEX[chapter_main], last_idx = ltx.include_str(TEX[chapter_main], '\\pagestyle{fancy}', last_idx + 1)
-
-    # Introduction
-    chapter = 'Introduction'
-    TEX[chapter] = TEMPLATES[chapter]
-    TEX[chapter_main], last_idx = ltx.include_include(TEX[chapter_main], chapter, line=last_idx + 1)
-    TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Revision_Table_page_1"])
-    TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Status_table"])
-    TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Map"])
-
-    TEX[chapter] = ltx.insertLatexVars(TEX[chapter], INPUT_REPORT[chapter])
-
+    TEX["main"], TEX["Titlepage"], TEX["Introduction"] = ltx.initilize_document(INPUT_REPORT["DocumentMeta"],
+                                                                                Revisions,
+                                                                                Biblografys,
+                                                                                INPUT_REPORT["General"]["acronym_path"],
+                                                                                path_report)
     # Data Basis
     chapter = 'DataBasis'
-    TEX[chapter_main], last_idx = ltx.include_include(TEX[chapter_main], chapter, line=last_idx + 1)
+    TEX["main"], last_idx = ltx.include_include(TEX["main"], chapter)
 
     TEX[chapter] = TEMPLATES[chapter]
     TEX[chapter] = ltx.insertLatexVars(TEX[chapter], {"CombinedTimestep": f"{Meta_data.loc['Combined', 'Time Step']} s"})
@@ -2709,7 +2701,7 @@ if INPUT["DataBase"].get("create_report", {}):
     # General Theorie and Definitions
     chapter = 'GeneralTheorie'
     TEX[chapter] = TEMPLATES[chapter]
-    TEX[chapter_main], last_idx = ltx.include_include(TEX[chapter_main], chapter, line=last_idx + 1)
+    TEX["main"], last_idx = ltx.include_include(TEX["main"], chapter, line=last_idx + 1)
 
     if INPUT["RWI"]["gamma"] == 'torset':
         TEX[chapter] = ltx.insertLatexVars(TEX[chapter], {"Jonswap_gamma": INPUT_REPORT["GeneralTheorie"]["gamma_toreset"]})
@@ -2719,7 +2711,7 @@ if INPUT["DataBase"].get("create_report", {}):
 
     # Sensors
     chapter = "SensorAnalysis"
-    TEX[chapter_main], _ = ltx.include_include(TEX[chapter_main], chapter)
+    TEX["main"], _ = ltx.include_include(TEX["main"], chapter)
     TEX[chapter] = ltx.include_TableFig(TEMPLATES[chapter], FIGURES.loc["Sensor_names_page_1"])
 
     # include sensor ilustrations
@@ -2745,7 +2737,7 @@ if INPUT["DataBase"].get("create_report", {}):
 
     chapter = "DataCorrelation"
     TEX[chapter] = TEMPLATES[chapter]
-    TEX[chapter_main], _ = ltx.include_include(TEX[chapter_main], chapter)
+    TEX["main"], _ = ltx.include_include(TEX["main"], chapter)
     TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Report_table_VMHS_page_1"])
     TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Report_table_HSTP_page_1"])
 
@@ -2787,7 +2779,7 @@ if INPUT["DataBase"].get("create_report", {}):
     FIGURES.loc["Weibull_table_page_1", "caption"] = f"Weibull fit of {SENSORS_REPORT.loc['v_m', 'Alias']}"
 
     TEX[chapter] = TEMPLATES[chapter]
-    TEX[chapter_main], _ = ltx.include_include(TEX[chapter_main], chapter)
+    TEX["main"], _ = ltx.include_include(TEX["main"], chapter)
 
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc[f"Weibull_v_m over dir_v_m_page_3"])
     TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Weibull_table_page_1"])
@@ -2796,7 +2788,7 @@ if INPUT["DataBase"].get("create_report", {}):
     # Extreme
     chapter = "Extreme"
     TEX[chapter] = TEMPLATES[chapter]
-    TEX[chapter_main], _ = ltx.include_include(TEX[chapter_main], chapter)
+    TEX["main"], _ = ltx.include_include(TEX["main"], chapter)
 
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Extreme_Timeseries_Example"])
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["Extreme_qq_example"])
@@ -2845,7 +2837,7 @@ if INPUT["DataBase"].get("create_report", {}):
     # resonant seastate
     chapter = "Resonant"
     TEX[chapter] = TEMPLATES[chapter]
-    TEX[chapter_main], _ = ltx.include_include(TEX[chapter_main], chapter)
+    TEX["main"], _ = ltx.include_include(TEX["main"], chapter)
 
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["RWI_wind_page_3"])
 
@@ -2858,20 +2850,20 @@ if INPUT["DataBase"].get("create_report", {}):
     # BreakingWaves
     chapter = "BreakingWaves"
     TEX[chapter] = TEMPLATES[chapter]
-    TEX[chapter_main], last_idx = ltx.include_include(TEX[chapter_main], chapter)
+    TEX["main"], last_idx = ltx.include_include(TEX["main"], chapter)
 
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["WaveBreak_wind_page_3"])
 
     TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc[f"WaveBreak_wind_page_1"], FIGURES.loc[f"WaveBreak_wind_page_2"]])
 
     # list of figures
-    TEX[chapter_main], last_idx = ltx.include_str(TEX[chapter_main], '\\listoffigures', last_idx + 1)
-    TEX[chapter_main], last_idx = ltx.include_str(TEX[chapter_main], '\\listoftables \\newpage', last_idx + 1)
+    TEX["main"], last_idx = ltx.include_str(TEX["main"], '\\listoffigures', last_idx + 1)
+    TEX["main"], last_idx = ltx.include_str(TEX["main"], '\\listoftables \\newpage', last_idx + 1)
 
     # Appendix
     chapter = "Annex"
     TEX[chapter] = TEMPLATES[chapter]
-    TEX[chapter_main], _ = ltx.include_include(TEX[chapter_main], chapter, line=last_idx + 1)
+    TEX["main"], _ = ltx.include_include(TEX["main"], chapter, line=last_idx + 1)
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["VMHS_example_page_1"])
     TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Report_table_VMHS_example_page_1"])
     TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Sensor_Original_page_1"])
