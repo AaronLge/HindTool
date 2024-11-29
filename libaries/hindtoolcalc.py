@@ -42,8 +42,42 @@ class Segment:
 
 
 class Calculation:
+    """
+    A class for performing calculations and filtering operations on data stored in a SQL database.
 
+    Attributes:
+        result (any): The result of a calculation or operation.
+        basedata (dict): Metadata about the data, such as database name, table name, and sample rate.
+        filters (list): A list of filters applied to the data.
+
+    Methods:
+        __init__(self, result=None, basedata=None, filters=None):
+            Initializes the Calculation instance with optional result, basedata, and filters.
+
+        initilize_from_db(self, db_path, table_name, colnames, **kwargs):
+            Initializes a dataframe by loading data from a SQL database, with optional filtering by timeframe.
+
+        add_filter(self, colnames=None, mode='range', ranges=None):
+            Adds a filter to the data based on column names and value ranges, and stores the filter in the filters list.
+
+        apply_filters(self, apply_only=None):
+            Applies all added filters and returns the common datetime indices that satisfy all filters.
+
+        create_segment_title(self, mode='verbose', latex=True):
+            Generates titles for segments in the result data, with different verbosity and LaTeX formatting options.
+
+        load_from_db(self, column_names=None, applie_filt=True, colnames_ini=False, indizes=None):
+            Loads a dataframe from the SQL database, optionally applying filters and selecting specific indices.
+    """
     def __init__(self, result=None, basedata=None, filters=None):
+        """
+        Initializes the Calculation instance with optional result, basedata, and filters.
+
+        Args:
+            result (any, optional): The result of a calculation or operation.
+            basedata (dict, optional): A dictionary containing metadata about the data.
+            filters (list, optional): A list of filters to apply to the data.
+        """
         self.result = result
 
         self.basedata = basedata
@@ -53,12 +87,21 @@ class Calculation:
         self.filters = filters
 
     def initilize_from_db(self, db_path, table_name, colnames, **kwargs):
-        """initilizes dataframe from sql database at "db_path" by loading the colims specified by colnames in the table "table_name". If colnames is None, all columns are loaded
-         Returns dataframe
+        """
+        Initializes the calculation parameters by loading data from a SQL database, with optional filtering by timeframe.
 
-         optional:
-         timeframe: list of two datetime objects specifying the start and end time of the data to be evaluated
-         """
+        Args:
+            db_path (str): Path to the database.
+            table_name (str): The name of the table to load.
+            colnames (list of str): The columns to load from the table.
+            **kwargs: Optional keyword arguments, including:
+                - timeframe (list): A list of two datetime objects specifying the start and end time.
+                - indizes (datetime index): A custom set of indices to load.
+
+        Returns:
+            pd.DataFrame: The loaded dataframe.
+
+        """
 
         timeframe = kwargs.get('timeframe', None)
         indizes = kwargs.get('indizes', None)
@@ -94,13 +137,14 @@ class Calculation:
          colnames: colnames
          ranges: ranges
 
-        INPUT:
-        colnames: list of stings, columnames to filter by in Dataframe
-        ranges: list of lists, list containing len(colnames) elements of length 2, in fomrmat [a_min, a_max] specifing the range of the filtered data
-                if a_max is None, maximal value of the correspnding values of column spcified by colname in with same index used
+        Args:
+            colnames (list of str, optional): A list of column names to filter by.
+            mode (str, optional): The mode of filtering ('range' or 'nans'). Default is 'range'.
+            ranges (list of lists, optional): The ranges of values to filter by, if mode is 'range'.
 
-        retrun:
-        indizes: datetime index object, with all indizies still in the filtered list"""
+        Returns:
+            dict: The filter information, including indices included and excluded by the filter.
+        """
 
         indizes_full = self.basedata["indizes"]
 
@@ -144,6 +188,17 @@ class Calculation:
         return filt
 
     def apply_filters(self, apply_only=None):
+        """
+        Applies all added filters and returns the common datetime indices that satisfy all filters.
+
+        Args:
+            apply_only (list, optional): A list of filter indices to apply. If None, applies all filters.
+
+        Returns:
+            list: A sorted list of datetime indices that satisfy all filters.
+
+        """
+
         if self.filters is None:
             print("no filters specified")
             return
@@ -168,9 +223,18 @@ class Calculation:
         return sorted(common_dates)
 
     def create_segment_title(self, mode='verbose', latex=True):
-        """"if the data stored in result is list of "Segment",  it exports a list of title in Latex format
-            if mode='general', Segment.basedata has to be initilized
-        """""
+        """
+        Generates titles for segments in the result data, with different verbosity and LaTeX formatting options.
+        Segment.basedata has to be initilized
+
+        Args:
+            mode (str, optional): The mode for generating titles ('verbose', 'standard', or 'sparse'). Default is 'verbose'.
+            latex (bool, optional): Whether to format the titles in LaTeX. Default is True.
+
+        Returns:
+            list of str: A list of segment titles.
+
+        """
 
         titles = []
         for segment_curr in self.result:
@@ -220,7 +284,18 @@ class Calculation:
         return titles
 
     def load_from_db(self, column_names=None, applie_filt=True, colnames_ini=False, indizes=None):
-        """wrapper for export_df_from_sql in general lib, takes db_name and tablename from Calcul,ation information, applies filter if it is there"""
+        """
+        Loads a dataframe from the SQL database, optionally applying filters and selecting specific indices.
+
+        Args:
+            column_names (list of str, optional): The column names to load. Defaults to None.
+            applie_filt (bool, optional): Whether to apply filters. Default is True.
+            colnames_ini (bool, optional): Whether to use the initial column names from the basedata. Default is False.
+            indizes (datetime index, optional): A list of specific indices to load. Default is None.
+
+        Returns:
+            pd.DataFrame: The loaded dataframe.
+        """
         if colnames_ini:
             column_names = self.basedata["colnames_ini"]
 
@@ -247,18 +322,6 @@ class Calculation:
         df = gl.export_df_from_sql(self.basedata["dbname"], self.basedata["tablename"], column_names=column_names, indizes=indx_requested)
 
         return df
-
-
-class DataCol:
-    def __init__(self, name_data=str(), name_plot=str(), db_name=None, table_raw=None, symbol=None):
-        self.name_data = name_data
-        self.name_plot = name_plot
-        self.db_name = db_name
-
-        if table_raw is None:
-            self.table_raw = []
-
-        self.symbol = symbol
 
 
 # %% general functions

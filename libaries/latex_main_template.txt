@@ -6,9 +6,10 @@
 \usepackage{lastpage}
 \usepackage{lipsum}
 \usepackage{multirow}  
+\usepackage{enumitem}
 \usepackage{fancyhdr}
 \usepackage[htt]{hyphenat}
-\usepackage[hmargin=2cm,top=5cm,bottom=2cm,headheight=80pt,footskip=30pt]{geometry}
+\usepackage[hmargin=2cm,top=4cm,bottom=2.5cm,headheight=55pt,footskip=25pt]{geometry}
 \usepackage{xcolor, colortbl}
 \usepackage{geometry}
 \usepackage{graphicx} 

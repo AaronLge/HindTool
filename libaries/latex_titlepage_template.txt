@@ -1,4 +1,4 @@
-\newgeometry{top=3cm, bottom=2cm, left=2cm, right=2cm,headheight=10pt, footskip=0pt}
+\newgeometry{top=2cm, bottom=2cm, left=2cm, right=2cm,headheight=0pt, footskip=0pt}
 \thispagestyle{titlepage} % Use custom footer for the title page
 
 \begin{table}[]
@@ -136,7 +136,9 @@
 \begin{minipage}{\textwidth}
 
 \fontsize{14}{20}\selectfont \textbf{?Client} \\
+\fontsize{20}{25}\selectfont \textbf{?ProjectSubtitle} \\
 \fontsize{20}{25}\selectfont \textbf{?ProjectTitle} \\
+\\
 \\
 \fontsize{18}{25}\selectfont \textbf{?DocumentType} \\
 \textcolor{JBOGreen}{\fontsize{16}{14.4}\selectfont \textit{\textbf{?DocumentTitle}}}

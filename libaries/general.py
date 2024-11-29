@@ -1865,3 +1865,33 @@ def xlsx2csv(excel_file, output_dir, exclude_sheets=None):
         # Save the DataFrame to a CSV file
         df.to_csv(csv_file, index=False)
         print(f"Saved {sheet_name} to {csv_file}")
+
+
+def e57_2_txt(file_path, save_path =None):
+    """
+    Converts E57 point cloud files to TXT format by extracting and saving both point color
+    and point coordinate data.
+
+    Parameters:
+    -----------
+    file_path : str
+        The path to the directory containing E57 files or a specific E57 file.
+    save_path : str, optional
+        The directory where the TXT files will be saved. If not provided, files are saved
+        in the same directory as the input E57 files.
+
+    Returns:
+    --------
+    None
+
+    Notes:
+    ------
+    - Only processes files with the '.e57' extension found in the specified directory.
+    - For each E57 file:
+        - The color data of the points is scaled to a range of 0-255, rounded,
+          and saved in a file named `<basename>_color.txt`.
+        - The point coordinate data is saved in a file named `<basename>_points.txt`
+          with four decimal places.
+    - Both TXT files are saved in the specified or default output directory.
+    - Prints progress messages for each file being processed.
+    """

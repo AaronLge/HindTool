@@ -1,17 +1,33 @@
 import pandas as pd
-
-from libaries import general as gl
-from libaries import hindtoolplot as hc_plt
-
 import os
 import subprocess
 import time
 from threading import Thread
 
+from libaries import general as gl
+from libaries import hindtoolplot as hc_plt
+import shutil
+
+
+
 def insertLatexVars(string, replacements):
-    """Wrapper for 'gl.alias' function to replace variables in string with replacements.#
-        '?' + replacements.keys() as original
-        replacements.values() as replacements"""
+    """
+    Wrapper for the 'gl.alias' function to replace variables in the input string with specified replacements.
+
+    Args:
+        string (str): The input string containing variables to be replaced.
+        replacements (dict): A dictionary where keys are the variables to be replaced
+                              and values are their corresponding replacement values.
+
+    Returns:
+        str: A new string with the variables replaced by the provided replacements.
+
+    Example:
+        input_string = "This is a test with ?var1 and ?var2."
+        replacements = {"var1": "value1", "var2": "value2"}
+        output_string = insertLatexVars(input_string, replacements)
+        # output_string will be "This is a test with value1 and value2."
+    """
 
     Dummy_Orig = {Replacement_col: "?" + Replacement_col for Replacement_col in replacements.keys()}
 
@@ -21,8 +37,22 @@ def insertLatexVars(string, replacements):
 
 
 def find_keyword(string, keyword):
-    """finds lines in string in which there is the keyword"""
+    """
+    Finds the indices of lines in the input string that contain the specified keyword.
 
+    Args:
+        string (str): The input string to search within.
+        keyword (str): The keyword to search for.
+
+    Returns:
+        list: A list of indices of the lines that contain the keyword.
+
+    Example:
+        input_string = "Line 1\nLine 2 with keyword\nLine 3"
+        keyword = "keyword"
+        indices = find_keyword(input_string, keyword)
+        # indices will be [1]
+    """
     indizes = []
     lines = string.split('\n')
     for i, line in enumerate(lines):
@@ -33,15 +63,28 @@ def find_keyword(string, keyword):
 
 
 def include_include(main, Include, line=None):
-    # Read the file content
+    """
+    Inserts an `\\include{}` statement for a specified LaTeX file into the main LaTeX content.
 
-    # Initialize variables to track the position of key elements
-    begin_doc_idx = None
-    end_doc_idx = None
-    last_include_idx = None
+    Parameters:
+    -----------
+    main : str
+        The main LaTeX content as a string.
+    Include : str
+        The name of the LaTeX file (without the `.tex` extension) to include.
+    line : int, optional
+        The line number where the `\\include{}` statement should be inserted.
+        If None, the statement is inserted one line above the `\\end{document}` line.
+
+    Returns:
+    --------
+    tuple
+        - `updated_main` (str): The modified LaTeX content with the inclusion statement added.
+        - `insert_idx` (int): The index where the inclusion statement was inserted.
+    """
 
     lines = main.split('\n')
-
+    insert_idx = None
     if line is None:
         # Find the positions of "\begin{document}", "\end{document}", and the last "\include{"
         for i, line in enumerate(lines):
@@ -50,7 +93,7 @@ def include_include(main, Include, line=None):
                 insert_idx = end_doc_idx - 1
 
         # Check "\end{document}" exist
-        if end_doc_idx is None:
+        if insert_idx is None:
             raise ValueError("The file does not contain a valid LaTeX document structure.")
 
     else:
@@ -59,11 +102,27 @@ def include_include(main, Include, line=None):
     lines.insert(insert_idx, '\\include{' + f"{Include}" + "}")
 
     # Write the modified contents back to the file
-
     return '\n'.join(lines), insert_idx
 
 
 def include_str(main, string, line, replace=False):
+    """
+    Inserts or replaces a string in the specified line of the main LaTeX content.
+
+    Parameters:
+    -----------
+    main : str
+        The main LaTeX content as a string.
+    string : str
+        The string to be inserted into the LaTeX content.
+    line : int
+        The line number where the string should be inserted.
+    replace : bool, optional
+        If True, replaces the existing content at the specified line.
+        If False, the string is inserted without replacing existing content. Default is False.
+    """
+
+
     lines_include = len(string.split('\n'))
 
     # Read the file content
@@ -79,20 +138,62 @@ def include_str(main, string, line, replace=False):
 
 
 def compile_lualatex(tex_file, pdf_path=None, miktex_lualatex_path='C:/temp/MikTex/miktex/bin/x64/lualatex.exe', biber_path='C:/temp/MikTex/miktex/bin/x64/biber.exe'):
+    """
+    Compiles a LaTeX document using LuaLaTeX and Biber, ensuring all references and bibliographies are processed.
+
+    Parameters:
+    -----------
+    tex_file : str
+        The path to the `.tex` file to compile.
+    pdf_path : str, optional
+        The desired path for the output PDF. If not provided, the PDF will be saved in the same directory as `tex_file`.
+    miktex_lualatex_path : str, optional
+        Path to the LuaLaTeX executable. Defaults to 'C:/temp/MikTex/miktex/bin/x64/lualatex.exe'.
+    biber_path : str, optional
+        Path to the Biber executable. Defaults to 'C:/temp/MikTex/miktex/bin/x64/biber.exe'.
+
+    Returns:
+    --------
+    str or None
+        The path to the generated PDF if successful, or `None` if the PDF generation failed.
+
+    Notes:
+    ------
+    - LuaLaTeX is run multiple times: initially to process the document, and two additional times to update references.
+    - Biber is used to handle the bibliography, and it is executed between LuaLaTeX passes.
+    - A separate thread sends newline characters to the LuaLaTeX process periodically, which may be necessary to handle specific interactive prompts.
+
+    """
     def press_return_periodically(process):
-        # Function to send newline every second to simulate "return"
-        while process.poll() is None:  # Run as long as the process is active
+        """
+        Sends a newline character (`\\n`) to the input of a subprocess periodically.
+
+        Parameters:
+        -----------
+        process : subprocess.Popen
+            The process to which the newline character will be sent.
+        """
+        while process.poll() is None:  # Check if the process is active
             process.stdin.write('\n')
             process.stdin.flush()
             time.sleep(1)
 
     def run_subprocess(command, cwd):
+        """
+        Runs a subprocess command and handles periodic interaction with the process.
+
+        Parameters:
+        -----------
+        command : list of str
+            The command to execute as a list of arguments.
+        cwd : str
+            The working directory where the command should be executed.
+        """
         with subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, stdin=subprocess.PIPE, text=True, cwd=cwd) as process:
-            # Start a separate thread to press "return" every second
             thread = Thread(target=press_return_periodically, args=(process,))
             thread.start()
             process.wait()  # Wait for the process to complete
-            thread.join()  # Ensure the thread has finished
+            thread.join()  # Ensure the thread finishes
 
     run_path = os.path.dirname(os.path.realpath(__file__))
     txt_path = os.path.dirname(tex_file)
@@ -113,14 +214,14 @@ def compile_lualatex(tex_file, pdf_path=None, miktex_lualatex_path='C:/temp/MikT
         except Exception as e:
             print(f"Biber execution failed: {e}")
 
-    # Run LuaLaTeX two more times for references update
+    # Run LuaLaTeX two more times to update references
     for i in range(3):
         try:
             run_subprocess([miktex_lualatex_path, tex_file, '-output-directory', txt_path], cwd=txt_path)
         except Exception as e:
             print(f"LuaLaTeX pass {i + 2} failed: {e}")
 
-    # Check if the output PDF was created
+    # Verify if the output PDF was created
     if os.path.exists(output_pdf):
         print(f"PDF successfully created at: {output_pdf}")
         return output_pdf
@@ -130,6 +231,33 @@ def compile_lualatex(tex_file, pdf_path=None, miktex_lualatex_path='C:/temp/MikT
 
 
 def include_Fig(string, FigInfo):
+    """
+        Inserts a LaTeX figure into a string at a specific placeholder.
+
+        Parameters:
+        -----------
+        string : str
+            The LaTeX string where the figure should be inserted.
+        FigInfo : pandas.Series or None
+            Information about the figure to be included. Must contain the keys:
+            - "path": The file path to the figure image.
+            - "caption": The caption for the figure.
+            - "width": The width of the figure (relative to `\textwidth`).
+            - "name": The label for the figure (used for references).
+
+            If `FigInfo` is `None`, a placeholder message is inserted.
+
+        Returns:
+        --------
+        str
+            The updated LaTeX string with the figure included.
+
+        Notes:
+        ------
+        - The placeholder `?FIG` in the `string` marks where the figure will be inserted.
+        - If `FigInfo` is not provided, a default message (`No data available.`) will replace the placeholder.
+        """
+
     figure_template = ("\\begin{figure}[H] \n "
                        "\\includegraphics[width=?FIGURE_WIDTH\\textwidth]{?FIGURE_PATH} \n "
                        "\\caption{ \\textit{?CAPTION}} \n "
@@ -157,6 +285,32 @@ def include_Fig(string, FigInfo):
 
 
 def include_MultiFig(string, FigInfo):
+    """
+    Inserts multiple LaTeX figures into a string at a specific placeholder.
+
+    Parameters:
+    -----------
+    string : str
+        The LaTeX string where the figures should be inserted.
+    FigInfo : list of pandas.Series or None
+        A list containing information about each figure to be included. Each element must contain the keys:
+        - "path": The file path to the figure image.
+        - "caption": The caption for the figure.
+        - "width": The width of the figure (relative to `\textwidth`).
+        - "name": The label for the figure (used for references).
+
+        If an element in the list is `None`, it is skipped.
+
+    Returns:
+    --------
+    str
+        The updated LaTeX string with all figures included.
+
+    Notes:
+    ------
+    - The placeholder `?MULTIFIG` in the `string` marks where the figures will be inserted.
+    - Figures are formatted using a common LaTeX `figure` environment template.
+    """
 
     figure_template = ("\\begin{figure}[H] \n "
                        "\\includegraphics[width=?FIGURE_WIDTH\\textwidth]{?FIGURE_PATH} \n "
@@ -190,6 +344,32 @@ def include_MultiFig(string, FigInfo):
 
 
 def include_MultiTab(string, FigInfo):
+    """
+    Inserts multiple LaTeX table-style figures into a string at a specific placeholder.
+
+    Parameters:
+    -----------
+    string : str
+        The LaTeX string where the table-style figures should be inserted.
+    FigInfo : list of pandas.Series or None
+        A list containing information about each figure to be included. Each element must contain the keys:
+        - "path": The file path to the figure image.
+        - "caption": The caption for the figure.
+        - "width": The width of the figure (relative to `\textwidth`).
+        - "name": The label for the figure (used for references).
+
+        If an element in the list is `None`, it is skipped.
+
+    Returns:
+    --------
+    str
+        The updated LaTeX string with all table-style figures included.
+
+    Notes:
+    ------
+    - The placeholder `?MULTITAB` in the `string` marks where the figures will be inserted.
+    - Figures are formatted to appear as tables using `\captionsetup{type=table}` in the LaTeX template.
+     """
 
     figure_template = ("\\begin{figure}[H] \n "
                        "\\captionsetup{type=table} \n"
@@ -222,7 +402,35 @@ def include_MultiTab(string, FigInfo):
 
     return string_out
 
+
 def include_TableFig(string, FigInfo):
+    """
+    Inserts a single table-style figure into a LaTeX string at a specific placeholder.
+
+    Parameters:
+    -----------
+    string : str
+        The LaTeX string where the table-style figure should be inserted.
+    FigInfo : dict or None
+        A dictionary containing information about the figure to be included. Must include the keys:
+        - "path": The file path to the figure image.
+        - "caption": The caption for the figure (or None for no caption).
+        - "width": The width of the figure (relative to `\textwidth`).
+        - "name": The label for the figure (used for references).
+
+        If `FigInfo` is `None`, the function inserts an empty placeholder (`\\`).
+
+    Returns:
+    --------
+    str
+        The updated LaTeX string with the table-style figure included.
+
+    Notes:
+    ------
+    - The placeholder `?TABLE` in the `string` marks where the figure will be inserted.
+    - Figures are formatted to appear as tables using `\captionsetup{type=table}` in the LaTeX template.
+    """
+
     figure_template = ("\\begin{figure}[H] \n "
                        "\\captionsetup{type=table} \n"
                        "\\caption{ \\textit{?CAPTION}} \n "
@@ -267,46 +475,60 @@ def include_TableFig(string, FigInfo):
     return string_out
 
 
-def initilize_document(DocumentMeta, Revisions, bib_paths, acronyms_path, save_path):
+def initilize_document(DocumentMeta, Revisions, bib_paths, acronyms_path, save_path, map=None, introduction_text=None, document_purpose_text=None):
+    """
+    Initializes a JBO LaTeX document by preparing metadata, bibliographies, acronyms, and other content for rendering.
 
+    Parameters:
+    -----------
+    DocumentMeta : dict
+        Metadata for the document, including keys like "RevisionJBO", "RevisionEmployer", and "RevisionDate".
+        Values set to 'auto' will be replaced with corresponding values from the `Revisions` DataFrame.
+    Revisions : pandas.DataFrame
+        A table of revision data, where the last row provides default values for metadata fields.
+    bib_paths : list of str
+        Paths to the bibliography files to be included in the document.
+    acronyms_path : str
+        Path to the file containing acronyms, to be inserted into the document.
+    save_path : str
+        Directory where generated figures and files will be saved.
+    map : tuple of str, optional
+        A tuple containing the path and caption of a map image to include in the document. Default is None.
+    introduction_text : str, optional
+        Text to be included in the introduction section. Default is None.
+    document_purpose_text : str, optional
+        Text describing the purpose of the document, included in the introduction. Default is None.
+
+    Returns:
+    --------
+    tuple
+        - `main_tex` (str): The main LaTeX content with placeholders replaced.
+        - `titlepage_tex` (str): LaTeX content for the title page.
+        - `introduction_tex` (str): LaTeX content for the introduction, including figures and tables.
+
+    Raises:
+    -------
+    Any exception raised by file operations or external functions will propagate to the caller.
+    """
+
+    curr_path = os.path.dirname(os.path.realpath(__file__))
     figsize_fullpage = [17 * 0.39370079, None]
 
+    if DocumentMeta["RevisionJBO"] == 'auto':
+        DocumentMeta["RevisionJBO"] = Revisions.iloc[-1, 0]
 
-    if Revisions["DocumentStatus"] == 'auto':
-        if Revisions.iloc[-1, 3] == 'First Release':
-            Revisions["DocumentStatus"] = 'FR'
-        elif Revisions.iloc[-1, 3] == 'Final':
-            Revisions["DocumentStatus"] = 'FIN'
-        elif Revisions.iloc[-1, 3] == 'Preliminary':
-            Revisions["DocumentStatus"] = 'PRE'
-        elif Revisions.iloc[-1, 3] == 'Issued for Review':
-            Revisions["DocumentStatus"] = 'IFR'
-        elif Revisions.iloc[-1, 3] == 'Issued for Excecution':
-            Revisions["DocumentStatus"] = 'IFE'
-        elif Revisions.iloc[-1, 3] == 'As Built':
-            Revisions["DocumentStatus"] = 'AB'
-        elif Revisions.iloc[-1, 3] == 'First Release':
-            Revisions["DocumentStatus"] = 'AB'
+    if DocumentMeta["RevisionEmployer"] == 'auto':
+        DocumentMeta["RevisionEmployer"] = Revisions.iloc[-1, 1]
 
-        else:
-            print(f"initilize document: {Revisions.iloc[-1, 3]} no known keyword, leaving it as is")
-            Revisions["DocumentStatus"] = Revisions.iloc[-1, 3]
+    if DocumentMeta["RevisionDate"] == 'auto':
+        DocumentMeta["RevisionDate"] = Revisions.iloc[-1, 2]
 
-    if Revisions["RevisionJBO"] == 'auto':
-        Revisions["RevisionJBO"] = Revisions.iloc[-1, 0]
+    if DocumentMeta["RevisionDate"] == 'auto':
+        DocumentMeta["RevisionDate"] = Revisions.iloc[-1, 2]
 
-    if Revisions["RevisionEmployer"] == 'auto':
-        Revisions["RevisionEmployer"] = Revisions.iloc[-1, 1]
-
-    if Revisions["RevisionDate"] == 'auto':
-        Revisions["RevisionDate"] = Revisions.iloc[-1, 2]
-
-    if Revisions["RevisionDate"] == 'auto':
-        Revisions["RevisionDate"] = Revisions.iloc[-1, 2]
-
-    main_path = 'latex_main_template.txt'
-    titlepage_path = 'latex_titlepage_template.txt'
-    introduction_path = 'latex_introduction_template.txt'
+    main_path = curr_path + '\\latex_main_template.txt'
+    titlepage_path = curr_path + '\\latex_titlepage_template.txt'
+    introduction_path = curr_path + '\\latex_introduction_template.txt'
 
     FIGURES = pd.DataFrame()
 
@@ -323,18 +545,30 @@ def initilize_document(DocumentMeta, Revisions, bib_paths, acronyms_path, save_p
 
     gl.save_figs_as_png([FIG], save_path + f'\\Revision_Table', dpi=500)
 
-    pic = "latex_Status_table"
-    FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
-    FIGURES.loc[pic, "path"] = save_path + f"\\{pic}.jpg"
+    shutil.copyfile(curr_path + "\\latex_Status_table.png", save_path + "\\Status_table.png")
+    shutil.copyfile(curr_path+'\\JBO_logo.jpg', save_path + '\\JBO_logo.jpg')
+
+    pic = "Status_table"
+    FIGURES.loc[pic, "filename"] = f"{pic}.png"
+    FIGURES.loc[pic, "path"] = save_path + f"\\{pic}.png"
     FIGURES.loc[pic, "caption"] = None
     FIGURES.loc[pic, "width"] = 0.4
 
     # Figures
-    pic = "Revision_table"
-    FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
-    FIGURES.loc[pic, "path"] = save_path + f"\\{pic}.jpg"
+    pic = "Revision_Table_page_1"
+    FIGURES.loc[pic, "filename"] = f"{pic}.png"
+    FIGURES.loc[pic, "path"] = save_path + f"\\{pic}.png"
     FIGURES.loc[pic, "caption"] = None
-    FIGURES.loc[pic, "width"] = 0.4
+    FIGURES.loc[pic, "width"] = 1
+
+    if map is not None:
+        pic = "map"
+        FIGURES.loc[pic, "filename"] = f"{pic}.png"
+        FIGURES.loc[pic, "path"] = map[0]
+        FIGURES.loc[pic, "caption"] = map[0]
+        FIGURES.loc[pic, "width"] = 0.4
+
+    FIGURES.loc[:, "path"] = [string.replace("\\", "/") for string in FIGURES.loc[:, "path"]]
 
     with open(main_path, 'r', encoding='utf-8') as file:
         main_tex = file.read()
@@ -346,12 +580,9 @@ def initilize_document(DocumentMeta, Revisions, bib_paths, acronyms_path, save_p
         introduction_tex = file.read()
 
     with open(acronyms_path, 'r', encoding='utf-8') as file:
-        acronyms_path = file.read()
+        acronyms = file.read()
 
-    # inport acronyms
-    with open(acronyms_path, 'r') as f:
-        acros = f.read()
-    main_tex = insertLatexVars(main_tex, {"ACRONYMS": acros})
+    main_tex = insertLatexVars(main_tex, {"ACRONYMS": acronyms})
 
     # import biblografys:
     biblografies = []
@@ -360,7 +591,7 @@ def initilize_document(DocumentMeta, Revisions, bib_paths, acronyms_path, save_p
         biblografies.append("\\addbibresource{" + f"{bib_path}" + "}")
 
     biblografies = '\n'.join(biblografies)
-    main_tex = insertLatexVars(main_tex, {'?Biblografies': biblografies})
+    main_tex = insertLatexVars(main_tex, {'Biblografies': biblografies})
 
     # insert titlepage
     chapter = 'titlepage'
@@ -369,13 +600,16 @@ def initilize_document(DocumentMeta, Revisions, bib_paths, acronyms_path, save_p
 
     #pagestyle
     main_tex, last_idx = include_str(main_tex, '\\pagestyle{fancy}', last_idx + 1)
+    main_tex = insertLatexVars(main_tex, DocumentMeta)
 
-    # insert introductiot
+    # insert introduction
     chapter = 'introduction'
-    introduction_tex = insertLatexVars(introduction_tex, DocumentMeta)
 
     introduction_tex = include_TableFig(introduction_tex, FIGURES.loc["Revision_Table_page_1"])
-    introduction_tex = include_TableFig(introduction_tex, FIGURES.loc["latex_Status_table"])
+    introduction_tex = include_TableFig(introduction_tex, FIGURES.loc["Status_table"])
+    introduction_tex = insertLatexVars(introduction_tex, {"IntroductionText": introduction_text, "DocumentPurposeText": document_purpose_text})
+
+    introduction_tex = include_Fig(introduction_tex, FIGURES.loc["map"] if "map" in FIGURES.index else None)
 
     main_tex, last_idx = include_include(main_tex, chapter)
 
