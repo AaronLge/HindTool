@@ -166,6 +166,19 @@ SENSORS["Symbol"] = [INPUT["Symbols"][key] if key in INPUT["ColumNames"] else fl
 SENSORS["Alias"] = [INPUT["Aliase"][key] if key in INPUT["ColumNames"] else float('nan') for key in SENSORS.index]
 SENSORS["Unit"] = [INPUT["Units"][key] if key in INPUT["ColumNames"] else float('nan') for key in SENSORS.index]
 
+Meta_data = gl.export_df_from_sql(db_path, 'Hind_MetaData')
+
+datasorce_cols = gl.export_colnames_from_db(db_path)
+datasorce_keys_raw = [col for col in datasorce_cols.keys() if "Hind_raw" in col]
+
+DATABASE = pd.DataFrame(columns=["used"], index=Meta_data.index)
+DATABASE.loc[:, "used"] = False
+for sensor_key, sensor_name in SENSORS["Name"].items():
+    for datasorce_key_raw in datasorce_keys_raw:
+        datasorce_key_clean = datasorce_key_raw.replace('Hind_raw_', '')
+        if sensor_name in datasorce_cols[datasorce_key_raw]:
+            DATABASE.loc[datasorce_key_clean, "used"] = True
+            SENSORS.loc[sensor_key, "DataSorce"] = datasorce_key_clean
 
 # %% Calculation
 angle_grid, angle_grid_mod = hc_calc.angles(INPUT["AngleSection"]["mode_angle"], INPUT["AngleSection"]["N_angle"], INPUT["AngleSection"]["angle_start"],
@@ -698,8 +711,8 @@ for sea_type, column_names in validation_column_names_dict.items():
                                          df_data[column_names[2]],
                                          DATA_OUT["table_vmhs"][sea_type].result,
                                          DATA_OUT["table_vmtp"][sea_type].result,
-                                         INPUT["DataBase"]["JBOOST_proj"],
-                                         INPUT["DataBase"]["JBOOST_input"],
+                                         INPUT["Structure"]["JBOOST_proj"],
+                                         INPUT["Structure"]["JBOOST_input"],
                                          r".\\JBOOST\\")
 
         Calc.result = result
@@ -772,6 +785,7 @@ figsize_halfpage_halfpage = [figsize_fullpage[0] / 2, figsize_fullpage[1] / 2.5]
 
 #  vmhs
 if INPUT["Toggle_Modules"].get("plot_condensation_example", {}):
+    print(f"plotting VMHS example...")
 
     Calc = DATA_OUT["VMHS"]["wind_example"]
 
@@ -780,10 +794,9 @@ if INPUT["Toggle_Modules"].get("plot_condensation_example", {}):
 
     df = Calc.load_from_db(colnames_ini=True)
     titels = Calc.create_segment_title()
-    titels = gl.alias(titels, INPUT["ColumNames"], INPUT["Alias"])
+    titels = gl.alias(titels, INPUT["ColumNames"], INPUT["Aliase"])
 
     for i, Seg in enumerate(Calc.result):
-        print(f"plotting VMHS example...")
 
         if Seg.angles is None:
             Seg.indizes = pd.to_datetime(Seg.indizes)
@@ -793,8 +806,8 @@ if INPUT["Toggle_Modules"].get("plot_condensation_example", {}):
             use_mean = np.where(Seg.result["data"]["use_regression"] == 0)[0]
 
             tile_curr = hc_plt.Tile(i,
-                                    x_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Alias"]),
-                                    y_label=gl.alias(Seg.colnames['y'], INPUT["ColumNames"], INPUT["Alias"]),
+                                    x_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Aliase"]),
+                                    y_label=gl.alias(Seg.colnames['y'], INPUT["ColumNames"], INPUT["Aliase"]),
                                     title=titels[i])
 
             scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]],
@@ -967,7 +980,7 @@ if INPUT["Toggle_Modules"].get("plot_VMHS", {}) and (len(INPUT["Toggle_Modules"]
         Tiles_omni = []
 
         df = Calc.load_from_db(colnames_ini=True)
-        titles = gl.alias(Calc.create_segment_title(), INPUT["ColumNames"], INPUT["Alias"])
+        titles = gl.alias(Calc.create_segment_title(), INPUT["ColumNames"], INPUT["Aliase"])
 
         for i, Seg in enumerate(Calc.result):
             Seg.indizes = pd.to_datetime(Seg.indizes)
@@ -975,8 +988,8 @@ if INPUT["Toggle_Modules"].get("plot_VMHS", {}) and (len(INPUT["Toggle_Modules"]
 
             tile_curr = hc_plt.Tile(
                 i,
-                x_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Alias"]),
-                y_label=gl.alias(Seg.colnames['y'], INPUT["ColumNames"], INPUT["Alias"]),
+                x_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Aliase"]),
+                y_label=gl.alias(Seg.colnames['y'], INPUT["ColumNames"], INPUT["Aliase"]),
                 title=titles[i],
             )
 
@@ -1086,7 +1099,7 @@ if INPUT["Toggle_Modules"].get("plot_HSTP", {}) and (len(INPUT["Toggle_Modules"]
         Tiles_omni = []
 
         df = Calc.load_from_db(colnames_ini=True)
-        titles = gl.alias(Calc.create_segment_title(), INPUT["ColumNames"], INPUT["Alias"])
+        titles = gl.alias(Calc.create_segment_title(), INPUT["ColumNames"], INPUT["Aliase"])
 
         for i, Seg in enumerate(Calc.result):
             Seg.indizes = pd.to_datetime(Seg.indizes)
@@ -1094,8 +1107,8 @@ if INPUT["Toggle_Modules"].get("plot_HSTP", {}) and (len(INPUT["Toggle_Modules"]
 
             tile_curr = hc_plt.Tile(
                 i,
-                x_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Alias"]),
-                y_label=gl.alias(Seg.colnames['y'], INPUT["ColumNames"], INPUT["Alias"]),
+                x_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Aliase"]),
+                y_label=gl.alias(Seg.colnames['y'], INPUT["ColumNames"], INPUT["Aliase"]),
                 title=titles[i],
             )
 
@@ -1192,7 +1205,7 @@ if INPUT["Toggle_Modules"].get("plot_VMTP", {}) and (len(INPUT["Toggle_Modules"]
             Tiles_omni = []
 
             df = Calc.load_from_db(colnames_ini=True)
-            titles = gl.alias(Calc.create_segment_title(), INPUT["ColumNames"], INPUT["Alias"])
+            titles = gl.alias(Calc.create_segment_title(), INPUT["ColumNames"], INPUT["Aliase"])
 
             for i, Seg in enumerate(Calc.result):
                 Seg.indizes = pd.to_datetime(Seg.indizes)
@@ -1200,8 +1213,8 @@ if INPUT["Toggle_Modules"].get("plot_VMTP", {}) and (len(INPUT["Toggle_Modules"]
 
                 tile_curr = hc_plt.Tile(
                     i,
-                    x_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Alias"]),
-                    y_label=gl.alias(Seg.colnames['y'], INPUT["ColumNames"], INPUT["Alias"]),
+                    x_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Aliase"]),
+                    y_label=gl.alias(Seg.colnames['y'], INPUT["ColumNames"], INPUT["Aliase"]),
                     title=titles[i],
                 )
 
@@ -1264,7 +1277,7 @@ if INPUT["Toggle_Modules"].get("plot_RWI", {}) and (len(INPUT["Toggle_Modules"][
             df = Calc.load_from_db(colnames_ini=True)
 
             titels = Calc.create_segment_title()
-            titels = gl.alias(titels, INPUT["ColumNames"], INPUT["Alias"])
+            titels = gl.alias(titels, INPUT["ColumNames"], INPUT["Aliase"])
 
             # Process each segment
             for i, Seg in enumerate(Calc.result):
@@ -1272,8 +1285,8 @@ if INPUT["Toggle_Modules"].get("plot_RWI", {}) and (len(INPUT["Toggle_Modules"][
                 point_data = df[df.index.isin(Seg.indizes)]
 
                 tile_curr = hc_plt.Tile(i,
-                                        x_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Alias"]),
-                                        y_label=gl.alias(Seg.colnames['y'], INPUT["ColumNames"], INPUT["Alias"]),
+                                        x_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Aliase"]),
+                                        y_label=gl.alias(Seg.colnames['y'], INPUT["ColumNames"], INPUT["Aliase"]),
                                         title=titels[i])
 
                 scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]],
@@ -1333,7 +1346,7 @@ if INPUT["Toggle_Modules"].get("plot_BreakSteep", {}) and (len(INPUT["Toggle_Mod
             df = Calc.load_from_db(colnames_ini=True)
 
             titels = Calc.create_segment_title()
-            titels = gl.alias(titels, INPUT["ColumNames"], INPUT["Alias"])
+            titels = gl.alias(titels, INPUT["ColumNames"], INPUT["Aliase"])
 
             # Process each segment
             for i, Seg in enumerate(Calc.result):
@@ -1341,8 +1354,8 @@ if INPUT["Toggle_Modules"].get("plot_BreakSteep", {}) and (len(INPUT["Toggle_Mod
                 point_data = df[df.index.isin(Seg.indizes)]
 
                 tile_curr = hc_plt.Tile(i,
-                                        x_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Alias"]),
-                                        y_label=gl.alias(Seg.colnames['y'], INPUT["ColumNames"], INPUT["Alias"]),
+                                        x_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Aliase"]),
+                                        y_label=gl.alias(Seg.colnames['y'], INPUT["ColumNames"], INPUT["Aliase"]),
                                         title=titels[i])
 
                 c_krit = Seg.result["steepness"]
@@ -1392,9 +1405,9 @@ if INPUT["Toggle_Modules"].get("plot_Tables", {}) and (len(INPUT["Toggle_Modules
                 continue
 
             Calc = DATA_OUT["table_vmhs"][sea_type]
-            titel = f"'{gl.alias(Calc.result[0].colnames['y'], SENSORS['Name'], INPUT['Alias'])}'" + "\n " + \
-                    f"in '{gl.alias(Calc.result[1].angle_name, SENSORS['Name'], INPUT['Alias'])}' directional sections" + "\n" + \
-                    r"\small " + f"with v_m = '{gl.alias(Calc.result[0].colnames['x'], SENSORS['Name'], INPUT['Alias'])}'"
+            titel = f"'{gl.alias(Calc.result[0].colnames['y'], INPUT['ColumNames'], INPUT['Aliase'])}'" + "\n " + \
+                    f"in '{gl.alias(Calc.result[1].angle_name, INPUT['ColumNames'], INPUT['Aliase'])}' directional sections" + "\n" + \
+                    r"\small " + f"with v_m = '{gl.alias(Calc.result[0].colnames['x'], INPUT['ColumNames'], INPUT['Aliase'])}'"
 
             FIG = [hc_plt.plot_table_condesation(Calc, figsize=figsize_fullpage, titel=titel)]
 
@@ -1408,9 +1421,9 @@ if INPUT["Toggle_Modules"].get("plot_Tables", {}) and (len(INPUT["Toggle_Modules
 
             # VMTP
             Calc = DATA_OUT["table_vmtp"][sea_type]
-            titel = f"'{gl.alias(Calc.result[0].colnames['y'], SENSORS['Name'], INPUT['Alias'])}'" + "\n " + \
-                    f"in '{gl.alias(Calc.result[1].angle_name, SENSORS['Name'], INPUT['Alias'])}' directional sections" + "\n" + \
-                    r"\small " + f"with v_m = '{gl.alias(Calc.result[0].colnames['x'], SENSORS['Name'], INPUT['Alias'])}'"
+            titel = f"'{gl.alias(Calc.result[0].colnames['y'], INPUT['ColumNames'], INPUT['Aliase'])}'" + "\n " + \
+                    f"in '{gl.alias(Calc.result[1].angle_name, INPUT['ColumNames'], INPUT['Aliase'])}' directional sections" + "\n" + \
+                    r"\small " + f"with v_m = '{gl.alias(Calc.result[0].colnames['x'], INPUT['ColumNames'], INPUT['Aliase'])}'"
 
             FIG = [hc_plt.plot_table_condesation(Calc, figsize=figsize_fullpage, titel=titel)]
 
@@ -1439,7 +1452,7 @@ if INPUT["Toggle_Modules"].get("plot_AngleDeviation", {}):
         subtitle = Calc.create_segment_title(mode='sparse')
         subsubtitle = f"with v_m = {Calc.result[1].colnames['v_m']}"
         titles = [title + "\n " + subtitle_curr + "\n " + subsubtitle for subtitle_curr in subtitle]
-        titles = gl.alias(titles, INPUT["ColumNames"], INPUT["Alias"])
+        titles = gl.alias(titles, INPUT["ColumNames"], INPUT["Aliase"])
 
         for i, Seg in enumerate(Calc.result):
 
@@ -1456,9 +1469,9 @@ if INPUT["Toggle_Modules"].get("plot_AngleDeviation", {}):
 
                 FIG_Tables.append(temp)
             else:
-                title = f"Misalignment of {INPUT['Alias'][INPUT['Toggle_Modules']['calc_AngleDeviation'][1]]}" + " \n " + f"to {INPUT['Alias'][INPUT['Toggle_Modules']['calc_AngleDeviation'][0]]}"
-                title = gl.alias(title, INPUT["ColumNames"], INPUT["Alias"])
-                x_label = gl.alias(Seg.colnames['ang_orig'], INPUT["ColumNames"], INPUT["Alias"])
+                title = f"Misalignment of {INPUT['Aliase'][INPUT['Toggle_Modules']['calc_AngleDeviation'][1]]}" + " \n " + f"to {INPUT['Aliase'][INPUT['Toggle_Modules']['calc_AngleDeviation'][0]]}"
+                title = gl.alias(title, INPUT["ColumNames"], INPUT["Aliase"])
+                x_label = gl.alias(Seg.colnames['ang_orig'], INPUT["ColumNames"], INPUT["Aliase"])
                 tile_scatter = hc_plt.Tile(i, x_label=x_label, y_label='deviation [°]',
                                            title=title)
 
@@ -1500,7 +1513,7 @@ if INPUT["Toggle_Modules"].get("plot_Roseplots", {}) and INPUT["Toggle_Modules"]
     for Roseplot_name, Calc in DATA_OUT["Roseplot"].items():
         titel = f'{Calc.basedata["colnames_ini"][1]} over' + "\n" + f'{Calc.basedata["colnames_ini"][0]}'
 
-        titel = gl.alias(titel, INPUT["ColumNames"], INPUT["Alias"])
+        titel = gl.alias(titel, INPUT["ColumNames"], INPUT["Aliase"])
         radial = Calc.result["table"].div(Calc.basedata['N_rows'] / 100)
         radial = [radial[col].tolist() for col in radial]
 
@@ -1512,7 +1525,7 @@ if INPUT["Toggle_Modules"].get("plot_Roseplots", {}) and INPUT["Toggle_Modules"]
                               radial_mode='summed',
                               radial_datatype='percent',
                               cbar=True,
-                              cbar_label=gl.alias(Calc.basedata['colnames_ini'][1], INPUT["ColumNames"], INPUT["Alias"]),
+                              cbar_label=gl.alias(Calc.basedata['colnames_ini'][1], INPUT["ColumNames"], INPUT["Aliase"]),
                               r_max=Calc.result["r_max"]
                               )
 
@@ -1557,7 +1570,7 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and INPUT["Toggle_Modul
         Tiles_omni = []
         df = Calc.load_from_db(colnames_ini=True)
         titels = Calc.create_segment_title()
-        titels = gl.alias(titels, INPUT["ColumNames"], INPUT["Alias"])
+        titels = gl.alias(titels, INPUT["ColumNames"], INPUT["Aliase"])
 
         for i, Seg in enumerate(Calc.result):
 
@@ -1566,7 +1579,7 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and INPUT["Toggle_Modul
 
             tile_curr = hc_plt.Tile(i,
                                     x_label='date',
-                                    y_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Alias"]),
+                                    y_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Aliase"]),
                                     title=titels[i])
 
             Line = hc_plt.Line(x=df_seg[Seg.colnames['x']].index,
@@ -1608,7 +1621,7 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and INPUT["Toggle_Modul
                                                           f'intervall algorithm: {Seg.result["meta"]["intervall_algorithm"]}, '
                                                           f'itterations: {Seg.result["meta"]["N_itter"]}')
             tile_curr = hc_plt.Tile(i,
-                                    x_label='Annual maximum values of' + '\n' + gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Alias"]),
+                                    x_label='Annual maximum values of' + '\n' + gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Aliase"]),
                                     y_label='Theoretical Maxima (gumbel)',
                                     title=title)
 
@@ -1671,7 +1684,7 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and INPUT["Toggle_Modul
         Tiles_omni = []
         T_Return_table_data = []
         titels = Calc.create_segment_title()
-        titels = gl.alias(titels, INPUT["ColumNames"], INPUT["Alias"])
+        titels = gl.alias(titels, INPUT["ColumNames"], INPUT["Aliase"])
 
         for i, Seg in enumerate(Calc.result):
 
@@ -1680,7 +1693,7 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and INPUT["Toggle_Modul
                                                           f'itterations: {Seg.result["meta"]["N_itter"]}')
 
             tile_curr = hc_plt.Tile(i, x_label='Return period [years]',
-                                    y_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Alias"]),
+                                    y_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Aliase"]),
                                     title=title,
                                     x_norm='log')
 
@@ -1763,7 +1776,7 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and INPUT["Toggle_Modul
             #omni
             else:
                 Tiles_omni.append(tile_curr)
-                T_Return_table_data.append(T_R_text)
+                T_Return_table_data = T_R_text
 
         FIG_direc = hc_plt.plot_tiled(Tiles, global_max=[None, None], global_min=[None, None], grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
@@ -1776,7 +1789,7 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and INPUT["Toggle_Modul
             gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f'Extreme_T_return_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
         # T_return Table
-        FIG = hc_plt.table(T_Return_table_data,
+        FIG = hc_plt.table(T_Return_table_data.values,
                            collabels=['T Return [years]', 'lower band', 'gumbel distribution', 'upper band'],
                            rowlabels=None,
                            row_label_name=None,
@@ -1828,7 +1841,7 @@ if INPUT["Toggle_Modules"].get("plot_Validation", {}) and (len(INPUT["Toggle_Mod
             Tiles_omni = []
             titels = Calc.create_segment_title()
 
-            titels = gl.alias(titels, INPUT["ColumNames"], INPUT["Alias"])
+            titels = gl.alias(titels, INPUT["ColumNames"], INPUT["Aliase"])
 
             for i, Seg in enumerate(Calc.result):
 
@@ -1846,7 +1859,7 @@ if INPUT["Toggle_Modules"].get("plot_Validation", {}) and (len(INPUT["Toggle_Mod
                           {"color": 'grey', "label": "condensed", "linestyle": '--'}]
 
                 tile_curr = hc_plt.Tile(i,
-                                        x_label=gl.alias(Seg.colnames["Hindcast"]["v_m"], INPUT["ColumNames"], INPUT["Alias"]),
+                                        x_label=gl.alias(Seg.colnames["Hindcast"]["v_m"], INPUT["ColumNames"], INPUT["Aliase"]),
                                         y_label=f'Bending DEL [Nm]' + r" $\vert$ " + f'm={Meta["SN_slope"]}' + "\n" + f'N_ref={Meta["N_ref"]:.2e}' + r" $\vert$ " + f'lifetime={Meta["design_life"]}y',
                                         y_label_right='number of datapoints',
                                         title=titels[i],
@@ -1944,7 +1957,7 @@ if INPUT["Toggle_Modules"].get("plot_Validation", {}) and (len(INPUT["Toggle_Mod
 
                 titels = [f'{sea_type.capitalize()} Sea, config: {config} ' + "\n" + title + "\n" for title in titels]
 
-                titels = gl.alias(titels, INPUT["ColumNames"], INPUT["Alias"])
+                titels = gl.alias(titels, INPUT["ColumNames"], INPUT["Aliase"])
 
                 for i, Seg in enumerate(Calc.result):
                     Meta = Seg.result["meta"]
@@ -1955,8 +1968,8 @@ if INPUT["Toggle_Modules"].get("plot_Validation", {}) and (len(INPUT["Toggle_Mod
                                                     indizes=Seg.indizes)
 
                     tile_curr = hc_plt.Tile(i,
-                                            x_label=gl.alias(Seg.colnames["Hindcast"]["H_s"], INPUT["ColumNames"], INPUT["Alias"]),
-                                            y_label=gl.alias(Seg.colnames["Hindcast"]["T_p"], INPUT["ColumNames"], INPUT["Alias"]),
+                                            x_label=gl.alias(Seg.colnames["Hindcast"]["H_s"], INPUT["ColumNames"], INPUT["Aliase"]),
+                                            y_label=gl.alias(Seg.colnames["Hindcast"]["T_p"], INPUT["ColumNames"], INPUT["Aliase"]),
                                             title=titels[i])
 
                     scatter = hc_plt.Scatter(x=df_data[Seg.colnames["Hindcast"]["H_s"]],
@@ -2002,7 +2015,7 @@ if INPUT["Toggle_Modules"].get("plot_SensorEval", {}):
 
         titels = Calc.create_segment_title(mode='sparse')
 
-        titels = gl.alias(titels, INPUT["ColumNames"], INPUT["Alias"])
+        titels = gl.alias(titels, INPUT["ColumNames"], INPUT["Aliase"])
 
         for i, Seg in enumerate(Calc.result):
 
@@ -2012,7 +2025,7 @@ if INPUT["Toggle_Modules"].get("plot_SensorEval", {}):
 
             # tile histo
             tile_histo = hc_plt.Tile(i,
-                                     x_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Alias"]),
+                                     x_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Aliase"]),
                                      y_label='number of datapoints [-]',
                                      title=titel)
 
@@ -2028,7 +2041,7 @@ if INPUT["Toggle_Modules"].get("plot_SensorEval", {}):
             x = df[Seg.colnames['x']].values
             titel = f'Timeseries with min = {gl.round_to_significant_digit([min(x)], 3)[0]}' + r" $\vert$ " + f'max = {gl.round_to_significant_digit([max(x)], 3)[0]}' + r" $\vert$ " + f'standard deviation = {round(np.std(x), 4)}, ' + titels[i]
 
-            tile_time = hc_plt.Tile(i, x_label='date', y_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Alias"]), title=titel)
+            tile_time = hc_plt.Tile(i, x_label='date', y_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Aliase"]), title=titel)
 
             timeseries = hc_plt.Line(x=df[Seg.colnames['x']].index,
                                      y=df[Seg.colnames['x']].values,
@@ -2065,7 +2078,7 @@ if INPUT["Toggle_Modules"].get("plot_Weibull", {}):
 
         titels = Calc.create_segment_title(mode='sparse')
 
-        titels = gl.alias(titels, INPUT["ColumNames"], INPUT["Alias"])
+        titels = gl.alias(titels, INPUT["ColumNames"], INPUT["Aliase"])
         weibull_table_data = []
         section_angles = []
         for i, Seg in enumerate(Calc.result):
@@ -2076,7 +2089,7 @@ if INPUT["Toggle_Modules"].get("plot_Weibull", {}):
 
             # tile histo
             tile_curr = hc_plt.Tile(i,
-                                    x_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Alias"]),
+                                    x_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Aliase"]),
                                     y_label='probability density [-]',
                                     title=titel)
 
@@ -2142,20 +2155,6 @@ if INPUT["Toggle_Modules"].get("plot_report_tables", {}):
     print("plotting Report Tables...")
 
     # plot databases
-    Meta_data = gl.export_df_from_sql(db_path, 'Hind_MetaData')
-
-    # add datasorce reference
-    datasorce_cols = gl.export_colnames_from_db(db_path)
-    datasorce_keys_raw = [col for col in datasorce_cols.keys() if "Hind_raw" in col]
-
-    DATABASE = pd.DataFrame(columns=["used", "png_name"], index=Meta_data.index)
-    DATABASE.loc[:, "used"] = False
-    for sensor_key, sensor_name in SENSORS["Name"].items():
-        for datasorce_key_raw in datasorce_keys_raw:
-            datasorce_key_clean = datasorce_key_raw.replace('Hind_raw_', '')
-            if sensor_name in datasorce_cols[datasorce_key_raw]:
-                DATABASE.loc[datasorce_key_clean, "used"] = True
-                SENSORS.loc[sensor_key, "DataSorce"] = datasorce_key_clean
 
     resamling_values = []
     resampling_colnames = []
@@ -2163,7 +2162,6 @@ if INPUT["Toggle_Modules"].get("plot_report_tables", {}):
 
         if DATABASE.loc[dataset_name, "used"] or dataset_name == 'Combined':
 
-            DATABASE.loc[dataset_name, "png_name"] = f'DataSorce_{dataset_name}_page_1.png'
             DATABASE.loc[dataset_name, "Time Step"] = f'{dataset_contents["Time Step"]} s'
             DATABASE.loc[dataset_name, "Start Date"] = dataset_contents["Start Date"]
             DATABASE.loc[dataset_name, "End Date"] = dataset_contents["End Date"]
@@ -2302,7 +2300,6 @@ if INPUT["Toggle_Modules"].get("plot_report_tables", {}):
 
     if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_pdf([FIG], path_out + f'Revision_Table', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
 
 
 # %% Data Out
@@ -2561,7 +2558,7 @@ if INPUT["DataOut"]["CSV_out"]:
 
         gl.save_df_list_to_excel(path_csv + f'/Database_info', [Meta_data])
 
-# %% plot report tables
+# %% Create Report
 if INPUT["DataBase"].get("create_report", {}):
 
     # Create Report Output
@@ -2595,7 +2592,6 @@ if INPUT["DataBase"].get("create_report", {}):
     png_names = [name.removesuffix('.png') for name in png_files]
     png_width = [0.5 if 'Roseplots' in png_name else 1 for png_name in png_names]
 
-
     FIGURES = pd.DataFrame(columns=["filename", "path", "caption", "width"])
     FIGURES["filename"] = png_files
     FIGURES["width"] = png_width
@@ -2606,16 +2602,16 @@ if INPUT["DataBase"].get("create_report", {}):
     FIGURES.index = png_names
 
     # captions
-    FIGURES.loc["DataSorce_global_page_1", "caption"] = "General databasis parameters"
-
     for indx in FIGURES.index:
-        if indx in INPUT_REPORT["Captions"].keys():
-            FIGURES.loc[indx, "caption"] = INPUT_REPORT["Captions"][indx]
+        if indx in INPUT["Captions"].keys():
+            FIGURES.loc[indx, "caption"] = INPUT["Captions"][indx]
+    
+    FIGURES.loc["DataSorce_global_page_1", "caption"] = "General databasis parameters"
 
     # map
     pic = "Map"
     FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
-    FIGURES.loc[pic, "path"] = INPUT_REPORT["Database_Info"]["map_path"]
+    FIGURES.loc[pic, "path"] = INPUT["DataBase"]["map_path"]
     FIGURES.loc[pic, "caption"] = "Overview map"
     FIGURES.loc[pic, "width"] = 1
 
@@ -2650,28 +2646,28 @@ if INPUT["DataBase"].get("create_report", {}):
     FIGURES.loc[pic, "caption"] = None
     FIGURES.loc[pic, "width"] = 0.4
 
-    # captions
-   # FIGURES.loc["DataSorce_global_page_1", "caption"] = "General databasis parameters"
-
-    for indx in FIGURES.index:
-        if indx in INPUT_REPORT["Captions"].keys():
-            FIGURES.loc[indx, "caption"] = INPUT_REPORT["Captions"][indx]
-
     FIGURES.loc[:, "path"] = [string.replace("\\", "/") for string in FIGURES.loc[:, "path"]]
 
-    # Crete TEX content
+    # initilize document
     TEX = {}
 
-    Revision_data = [INPUT_REPORT["DocumentMeta"][key] for key in INPUT_REPORT["DocumentMeta"].keys()]
+    Revision_data = [INPUT["RevisionTable"][key] for key in INPUT["RevisionTable"].keys()]
     Revisions = pd.DataFrame(data=Revision_data, columns=["Rev. JBO", "Rev. Employer", "Date", "Description"])
 
-    Biblografys = [INPUT_REPORT["DocumentMeta"][key] for key in INPUT_REPORT["DocumentMeta"].keys()]
+    Biblografys = [INPUT["DataBase"]["BIBDatasets"], INPUT["DataBase"]["BIBLiteratur"], INPUT["DataBase"]["BIBGuidelines"]]
 
-    TEX["main"], TEX["Titlepage"], TEX["Introduction"] = ltx.initilize_document(INPUT_REPORT["DocumentMeta"],
+    introduction_text = "For the support structure design of an offshore wind farm, the interpretation of the metocean data is required. Hydrodynamic load analysis will be conducted on this basis, which basically follow the recommendations in \cite{DNV-ST_0437} supported by \cite{IEC_61400_3_1}."
+    introduction_text += "\\" + INPUT["DocumentMeta"]["intro_siteSpecific"]
+    document_purpose_text = "This document describes the marine assessment of metocean hindcast data to determine the hydrodynamic load impact in an offshore wind project. The evaluated design parameter shall fulfil the requirements for a preliminary design phase of substructure and foundation."
+
+    TEX["main"], TEX["Titlepage"], TEX["Introduction"] = ltx.initilize_document(INPUT["DocumentMeta"],
                                                                                 Revisions,
                                                                                 Biblografys,
-                                                                                INPUT_REPORT["General"]["acronym_path"],
-                                                                                path_report)
+                                                                                INPUT["DataBase"]["acronym_path"],
+                                                                                path_report,
+                                                                                map=[INPUT["DataBase"]["map_path"], INPUT["Captions"]["Map"]],
+                                                                                introduction_text=introduction_text,
+                                                                                document_purpose_text=document_purpose_text)
     # Data Basis
     chapter = 'DataBasis'
     TEX["main"], last_idx = ltx.include_include(TEX["main"], chapter)
@@ -2690,7 +2686,7 @@ if INPUT["DataBase"].get("create_report", {}):
     # include Databasis Tables of used Databasis
     for index, row in DATABASE.iterrows():
         if row["used"]:
-            key_fig = [indx for indx in FIGURES.index if FIGURES.loc[indx, "filename"] == row["png_name"]][0]
+            key_fig = [indx for indx in FIGURES.index if FIGURES.loc[indx, "filename"] == f'DataSorce_{index}_page_1.png'][0]
             database = key_fig.replace("DataSorce_", "").replace("_page_1", "")
 
             FIGURES.loc[key_fig, "caption"] = f'"{database}" Data Set ' + "\\cite{" + f"{database}" + "}"
@@ -2703,11 +2699,14 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter] = TEMPLATES[chapter]
     TEX["main"], last_idx = ltx.include_include(TEX["main"], chapter, line=last_idx + 1)
 
+    gamma_toreset = "$\\gamma$ is defined by the Torsethaugen spectrum (\cite{DNV-ST_0437}) as: \n \\begin{align} \n \\gamma = 35 \\cdot \\frac{2  \\pi  H_s}{9.81 \\cdot T_p^2}^{6 / 7} \n \\end{align}"
+    gamma_default = ""
+
     if INPUT["RWI"]["gamma"] == 'torset':
-        TEX[chapter] = ltx.insertLatexVars(TEX[chapter], {"Jonswap_gamma": INPUT_REPORT["GeneralTheorie"]["gamma_toreset"]})
+        TEX[chapter] = ltx.insertLatexVars(TEX[chapter], {"Jonswap_gamma": gamma_toreset})
 
     if INPUT["RWI"]["gamma"] == 'default':
-        TEX[chapter] = ltx.insertLatexVars(TEX[chapter], {"Jonswap_gamma": INPUT_REPORT["GeneralTheorie"]["gamma_default"]})
+        TEX[chapter] = ltx.insertLatexVars(TEX[chapter], {"Jonswap_gamma": gamma_default})
 
     # Sensors
     chapter = "SensorAnalysis"
@@ -2717,7 +2716,7 @@ if INPUT["DataBase"].get("create_report", {}):
     # include sensor ilustrations
     temp_list = []
     for sensor_key in INPUT["SensorEval"]["Sensors"]:
-        sensor_alias = SENSORS_REPORT["Alias"][sensor_key]
+        sensor_alias = SENSORS["Alias"][sensor_key]
         FIGURES.loc[f"SensorEval_{sensor_key}_page_1", "caption"] = f'Timeseries and histogram of sensor: {sensor_alias}'
         temp = "\\subsubsection{Sensor: " + f"{sensor_alias}" + "} \n ?FIG" + "\n \\clearpage"
         temp = ltx.include_Fig(temp, FIGURES.loc[f"SensorEval_{sensor_key}_page_1"])
@@ -2776,7 +2775,7 @@ if INPUT["DataBase"].get("create_report", {}):
 
     # Normal Conditons
     chapter = "NormalConditions"
-    FIGURES.loc["Weibull_table_page_1", "caption"] = f"Weibull fit of {SENSORS_REPORT.loc['v_m', 'Alias']}"
+    FIGURES.loc["Weibull_table_page_1", "caption"] = f"Weibull fit of {SENSORS.loc['v_m', 'Alias']}"
 
     TEX[chapter] = TEMPLATES[chapter]
     TEX["main"], _ = ltx.include_include(TEX["main"], chapter)
@@ -2799,7 +2798,7 @@ if INPUT["DataBase"].get("create_report", {}):
 
     temp_list = []
     for sensor, sensor_group_name in zip(sensors, sensor_group_names):
-        sensor_name = SENSORS_REPORT.loc[sensor[1], "Alias"]
+        sensor_name = SENSORS.loc[sensor[1], "Alias"]
         sensor_group_name_clean = sensor_group_name.replace('_', ' ')
         template = "\\subsubsection{Data Evaluation: " + f"{sensor_name}" + "} \n" + "?FIG \n ?FIG  \n ?TABLE \n ?FIG \n ?TABLE \n ?MULTIFIG \n ?MULTIFIG \n ?MULTIFIG"
 
@@ -2863,7 +2862,7 @@ if INPUT["DataBase"].get("create_report", {}):
     # Appendix
     chapter = "Annex"
     TEX[chapter] = TEMPLATES[chapter]
-    TEX["main"], _ = ltx.include_include(TEX["main"], chapter, line=last_idx + 1)
+    TEX["main"], _ = ltx.include_include(TEX["main"], chapter)
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["VMHS_example_page_1"])
     TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Report_table_VMHS_example_page_1"])
     TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Sensor_Original_page_1"])
@@ -2889,7 +2888,6 @@ if INPUT["DataBase"].get("create_report", {}):
 
     # compiling Latex files
     print("   compiling Latex File, this might take some time...")
-    shutil.copy('./latex_templates/JBO_logo.jpg', path_report + r'\\' + 'JBO_logo.jpg')
 
     path_main = path_report + '\\main.tex'
     path_main = path_main.replace("\\", "/")
