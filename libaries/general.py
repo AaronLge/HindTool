@@ -14,7 +14,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import PolynomialFeatures
 from matplotlib.backends.backend_pdf import PdfPages
 import decimal
-
+import e57
 
 def model_regression(x: pd.core.series.Series, y: pd.core.series.Series,
                      **kwargs) -> skl.linear_model._base.LinearRegression:
@@ -1895,3 +1895,46 @@ def e57_2_txt(file_path, save_path =None):
     - Both TXT files are saved in the specified or default output directory.
     - Prints progress messages for each file being processed.
     """
+
+    if save_path is None:
+        save_path = file_path
+
+    path_templates = os.path.abspath(file_path)
+    e57files = [f for f in os.listdir(path_templates) if f.endswith('.e57')]
+
+    for file in e57files:
+
+        print("processing file {}".format(file))
+
+        pc = e57.read_points(file)
+
+        file_name = os.path.basename(file)
+        file_name = file_name.replace('.e57', '')
+
+        pc_color = 255*pc.color
+        np.savetxt(save_path+"\\"+file_name+"_color.txt", pc_color, fmt='%d')
+        np.savetxt(save_path+"\\"+file_name+"_points.txt", pc.points, fmt='%1.4f')
+
+
+def separate_wind_swell(T_p, v_m, dir_wave, dir_wind, water_depth, h_vm, alpha, beta):
+    omega = 2 * np.pi / T_p
+    k = k_aus_omega(omega, water_depth)
+    c = omega / k
+    indizes_swell = []
+    indizes_wind = []
+
+    v_m = h_vm * v_m
+
+    for T_p_curr, v_m_curr, dir_wave_curr, dir_wind_curr, c_curr, index in zip(
+            T_p.values, v_m.values, dir_wave.values, dir_wind.values, c.values, T_p.index
+    ):
+        dir_wave_curr = dir_wave_curr * 2 * np.pi / 360
+        dir_wind_curr = dir_wind_curr * 2 * np.pi / 360
+        beta_compare = v_m_curr / c_curr * (np.cos(dir_wave_curr - dir_wind_curr)) ** alpha
+
+        if beta_compare < beta:
+            indizes_swell.append(index)
+        else:
+            indizes_wind.append(index)
+
+    return indizes_swell, indizes_wind

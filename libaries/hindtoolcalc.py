@@ -1498,16 +1498,7 @@ def extreme_contures_blackbox(Hs, Tp, T_return):
     return out
 
 
-def seperate_wind_swell(T_p, v_m, dir_wave, dir_wind, water_depth, h_vm,  alpha, beta):
 
-    omega = 2*np.pi/T_R
-    k = gl.k_aus_omega(omega, water_depth)
-
-    c = omega/k
-
-    v_10/c * np.cos()
-
-    return
 
 # %% macro functions
 def calc_VMHS(Vm, Hs, angle, angle_grid,
