@@ -858,7 +858,7 @@ if INPUT["Toggle_Modules"].get("plot_condensation_example", {}):
 
             Line_use_reg = hc_plt.Line(x=[Seg.result["data"]['x'].iloc[use_reg_zone[0]]],
                                        y=None,
-                                       label=r'Start of datapoints evaluated with regression curve',
+                                       label=r'Start of data points evaluated with regression curve',
                                        color='#20D503',
                                        linewidth=2,
                                        linestyle='--')
@@ -1861,7 +1861,7 @@ if INPUT["Toggle_Modules"].get("plot_Validation", {}) and (len(INPUT["Toggle_Mod
                 tile_curr = hc_plt.Tile(i,
                                         x_label=gl.alias(Seg.colnames["Hindcast"]["v_m"], INPUT["ColumNames"], INPUT["Aliase"]),
                                         y_label=f'Bending DEL [Nm]' + r" $\vert$ " + f'm={Meta["SN_slope"]}' + "\n" + f'N_ref={Meta["N_ref"]:.2e}' + r" $\vert$ " + f'lifetime={Meta["design_life"]}y',
-                                        y_label_right='number of datapoints',
+                                        y_label_right='number of data points',
                                         title=titels[i],
                                         spinecolor_right=barcolor,
                                         legend=Legend)
@@ -2026,7 +2026,7 @@ if INPUT["Toggle_Modules"].get("plot_SensorEval", {}):
             # tile histo
             tile_histo = hc_plt.Tile(i,
                                      x_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Aliase"]),
-                                     y_label='number of datapoints [-]',
+                                     y_label='number of data points [-]',
                                      title=titel)
 
             bars_histo = hc_plt.Bar(x=Seg.result["center"],
