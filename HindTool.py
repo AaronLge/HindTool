@@ -14,10 +14,10 @@ import webbrowser
 
 from matplotlib.colors import LinearSegmentedColormap
 
-from libaries import general as gl
-from libaries import hindtoolcalc as hc_calc
-from libaries import hindtoolplot as hc_plt
-from libaries import latex as ltx
+from allib import general as gl
+from allib import hindtoolcalc as hc_calc
+from allib import hindtoolplot as hc_plt
+from allib import latex as ltx
 
 
 # %% FUNCTIONS - General
