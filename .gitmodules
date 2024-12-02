@@ -1,1 +1,4 @@
 
+[submodule "allib"]
+	path = allib
+	url = https://github.com/AaronLge/allib
