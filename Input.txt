@@ -1,8 +1,9 @@
 ########## INPUT FILE FOR HINDCAST TOOL #############
 	#FOR FORMATNG RULES SEE: ./Tips_Readme/Input_template.txt
 
+
 *DataBase*
-path_DataBase				>		"C:/Users/aaron.lange/Desktop/Projekte/HindcastArchive/23.65257_120.00693_DHI/23.65257_120.00693_DHI.db"
+path_DataBase				>		"C:/Users/aaron.lange/Desktop/Projekte/HindcastArchive/4_54.96112_6.254773_NIRAS/54.96112_6.254773_NIRAS.db"
 colnames_preset				>		None
 db_info_txt					>		'auto'
 
@@ -14,25 +15,25 @@ acronym_path				>		"C:/Users/aaron.lange/Desktop/Projekte/Report_Automation/Acro
 BIBDatasets                 >		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/yunlin/datasets.bib"
 BIBLiteratur				>		"C:/Users/aaron.lange/Desktop/Projekte/Report_Automation/Literature.bib"
 BIBGuidelines				>		"C:/Users/aaron.lange/Desktop/Projekte/Report_Automation/TechnicalGuidelines.bib"
-fig_path					>		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/yunlin/Data_Out_1/"
+fig_path					>		None
 
-map_path                    >       "C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/yunlin/map.png"
+map_path                    >       None
 
 *Structure*
 JBOOST_proj					>		"I:/2024/A/24A526_Shell_Concept_Design/03_Lasten/00_Conceptual_Design/05_JBOOST/2024-11-19_EF_FLS/proj.lua"					
 JBOOST_input				>		"I:/2024/A/24A526_Shell_Concept_Design/03_Lasten/00_Conceptual_Design/05_JBOOST/2024-11-19_EF_FLS/Input JBOOST Shell_N9p2.lua"
 
 steep_crit					>		0.04									>	float:	Steepness limit (Hs/lamda(Tp)) for WaveBreaking 
-f_0							>		0.151									>	float:	first resonance-frequency (overrides value in ".\JBOOST\proj.lua")
+f_0							>		0.151									>	float:	first resonance-frequency (overrides value in "./JBOOST/proj.lua")
 
-d_from_proj					> 		True
-d							>		42.28
+d_from_proj					> 		False
+d							>		42.9
 
 *DataOut*
-path_out					>			"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/yunlin/">	str:	path for output-files, it is created if it doesent exist
-dir_name					>		'Data_Out'									>	str or none:	if str, name of the folder created in the path_out (Attention, can overwrite old foulders), if None, name is given, including a timestamp (recommended)
+path_out					>		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/EnBW/" > sStr or none:	if str, name of the folder created in the path_out (Attention, can overwrite old foulders), if None, name is given, including a timestamp (recommended)
 CSV_out						>		True 									>	bool:	if True, export of all calculated data in "path_out/dirname/csv_data"
 CSV_deep					>		False											
+dir_name					>		'Data_Out_1'									>	str or none:	if str, name of the folder created in the path_out (Attention, can overwrite old foulders), if None, name is given, including a timestamp (recommended)
 
 *AngleSection*
 mode_angle					>		"full"									>	str:	seperation mode, "full": eqal division of the whole circle in "N_angle" parts	'section': equal devision in "N_angle" parts of the size "width_angle"
@@ -42,73 +43,72 @@ angle_start					>		-15										>	int:	starting angle
 
 *Filter*
 timeframe					>		False									>	bool:	if True, choose timeframe specified below
-datetime_start				>		'1979-01-01 07:00:00'					>	str:	startdatetime in the format: "YYYY-MM-DD"
-datetime_end				>		'1981-07-01 07:00:00'					>	str:	enddatetime in the format: "YYYY-MM-DD"
+datetime_start				>		'1979-01-01 07:00:00'							>	str:	startdatetime in the format: "YYYY-MM-DD"
+datetime_end				>		'1981-07-01 07:00:00'							>	str:	enddatetime in the format: "YYYY-MM-DD"
 
 *Toggle_Modules*
 #calc_VMHS					>		['wind', 'swell']									
-#calc_HSTP					>		['wind', 'swell']							
-#calc_VMTP					>		['swell']								
+calc_HSTP					>		['wind','swell']							
+#calc_VMTP					>		['wind', 'swell']								
 #calc_RWI					>		['wind']								
-#calc_Tables					>		['wind', 'swell']											
+#calc_Tables				>		['wind', 'swell']											
 #calc_WaveBreak_Steep		>		['wind']										
 #calc_AngleDeviation 		>		['dir_v_m', 'dir_T_mean_Wind', 'v_m']						>	angle_orig, angle_deviation, v_m
 #calc_Roseplots				>		True									>	 [[angle, magnitude],[angle, magnitude]]
 #calc_ExtremeValues			>		True									
 #calc_Validation 			>		['wind','swell']											
-#calc_SensorEval				>		True
-calc_Weibull				>		[['dir_v_m', 'v_m']]
-##calc_ExtremeConture			>		[['H_s', 'T_p', 'dir_v_m']]
-#
+#calc_SensorEval			>		True
+#calc_Weibull				>		[['dir_v_m', 'v_m']]
+#calc_ExtremeConture		>		[['H_s', 'T_p', 'dir_v_m']]
+
 plot_VMHS					>		['wind', 'total', 'swell']
 plot_HSTP					>		['wind', 'swell', 'total']
 plot_VMTP					>		['wind', 'swell', 'total']
 plot_RWI					>		['wind', 'total']
-plot_BreakSteep				>		['wind', 'total']
-plot_Tables					>		['wind', 'swell', 'total']
-plot_AngleDeviation			>		True
+plot_BreakSteep			>		['wind', 'total']
+plot_Tables				>		['wind', 'swell', 'total']
+plot_AngleDeviation		>		True
 plot_Roseplots				>		True
 plot_ExtremeValues			>		True
 plot_Validation 			>		['wind', 'swell']
-plot_SensorEval				>		True
+plot_SensorEval			>		True
 plot_Weibull				>		True
 #plot_condensation_example	>		True
-#plot_report_tables			>		True
+plot_report_tables			>		True
 
 plot_as						>		["png"]
 use_pgf						>		False
 dpi_figures					>		500									>	int: resolution (dots per sqinch) of all pdf's
 writing_box					>		[17, 22]
-cell_height_tables			>		0.7
-
+cell_height_tables 			>		0.8
 
 *ColumNames*
-datetime					>		"datetime (ISO 8601) [UTC]"
-v_m 						>	 	"Wind Speed at 10m (WS_{10}) [m/s]"
-dir_v_m 					> 		"Wind Direction at 10m (WD_{10}) [\Deg.N-from]"
-T_p							>		"Peak Wave Period (T_{p}) [s]"
-T_p_wind					>		"Peak Wave Period - Wind-Sea (T_{p-Sea}) [s]"
-T_p_swell					>		"Peak Wave Period - Swell (T_{p-Swell}) [s]"
-dir_T_p						>		"Peak Wave Direction (PWD) [\Deg.N-from]"
-H_s							>		"Sign. Wave Height (H_{m0}) [m]"
-H_s_wind					>		"Sign. Wave Height - Wind-Sea (H_{m0-Sea}) [m]"
-H_s_swell					>		"Sign. Wave Height - Swell (H_{m0-Swell}) [m]"
-dir_T_mean					>		"Mean Wave Direction (MWD) [\Deg.N-from]"
-dir_T_mean_Wind				>		"Mean Wave Direction - Wind-Sea (MWD_{Sea}) [\Deg.N-from]"
-dir_T_mean_Swell			>		"Mean Wave Direction - Swell (MWD_{Swell}) [\Deg.N-from]"
 
+datetime					>		"date"
+v_m 						>	 	"Wind speed 150m LAT [m/s]"
+dir_v_m 					> 		"Wind direction 150m LAT [degN-CF]"
+T_p							>		"Tp [s]"
+T_p_wind					>		"T_p_wind, WaveAge, beta=0.8"
+T_p_swell					>		"T_p_swell, WaveAge, beta=0.8"
+dir_T_p						>		"PeakWaveDirection"
+H_s							>		"Hs [m]"
+H_s_wind					>		"H_s_wind, WaveAge, beta=0.8"
+H_s_swell					>		"H_s_swell, WaveAge, beta=0.8"
+dir_T_mean					>		"Mean Wave Direction [degN-CF]"
+dir_T_mean_Wind				>		"Mean Wave Direction [degN-CF]"
+dir_T_mean_Swell			>		"Mean Wave Direction [degN-CF]"
 *Aliase*
 datetime					>		"date [UTC]"
-v_m 						>	 	"Wind speed at 150m over MSL [m/s]"
-dir_v_m 					> 		"Wind direction at 10m over MSL [deg]"
-H_s							>		"Significant wave height, total sea [m]"
-H_max						>		"Maximal wave height, total sea [m]"
-T_p							>		"Peak wave Period, total sea [s]"
-dir_T_p						>		"Peak wave direction, total sea [deg]"
-H_s_wind					>		"Significant wave height, wind sea [m]"
-dir_T_mean					>		"Mean wave direction, total sea [deg]"
+v_m 						>	 	"Wind speed at 150m [m/s]"
+dir_v_m 					> 		"Wind direction at 150m [deg]"
+H_s							>		"Sign. wave height [m]"
+H_max						>		"Maximal wave height [m]"
+T_p							>		"Peak wave Period [s]"
+dir_T_p						>		"Peak wave direction [deg]"
+H_s_wind					>		"Sign. wave height, wind sea [m]"
 T_p_wind					>		"Peak wave period, wind sea [s]"
-H_s_swell					>		"Significant wave height, swell sea [m]"
+dir_T_mean					>		"Mean wave direction [deg]"
+H_s_swell					>		"Sign. wave height, swell sea [m]"
 T_p_swell					>		"Peak wave period, swell sea [s]"
 WL							>		"Water level [mMSL]"
 dir_T_mean_Swell			>		"Mean wave direction, swell sea [deg]"
@@ -184,7 +184,7 @@ Rev_1						>		["01", "01", "25.11.2024", "First Release"]
 
 *VMHS_wind*
 N_grid						>		100										>	int: 	number of bins in Vm-Axis
-deg_reg						>		3									    >	int: 	degree used for regression 
+deg_reg						>		3									>	int: 	degree used for regression 
 model_reg					>		'poly'									>	str: 	method used for regression ('poly' : polynominal, 'sqrt' : squareroot), see documentation
 cut_reg						>		95										>	float: 	percentage calculated with mean-values, the top (100 - cut_reg)% by regression
 weighting_reg				>		0										>	float:	weighting of regression by number of data-points in bin, 1: full weighting 0: no weighting
@@ -192,48 +192,34 @@ zone_reg 					>		[0,None]								>	list: 	range from which calculating the regre
 zone_line					> 		[0, None] 								>	zone: 	zone, in which the regression (or mean) plot is shown (or displayed in the tables), if [.. , None]  the upper limit is the maximal found value, excuding values under n_bin (from the current angle-section)
 bin_min						>		0 										>	int:	mininmal number of Datapoints in one bin to include the bin in any calculation
 average_correction			>		1
-avrg_method					>		"weighted mean" 						>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
-make_monotone 				>		True                                    >   bool:   ensures a (non strict) monoton increasing function by setting every decreasing value to the value before
+avrg_method					>		"weighted mean" 							>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
+make_monotone 				>		True
 
 *VMHS_swell*
-N_grid						>		15										>	int: 	number of bins in Vm-Axis
-deg_reg						>		0									    >	int: 	degree used for regression 
+N_grid						>		20										>	int: 	number of bins in Vm-Axis
+deg_reg						>		0									>	int: 	degree used for regression 
 model_reg					>		'poly'									>	str: 	method used for regression ('poly' : polynominal, 'sqrt' : squareroot), see documentation
 cut_reg						>		100										>	float: 	percentage calculated with mean-values, the top (100 - cut_reg)% by regression
 weighting_reg				>		0										>	float:	weighting of regression by number of data-points in bin, 1: full weighting 0: no weighting
 zone_reg 					>		[0,None]								>	list: 	range from which calculating the regression function is determined, if[.. , None], the upper limit is the maximal found value (from the current angle-section)
 zone_line					> 		[0, None] 								>	zone: 	zone, in which the regression (or mean) plot is shown (or displayed in the tables), if [.. , None]  the upper limit is the maximal found value, excuding values under n_bin (from the current angle-section)
 bin_min						>		0 										>	int:	mininmal number of Datapoints in one bin to include the bin in any calculation
-average_correction			>		1.05                                    >   float:  factor for all vm points 
-avrg_method					>		"weighted mean" 						>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
-make_monotone 				>		True                                    >   bool:   ensures a (non strict) monoton increasing function by setting every decreasing value to the value before
-
-*VMHS_docu*
-N_grid						>		20										>	int: 	number of bins in Vm-Axis
-deg_reg						>		3									    >	int: 	degree used for regression 
-model_reg					>		'poly'									>	str: 	method used for regression ('poly' : polynominal, 'sqrt' : squareroot), see documentation
-cut_reg						>		95										>	float: 	percentage calculated with mean-values, the top (100 - cut_reg)% by regression
-weighting_reg				>		0										>	float:	weighting of regression by number of data-points in bin, 1: full weighting 0: no weighting
-zone_reg 					>		[15,None]								>	list: 	range from which calculating the regression function is determined, if[.. , None], the upper limit is the maximal found value (from the current angle-section)
-zone_line					> 		[0, None] 								>	zone: 	zone, in which the regression (or mean) plot is shown (or displayed in the tables), if [.. , None]  the upper limit is the maximal found value, excuding values under n_bin (from the current angle-section)
-bin_min						>		0 										>	int:	mininmal number of Datapoints in one bin to include the bin in any calculation
-average_correction			>		1
-avrg_method					>		"weighted mean" 						>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
-make_monotone 				>		True                                    >   bool:   ensures a (non strict) monoton increasing function by setting every decreasing value to the value before (not applied in regression section)
-
+average_correction			>		1.05
+avrg_method					>		"weighted mean" 							>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
+make_monotone 				>		True
 
 *VMHS_total*
 N_grid						>		60										>	int: 	number of bins in Vm-Axis
-deg_reg						>		3									    >	int: 	degree used for regression 
+deg_reg						>		3									>	int: 	degree used for regression 
 model_reg					>		'poly'									>	str: 	method used for regression ('poly' : polynominal, 'sqrt' : squareroot), see documentation
-cut_reg						>		60									    >	float: 	percentage calculated with mean-values, the top (100 - cut_reg)% by regression
+cut_reg						>		60									>	float: 	percentage calculated with mean-values, the top (100 - cut_reg)% by regression
 weighting_reg				>		0										>	float:	weighting of regression by number of data-points in bin, 1: full weighting 0: no weighting
 zone_reg 					>		[2, None]								>	list: 	range from which calculating the regression function is determined, if[.. , None], the upper limit is the maximal found value (from the current angle-section)
 zone_line					> 		[2, None] 								>	zone: 	zone, in which the regression (or mean) plot is shown (or displayed in the tables), if [.. , None]  the upper limit is the maximal found value, excuding values under n_bin (from the current angle-section)
 bin_min						>		0 										>	int:	mininmal number of Datapoints in one bin to include the bin in any calculation
-average_correction			>		1                                       >   float:  factor for all vm points 
-avrg_method					>		"weighted mean" 						>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
-make_monotone 				>		True                                    >   bool:   ensures a (non strict) monoton increasing function by setting every decreasing value to the value before (not applied in regression section)
+average_correction			>		1
+avrg_method					>		"weighted mean" 							>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
+make_monotone 				>		True
 
 *HSTP_wind*
 N_grid						>		100										>	int:	number of bins in Hs-Axis
@@ -245,12 +231,12 @@ zone_reg 					>		[0, None]								>	list:	range included for calculating the reg
 zone_line					> 		[0, None]								>	zone:	zone, in which the regression (or mean) plot is shown (or displayed in the tables), if [.. , None]  the upper limit is the maximal found value, excuding values under n_bin (from the current angle-section)
 bin_min						>		0										>	int:	mininmal number of Datapoints in one bin to include the bin in any calculation
 percentiles					>		[33,66]									>	list:	percentiles to display, 50% not necessary, covered by mean, any number of percentiles possible
-quantile_relative			>		5										>	float   realative offset of quantiles of f_0 in percent
+quantile_relative			>		5										>	realative offset
 quantile					>		True									>	bool:	if True: plot "quantile" line, is expectiong quant_low, quant_up and two percentiles, over and under mean
 quant_low					>		None									>	float:	lower (Period) limit (higher frequency value) of resonance frequency band, if None: not plotted
 quant_up					>		None									>	float:	upper (Period) limit (lower frequency value) of resonance frequency band, if None: not plotted
-avrg_method					>		"median"							    >	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)avrg_method					>		"mean"							>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
-make_monotone 				>		False                                   >   bool:   ensures a (non strict) monoton increasing function by setting every decreasing value to the value before (not applied in regression section)
+avrg_method					>		"median"							>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)avrg_method					>		"mean"							>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
+make_monotone 				>		False
 
 
 *HSTP_swell*
@@ -264,11 +250,11 @@ zone_line					> 		[0, None]								>	zone:	zone, in which the regression (or mea
 bin_min						>		0										>	int:	mininmal number of Datapoints in one bin to include the bin in any calculation
 percentiles					>		[]										>	list:	percentiles to display, 50% not necessary, covered by mean, any number of percentiles possible
 quantile					>		False									>	bool:	if True: plot "quantile" line, is expectiong quant_low, quant_up and two percentiles, over and under mean
-quantile_relative			>		None									>	float   realative offset of quantiles of f_0 in percent
+quantile_relative			>		None									>	realative offset
 quant_low					>		None									>	float:	lower (Period) limit (higher frequency value) of resonance frequency band, if None: not plotted
 quant_up					>		None									>	float:	upper (Period) limit (lower frequency value) of resonance frequency band, if None: not plotted
 avrg_method					>		"median"								>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
-make_monotone 				>		False                                   >   bool:   ensures a (non strict) monoton increasing function by setting every decreasing value to the value before (not applied in regression section)
+make_monotone 				>		False
 
 *HSTP_total*
 N_grid						>		50										>	int:	number of bins in Hs-Axis
@@ -277,15 +263,15 @@ model_reg					>		'sqrt'									>	str:	method used for regression ('poly' : poly
 cut_reg						>		0										>	float:	percentage calculated with mean-values, the top (100 - cut_reg)% by regression
 weighting_reg				>		0										>	float:	weighting of regression by number of data-points in bin, 1: full weighting 0: no weighting
 zone_reg 					>		[0, None]								>	list:	range included for calculating the regression function, if[.. , None], the upper limit is the maximal found value (from the current angle-section)
-zone_line					> 		[0, None]								>	list:	zone, in which the regression (or mean) plot is shown (or displayed in the tables), if [.. , None]  the upper limit is the maximal found value, excuding values under n_bin (from the current angle-section)
+zone_line					> 		[0, None]								>	zone:	zone, in which the regression (or mean) plot is shown (or displayed in the tables), if [.. , None]  the upper limit is the maximal found value, excuding values under n_bin (from the current angle-section)
 bin_min						>		0										>	int:	mininmal number of Datapoints in one bin to include the bin in any calculation
 percentiles					>		[]										>	list:	percentiles to display, 50% not necessary, covered by mean, any number of percentiles possible
 quantile					>		False									>	bool:	if True: plot "quantile" line, is expectiong quant_low, quant_up and two percentiles, over and under mean
-quantile_relative			>		None									>	float   realative offset of quantiles of f_0 in percent
+quantile_relative			>		None										>	realative offset
 quant_low					>		None									>	float:	lower (Period) limit (higher frequency value) of resonance frequency band, if None: not plotted
 quant_up					>		None									>	float:	upper (Period) limit (lower frequency value) of resonance frequency band, if None: not plotted
 avrg_method					>		"median"								>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
-make_monotone 				>		False                                   >   bool:   ensures a (non strict) monoton increasing function by setting every decreasing value to the value before (not applied in regression section)   
+make_monotone 				>		False
 
 
 *Tables*
@@ -299,10 +285,10 @@ rot_r_label					> 		0										>	float:	roation of r-lables in degree
 
 
 *Validation_wind*
-from_DB						> 		True                                    >   bool: if True, load DELs from "table name" if False, calculates new DELs if necessary (compares with data already there)
-table_name					>		"DEL_config_1"							>   str:  name of table containing the DELs
-nodes_to_load				>		['501']							        >   list None: 'all'
-scatter_configs				>		['IDLING node 501']                     >
+from_DB						> 		True
+table_name					>		"DEL_config_1"							
+nodes_to_load				>		['501']							> bei None: 'all'
+scatter_configs				>		['IDLING node 501']
 
 
 *Validation_swell*
@@ -315,7 +301,7 @@ scatter_configs				>		['IDLING node 501']
 wind						>		[['dir_v_m', 'v_m']]
 total_sea					>		[['dir_T_mean', 'H_s']]
 swell_sea					>		[['dir_T_mean_Swell', 'H_s_swell']]	
-wind_sea					>		[['dir_v_m', 'H_s_wind']]
+wind_sea					>		[['dir_T_mean_Wind', 'H_s_wind']]
 
 currents					>		[]
 
@@ -334,7 +320,7 @@ filter_by					>		["H_s_wind", "T_p_wind"]
 margin						>		[[0, 100], [0, 100]]
 
 *ExtremeValues*
-sensors_Wind_speed			>		['dir_v_m','v_m']
+sensors_Wind				>		['dir_v_m','v_m']
 #sensors_Water_level			>		[None,'WL']
 sensors_Wave_height			>		['dir_T_mean','H_s']
 
@@ -347,6 +333,18 @@ conf_inter_algorithm		>		'2'										> 1 oder 2
 T_return					>		[5,10,50]
 freq_samp					>		1
 
+*VMHS_docu*
+N_grid						>		20										>	int: 	number of bins in Vm-Axis
+deg_reg						>		3									>	int: 	degree used for regression 
+model_reg					>		'poly'									>	str: 	method used for regression ('poly' : polynominal, 'sqrt' : squareroot), see documentation
+cut_reg						>		95										>	float: 	percentage calculated with mean-values, the top (100 - cut_reg)% by regression
+weighting_reg				>		0										>	float:	weighting of regression by number of data-points in bin, 1: full weighting 0: no weighting
+zone_reg 					>		[15,None]								>	list: 	range from which calculating the regression function is determined, if[.. , None], the upper limit is the maximal found value (from the current angle-section)
+zone_line					> 		[0, None] 								>	zone: 	zone, in which the regression (or mean) plot is shown (or displayed in the tables), if [.. , None]  the upper limit is the maximal found value, excuding values under n_bin (from the current angle-section)
+bin_min						>		0 										>	int:	mininmal number of Datapoints in one bin to include the bin in any calculation
+average_correction			>		1
+avrg_method					>		"weighted mean" 							>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
+make_monotone 				>		True
 
 
 *Captions*
@@ -412,9 +410,9 @@ angle_deviation_table_page_6  				>  "Directional deviation wind sector [135°..
 angle_deviation_table_page_7  				>  "Directional deviation wind sector [165°...195°]"
 angle_deviation_table_page_8  				>  "Directional deviation wind sector [195°...225°]"
 angle_deviation_table_page_9  				>  "Directional deviation wind sector [225°...255°]"
-angle_deviation_table_page_10  				>  "Directional deviation wind sector [255°...285°]0"
-angle_deviation_table_page_11  				>  "Directional deviation wind sector [285°...315°]1"
-angle_deviation_table_page_12  				>  "Directional deviation wind sector [515°...345°]2"
+angle_deviation_table_page_10  				>  "Directional deviation wind sector [255°...285°]"
+angle_deviation_table_page_11  				>  "Directional deviation wind sector [285°...315°]"
+angle_deviation_table_page_12  				>  "Directional deviation wind sector [515°...345°]"
 Revision_Table_page_1  						>  None
 Map											>	"Overview map (BSH)"
 DataSorce_global_page_1						>	"General databasis parameters (\cite{MetConditions})"
