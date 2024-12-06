@@ -1041,10 +1041,17 @@ if INPUT["Toggle_Modules"].get("plot_HSTP", {}) and (len(INPUT["Toggle_Modules"]
 
         df = Calc.load_from_db(colnames_ini=True)
         titles = gl.alias(Calc.create_segment_title(), INPUT["ColumNames"], INPUT["Aliase"])
+        Input = INPUT[f"HSTP_{sea_type}"]
 
         for i, Seg in enumerate(Calc.result):
+
             Seg.indizes = pd.to_datetime(Seg.indizes)
             point_data = df[df.index.isin(Seg.indizes)]
+
+            key_plot = [key for key in Seg.result["data"].columns if 'plot' in key]
+            key_mean = [key for key in key_plot if 'mean' in key]
+            key_perc = [key for key in key_plot if 'percentile' in key]
+            key_quantile = [key for key in Seg.result["data"].columns if 'quantile' in key]
 
             tile_curr = hc_plt.Tile(
                 i,
@@ -1053,19 +1060,60 @@ if INPUT["Toggle_Modules"].get("plot_HSTP", {}) and (len(INPUT["Toggle_Modules"]
                 title=titles[i],
             )
 
-            tile_curr.add_scatter(hc_plt.Scatter(
+            scatter = hc_plt.Scatter(
                 x=point_data[Seg.colnames["x"]],
                 y=point_data[Seg.colnames["y"]],
                 cmap='cool',
                 size=2,
                 cmap_norm='sqrt'
-            ))
-            tile_curr.add_line(hc_plt.Line(
+            )
+
+            line_mean =hc_plt.Line(
                 x=Seg.result["data"]["x"],
                 y=Seg.result["data"]["mean result plot"],
                 label='Selected correlation',
                 color='black'
-            ))
+            )
+
+            tile_curr.add_scatter(scatter)
+            tile_curr.add_line(line_mean)
+
+            if len(key_perc) > 0:
+                Line_perc_low = hc_plt.Line(x=Seg.result["data"]["x"],
+                                            y=Seg.result["data"][key_perc[0]],
+                                            label=key_perc[0].replace('result', '').replace('plot', ''),
+                                            color='black',
+                                            linestyle='--')
+                tile_curr.add_line(Line_perc_low)
+
+                Line_perc_up = hc_plt.Line(x=Seg.result["data"]["x"],
+                                           y=Seg.result["data"][key_perc[1]],
+                                           label=key_perc[1].replace('result', '').replace('plot', ''),
+                                           color='black',
+                                           linestyle=':')
+                tile_curr.add_line(Line_perc_up)
+
+            if len(key_quantile) > 0:
+                Line_quant = hc_plt.Line(x=Seg.result["data"]["x"],
+                                         y=Seg.result["data"][key_quantile[0]],
+                                         label='Selected correlation',
+                                         color='red',
+                                         linestyle='-')
+                tile_curr.add_line(Line_quant)
+
+                Line_quant_up = hc_plt.Line(x=None,
+                                            y=[1 / Input["quant_up"]],
+                                            label=r'$f_{up}$' + f"$={round(Input['quant_up'], 3)}$ Hz",
+                                            color='green',
+                                            linestyle=':')
+                tile_curr.add_line(Line_quant_up)
+
+                Line_quant_low = hc_plt.Line(x=None,
+                                             y=[1 / Input["quant_low"]],
+                                             label=r'$f_{low}$' + f"$={round(Input['quant_low'], 3)}$ Hz",
+                                             color='green',
+                                             linestyle='--')
+                tile_curr.add_line(Line_quant_low)
 
             if Seg.angles is not None:
                 Tiles.append(tile_curr)
@@ -1093,7 +1141,6 @@ if INPUT["Toggle_Modules"].get("plot_HSTP", {}) and (len(INPUT["Toggle_Modules"]
             gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f"HSTP_{sea_type}", dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
         # Generate Parameter Table
-        Input = INPUT[f"HSTP_{sea_type}"]
         new_col = \
             [f"[{Input['percentiles'][0]}\\% ... {Input['percentiles'][1]}\\%]" if Input['quantile'] else "-",
                    f"[{Input['quant_up']} Hz ... {Input['quant_low']} Hz]" if Input['quantile'] else "-",
@@ -1647,8 +1694,8 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and INPUT["Toggle_Modul
             tile_curr.add_scatter(scatter)
 
             if Seg.result["meta"]["intervall_mode"] == 'std':
-                upper_lim_label = 'upper bound ($\\text{mean} + \sigma$)'
-                lower_lim_label = 'lower bound ($\text{mean} - \sigma$)'
+                upper_lim_label = 'upper bound ($\\text{mean} + \\sigma$)'
+                lower_lim_label = 'lower bound ($\text{mean} - \\sigma$)'
 
             if Seg.result["meta"]["intervall_mode"] == 'percentile':
                 upper_lim_label = 'upper band (95-percentile)'
@@ -2597,7 +2644,7 @@ if INPUT["DataBase"].get("create_report", {}):
 
     Biblografys = [INPUT["DataBase"]["BIBDatasets"], INPUT["DataBase"]["BIBLiteratur"], INPUT["DataBase"]["BIBGuidelines"]]
 
-    introduction_text = "For the support structure design of an offshore wind farm, the interpretation of the metocean data is required. Hydrodynamic load analysis will be conducted on this basis, which basically follow the recommendations in \cite{DNV-ST_0437} supported by \cite{IEC_61400_3_1}."
+    introduction_text = "For the support structure design of an offshore wind farm, the interpretation of the metocean data is required. Hydrodynamic load analysis will be conducted on this basis, which basically follow the recommendations in \\cite{DNV-ST_0437} supported by \\cite{IEC_61400_3_1}."
     introduction_text += "\\" + INPUT["DocumentMeta"]["intro_siteSpecific"]
     document_purpose_text = "This document describes the marine assessment of metocean hindcast data to determine the hydrodynamic load impact in an offshore wind project. The evaluated design parameter shall fulfil the requirements for a preliminary design phase of substructure and foundation."
 
@@ -2640,7 +2687,7 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter] = TEMPLATES[chapter]
     TEX["main"], last_idx = ltx.include_include(TEX["main"], chapter, line=last_idx + 1)
 
-    gamma_toreset = "$\\gamma$ is defined by the Torsethaugen spectrum (\cite{DNV-ST_0437}) as: \n \\begin{align} \n \\gamma = 35 \\cdot \\frac{2  \\pi  H_s}{9.81 \\cdot T_p^2}^{6 / 7} \n \\end{align}"
+    gamma_toreset = "$\\gamma$ is defined by the Torsethaugen spectrum (\\cite{DNV-ST_0437}) as: \n \\begin{align} \n \\gamma = 35 \\cdot \\frac{2  \\pi  H_s}{9.81 \\cdot T_p^2}^{6 / 7} \n \\end{align}"
     gamma_default = ""
 
     if INPUT["RWI"]["gamma"] == 'torset':
