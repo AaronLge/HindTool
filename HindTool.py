@@ -19,74 +19,12 @@ from allib import hindtoolcalc as hc_calc
 from allib import hindtoolplot as hc_plt
 from allib import latex as ltx
 
-
-# %% FUNCTIONS - General
-
-def modify_lua_variables(file_path, variables):
-    with open(file_path, 'r') as file:
-        lines = file.readlines()
-    for variable_name, new_value in variables.items():
-        variable_pattern = re.compile(rf'^(\s*{variable_name}\s*=\s*).*?(\s*,\s*--.*)?$')
-
-        for i, line in enumerate(lines):
-            match = variable_pattern.match(line)
-            if match:
-                indentation = match.group(1)
-                rest_of_line = match.group(2) if match.group(2) else ','
-                lines[i] = f"{indentation}{new_value}{rest_of_line}\n"
-                break
-
-    with open(file_path, 'w') as file:
-        file.writelines(lines)
-
-
-def Series_to_txt(series, path):
-    with open(path, "w") as text_file:
-        for time, row in series.items():
-            string = f"{time}" + '\t' + f"{row}" + '\n'
-            text_file.write(string)
-    return
-
-
-def Data_out_csv(Data_Out, Name, path_csv):
-    global path_out
-
-    i = 0
-
-    for dict_dict_name, cd_dict in Data_Out.items():
-        dict_dict_name = dict_dict_name.replace(':', '=')
-        dict_dict_name = dict_dict_name.replace(' ', '')
-
-        i = i + 1
-        i_print = str(i).zfill(2)
-
-        path_csv_full = path_csv + Name + '_' + i_print + '_' + dict_dict_name + '.csv'
-
-        cd_dict.to_csv(path_csv_full)
-
-
-def Data_out_xls(Data_Out, Name, path_csv):
-    global path_out
-
-    i = 0
-
-    with pd.ExcelWriter(path_csv + Name) as writer:
-        for dict_dict_name, cd_dict in Data_Out.items():
-            dict_dict_name = dict_dict_name.replace(':', '=')
-            dict_dict_name = dict_dict_name.replace(' ', '')
-
-            cd_dict.to_excel(writer, sheet_name=dict_dict_name, index=False)
-
-            i = i + 1
-
-
-# %% Startup
-
 simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
-
 warnings.filterwarnings("ignore", category=RuntimeWarning)
-
 pd.options.mode.chained_assignment = None  # default='warn'
+
+
+# %% Startup Block
 
 script_name = os.path.basename(__file__)
 
@@ -102,6 +40,31 @@ path_in = args.i
 
 filename = inspect.getframeinfo(inspect.currentframe()).filename
 path_main = os.path.dirname(os.path.abspath(filename))
+
+print(f"reading Inputfile ({path_in})...")
+
+INPUT = gl.read_input_txt(path_in)
+timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+
+if args.o is None:
+    if INPUT['DataOut']['dir_name'] is None:
+        path_out = os.path.abspath(INPUT['DataOut']['path_out']) + '\\HindCast_' + timestamp + '\\'
+    else:
+        path_out = os.path.abspath(INPUT['DataOut']['path_out']) + '\\' + INPUT['DataOut']['dir_name'] + '\\'
+
+else:
+    path_out = os.path.abspath(args.o) + '/'
+
+print(f"Path_out = {path_out}")
+
+if not os.path.exists(path_out):
+    os.makedirs(path_out)
+
+shutil.copy(path_in, path_out + 'Input.txt')
+
+
+# %% Programm specific
+
 
 DATA_OUT = {}
 
@@ -119,29 +82,7 @@ INFO_LOG = str()
 print("\n***Starting " + f"{script_name}" +
       ", this might take a few minutes***\n")
 
-# %% UserInput
-print(f"reading Inputfile ({path_in})...")
-
-INPUT = gl.read_input_txt(path_in)
-timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-
-if args.o is None:
-    if INPUT['DataOut']['dir_name'] is None:
-        path_out = os.path.abspath(INPUT['DataOut']['path_out']) + '\\HindCast_' + timestamp + '\\'
-    else:
-        path_out = os.path.abspath(INPUT['DataOut']['path_out']) + '\\' + INPUT['DataOut']['dir_name'] + '\\'
-
-else:
-    path_out = os.path.abspath(args.o) + '/'
-
 INFO_LOG += f"Path_out = {path_out}" + "\n \n"
-
-print(f"Path_out = {path_out}")
-
-if not os.path.exists(path_out):
-    os.makedirs(path_out)
-
-shutil.copy(path_in, path_out + 'Input.txt')
 
 # load from lua?
 if INPUT['Structure']['d_from_proj']:
