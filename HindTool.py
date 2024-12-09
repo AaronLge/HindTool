@@ -261,8 +261,8 @@ for sea_type, column_names in hstp_columns.items():
 
         # Set quantile bounds if applicable
         if Input.get("quantile_relative") is not None:
-            Input["quant_up"] = INPUT["Structure"]["f_0"] - INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
-            Input["quant_low"] = INPUT["Structure"]["f_0"] + INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100
+            Input["quant_up"] = round(INPUT["Structure"]["f_0"] - INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100,3)
+            Input["quant_low"] = round(INPUT["Structure"]["f_0"] + INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100, 3)
 
         # Run calculations for omni and directional HSTP
         omni = hc_calc.calc_HSTP(df[column_names[0]], df[column_names[1]], df[column_names[2]], None,
@@ -533,6 +533,10 @@ if INPUT["Toggle_Modules"].get("calc_ExtremeValues", {}):
 
         Calc = hc_calc.Calculation()
         df = Calc.initilize_from_db(db_path, table_name, column_names, timeframe=timeframe)
+
+        # Apply filters
+        Calc.add_filter(mode='nans')
+        df = df.loc[Calc.apply_filters()]
 
         if cols[0] is not None:
             directional = hc_calc.calc_ExtemeValues(df[SENSORS["Name"][cols[1]]],
@@ -2167,7 +2171,7 @@ if INPUT["Toggle_Modules"].get("plot_report_tables", {}):
             meta_value = []
 
             for dataset_para, dataset_value in dataset_contents.items():
-                if dataset_value is not None:
+                if dataset_value is not None and not pd.isna(dataset_value):
                     meta_para.append(dataset_para)
                     meta_value.append(dataset_value)
 

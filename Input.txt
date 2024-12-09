@@ -48,7 +48,7 @@ datetime_end				>		'1981-07-01 07:00:00'							>	str:	enddatetime in the format:
 
 *Toggle_Modules*
 #calc_VMHS					>		['wind', 'swell']									
-calc_HSTP					>		['wind','swell']							
+#calc_HSTP					>		['wind','swell']							
 #calc_VMTP					>		['wind', 'swell']								
 #calc_RWI					>		['wind']								
 #calc_Tables				>		['wind', 'swell']											
