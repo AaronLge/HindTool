@@ -9,32 +9,34 @@ db_info_txt					>		'auto'
 
 
 #Report
-create_report				>		False
+create_report				>		True
 path_latex_templates 		> 		".\latex_templates"	
 acronym_path				>		"C:/Users/aaron.lange/Desktop/Projekte/Report_Automation/Acronyms.txt"
-BIBDatasets                 >		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/yunlin/datasets.bib"
+BIBDatasets                 >		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/EnBW/datasets.bib"
 BIBLiteratur				>		"C:/Users/aaron.lange/Desktop/Projekte/Report_Automation/Literature.bib"
 BIBGuidelines				>		"C:/Users/aaron.lange/Desktop/Projekte/Report_Automation/TechnicalGuidelines.bib"
 fig_path					>		None
 
-map_path                    >       None
+map_path                    >       "C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/EnBW/map.png"
 
+
+extern_appendenix 			>		["C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/EnBW/Wind_swell_Seperation/report/report"]
 *Structure*
-JBOOST_proj					>		"I:/2024/A/24A526_Shell_Concept_Design/03_Lasten/00_Conceptual_Design/05_JBOOST/2024-11-19_EF_FLS/proj.lua"					
-JBOOST_input				>		"I:/2024/A/24A526_Shell_Concept_Design/03_Lasten/00_Conceptual_Design/05_JBOOST/2024-11-19_EF_FLS/Input JBOOST Shell_N9p2.lua"
+JBOOST_proj					>		"I:/2024/A/24A525_EnBW_Dreekant_FEED/03_Lasten/00_Conceptual_Design/05_JBOOST/v1/proj.lua"					
+JBOOST_input				>		"I:/2024/A/24A525_EnBW_Dreekant_FEED/03_Lasten/00_Conceptual_Design/05_JBOOST/v1/Input JBOOST EnBW-Dreekant-PreFeed-v1.lua"
 
 steep_crit					>		0.04									>	float:	Steepness limit (Hs/lamda(Tp)) for WaveBreaking 
-f_0							>		0.151									>	float:	first resonance-frequency (overrides value in "./JBOOST/proj.lua")
+f_0							>		0.125									>	float:	first resonance-frequency (overrides value in "./JBOOST/proj.lua")
 
 d_from_proj					> 		False
-d							>		42.9
+d							>		42.63
 
 *DataOut*
 path_out					>		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/EnBW/" > sStr or none:	if str, name of the folder created in the path_out (Attention, can overwrite old foulders), if None, name is given, including a timestamp (recommended)
 CSV_out						>		True 									>	bool:	if True, export of all calculated data in "path_out/dirname/csv_data"
 CSV_deep					>		False											
-dir_name					>		'Data_Out_1'									>	str or none:	if str, name of the folder created in the path_out (Attention, can overwrite old foulders), if None, name is given, including a timestamp (recommended)
-
+dir_name					>		'Data_Out_3'									>	str or none:	if str, name of the folder created in the path_out (Attention, can overwrite old foulders), if None, name is given, including a timestamp (recommended)
+<
 *AngleSection*
 mode_angle					>		"full"									>	str:	seperation mode, "full": eqal division of the whole circle in "N_angle" parts	'section': equal devision in "N_angle" parts of the size "width_angle"
 N_angle						>		12										>	int:	number of angle segments
@@ -48,16 +50,16 @@ datetime_end				>		'1981-07-01 07:00:00'							>	str:	enddatetime in the format:
 
 *Toggle_Modules*
 #calc_VMHS					>		['wind', 'swell']									
-#calc_HSTP					>		['wind','swell']							
+#calc_HSTP					>		['wind', 'swell']							
 #calc_VMTP					>		['wind', 'swell']								
 #calc_RWI					>		['wind']								
-#calc_Tables				>		['wind', 'swell']											
+#calc_Tables					>		['wind', 'swell']											
 #calc_WaveBreak_Steep		>		['wind']										
 #calc_AngleDeviation 		>		['dir_v_m', 'dir_T_mean_Wind', 'v_m']						>	angle_orig, angle_deviation, v_m
 #calc_Roseplots				>		True									>	 [[angle, magnitude],[angle, magnitude]]
 #calc_ExtremeValues			>		True									
 #calc_Validation 			>		['wind','swell']											
-#calc_SensorEval			>		True
+#calc_SensorEval				>		True
 #calc_Weibull				>		[['dir_v_m', 'v_m']]
 #calc_ExtremeConture		>		[['H_s', 'T_p', 'dir_v_m']]
 
@@ -65,13 +67,13 @@ plot_VMHS					>		['wind', 'total', 'swell']
 plot_HSTP					>		['wind', 'swell', 'total']
 plot_VMTP					>		['wind', 'swell', 'total']
 plot_RWI					>		['wind', 'total']
-plot_BreakSteep			>		['wind', 'total']
-plot_Tables				>		['wind', 'swell', 'total']
-plot_AngleDeviation		>		True
+plot_BreakSteep				>		['wind', 'total']
+plot_Tables					>		['wind', 'swell', 'total']
+plot_AngleDeviation			>		True
 plot_Roseplots				>		True
 plot_ExtremeValues			>		True
 plot_Validation 			>		['wind', 'swell']
-plot_SensorEval			>		True
+plot_SensorEval				>		True
 plot_Weibull				>		True
 #plot_condensation_example	>		True
 plot_report_tables			>		True
@@ -88,19 +90,23 @@ datetime					>		"date"
 v_m 						>	 	"Wind speed 150m LAT [m/s]"
 dir_v_m 					> 		"Wind direction 150m LAT [degN-CF]"
 T_p							>		"Tp [s]"
-T_p_wind					>		"T_p_wind, WaveAge, beta=0.8"
-T_p_swell					>		"T_p_swell, WaveAge, beta=0.8"
-dir_T_p						>		"PeakWaveDirection"
+T_p_wind					>		"T_p_wind, WaveAge, beta=0.7"
+T_p_swell					>		"T_p_swell, WaveAge, beta=0.7"
 H_s							>		"Hs [m]"
-H_s_wind					>		"H_s_wind, WaveAge, beta=0.8"
-H_s_swell					>		"H_s_swell, WaveAge, beta=0.8"
+H_s_wind					>		"H_s_wind, WaveAge, beta=0.7"
+H_s_swell					>		"H_s_swell, WaveAge, beta=0.7"
 dir_T_mean					>		"Mean Wave Direction [degN-CF]"
 dir_T_mean_Wind				>		"Mean Wave Direction [degN-CF]"
 dir_T_mean_Swell			>		"Mean Wave Direction [degN-CF]"
+H_max						>		"Hmax [m]"
+WL							>		"Sea Surface Elevation [mMSL]"
+v_curr						>		"Depth-averaged current speed [m/s]"
+dir_curr					>		"Depth-averaged current direction [degN-GT]"	
+
 *Aliase*
 datetime					>		"date [UTC]"
-v_m 						>	 	"Wind speed at 150m [m/s]"
-dir_v_m 					> 		"Wind direction at 150m [deg]"
+v_m 						>	 	"Wind speed at 150m LAT [m/s]"
+dir_v_m 					> 		"Wind direction at 150m LAT [deg]"
 H_s							>		"Sign. wave height [m]"
 H_max						>		"Maximal wave height [m]"
 T_p							>		"Peak wave Period [s]"
@@ -110,13 +116,11 @@ T_p_wind					>		"Peak wave period, wind sea [s]"
 dir_T_mean					>		"Mean wave direction [deg]"
 H_s_swell					>		"Sign. wave height, swell sea [m]"
 T_p_swell					>		"Peak wave period, swell sea [s]"
-WL							>		"Water level [mMSL]"
 dir_T_mean_Swell			>		"Mean wave direction, swell sea [deg]"
 dir_T_mean_Wind				>		"Mean wave direction, wind sea [deg]" 
-dir_curr					>		"Current firection [deg]"
-WL_tide						>		"Water level, tide [mMSL]"
-v_curr 						>		"Current speed [m/s]"
-v_curr_1m					>		"Current speed, 1m [m/s]"
+WL							>		"Sea Surface Elevation [mMSL]"
+v_curr 						>		"Depth-averaged current speed [m/s]"
+dir_curr					>		"Depth-averaged current direction [degN-GT]"
 
 *Units*
 datetime					>		r"[-]"
@@ -162,11 +166,11 @@ v_curr 						>		r"$v_{curr}$"
 DocumentType 				>		r"Technical Note"
 DocumentTitle				>		r"Hindcast Evaluation for Monopile Design"
 ProjectTitle				>		r"Offshore Wind Farm"
-ProjectSubtitle				>		r"N-9.x"
-Client						>		r"Shell Global Solutions International BV"
-ClientLogo					>		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/Shell_Hindcast/Shell-Logo.png"
-EmployerNumber				>		"-"
-RefNumber					>		"24A526-JBO-TNHECD-EN-3001"
+ProjectSubtitle				>		r"Dreekant (former N-12.3)"
+Client						>		r"EnBW Dreekant GmbH"
+ClientLogo					>		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/EnBW/logo.png"
+EmployerNumber				>		"DKT-xxxx318"
+RefNumber					>		"24A525-JBO-TNMOCD-EN-3003"
 DocumentStatus				>		"IFR"
 RevisionJBO					>		'auto'
 RevisionEmployer			>		'auto'
@@ -176,22 +180,22 @@ DocumentAuthor				>		"ALa"
 QualityCheck				>		"FOs"
 Approval					>		"FOs"
 
-intro_siteSpecific				>		"The investigated project site is discribed in \\cite{MetConditions} and the data provided for the extraction point P1 is used. The assumed monopile substructure parameters can be found in \\cite{Structure}."
+intro_siteSpecific			>		"The data used for the investigated project site is discribed in \\cite{MetConditions}. The Design Input parameters are provided in \\cite{DesignInput}. The Wind-swell seperation is conductet by JBO, described in \\cite{WindSwellSeperation}. The assumed monopile substructure parameters can be found in \\cite{Structure}."
 
 *RevisionTable*
-Rev_1						>		["01", "01", "25.11.2024", "First Release"]
+Rev_1						>		["01", "01", "11.12.2024", "First Release"]
 
 
 *VMHS_wind*
-N_grid						>		100										>	int: 	number of bins in Vm-Axis
-deg_reg						>		3									>	int: 	degree used for regression 
+N_grid						>		50										>	int: 	number of bins in Vm-Axis
+deg_reg						>		3										>	int: 	degree used for regression 
 model_reg					>		'poly'									>	str: 	method used for regression ('poly' : polynominal, 'sqrt' : squareroot), see documentation
 cut_reg						>		95										>	float: 	percentage calculated with mean-values, the top (100 - cut_reg)% by regression
 weighting_reg				>		0										>	float:	weighting of regression by number of data-points in bin, 1: full weighting 0: no weighting
 zone_reg 					>		[0,None]								>	list: 	range from which calculating the regression function is determined, if[.. , None], the upper limit is the maximal found value (from the current angle-section)
-zone_line					> 		[0, None] 								>	zone: 	zone, in which the regression (or mean) plot is shown (or displayed in the tables), if [.. , None]  the upper limit is the maximal found value, excuding values under n_bin (from the current angle-section)
+zone_line					> 		[5, None] 								>	zone: 	zone, in which the regression (or mean) plot is shown (or displayed in the tables), if [.. , None]  the upper limit is the maximal found value, excuding values under n_bin (from the current angle-section)
 bin_min						>		0 										>	int:	mininmal number of Datapoints in one bin to include the bin in any calculation
-average_correction			>		1
+average_correction			>		1.05
 avrg_method					>		"weighted mean" 							>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
 make_monotone 				>		True
 
@@ -204,7 +208,7 @@ weighting_reg				>		0										>	float:	weighting of regression by number of dat
 zone_reg 					>		[0,None]								>	list: 	range from which calculating the regression function is determined, if[.. , None], the upper limit is the maximal found value (from the current angle-section)
 zone_line					> 		[0, None] 								>	zone: 	zone, in which the regression (or mean) plot is shown (or displayed in the tables), if [.. , None]  the upper limit is the maximal found value, excuding values under n_bin (from the current angle-section)
 bin_min						>		0 										>	int:	mininmal number of Datapoints in one bin to include the bin in any calculation
-average_correction			>		1.05
+average_correction			>		1.15
 avrg_method					>		"weighted mean" 							>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
 make_monotone 				>		True
 
@@ -286,14 +290,14 @@ rot_r_label					> 		0										>	float:	roation of r-lables in degree
 
 *Validation_wind*
 from_DB						> 		True
-table_name					>		"DEL_config_1"							
+table_name					>		"DEL_config_3"							
 nodes_to_load				>		['501']							> bei None: 'all'
 scatter_configs				>		['IDLING node 501']
 
 
 *Validation_swell*
 from_DB						> 		True
-table_name					>		"DEL_config_2"
+table_name					>		"DEL_config_4"
 nodes_to_load				>		['501']
 scatter_configs				>		['IDLING node 501']
 
@@ -303,13 +307,13 @@ total_sea					>		[['dir_T_mean', 'H_s']]
 swell_sea					>		[['dir_T_mean_Swell', 'H_s_swell']]	
 wind_sea					>		[['dir_T_mean_Wind', 'H_s_wind']]
 
-currents					>		[]
+currents					>		[['dir_curr', 'v_curr']]
 
 *RWI*
 gamma						>		'torset'
 
 *SensorEval*
-Sensors 					>		['v_m','H_s','T_p','H_s_wind','T_p_wind','H_s_swell','T_p_swell']
+Sensors 					>	['v_m','H_max','H_s','T_p','H_s_wind','T_p_wind','H_s_swell','T_p_swell', 'v_curr', 'WL']
 
 
 *AngleDeviation*
@@ -321,8 +325,9 @@ margin						>		[[0, 100], [0, 100]]
 
 *ExtremeValues*
 sensors_Wind				>		['dir_v_m','v_m']
-#sensors_Water_level			>		[None,'WL']
-sensors_Wave_height			>		['dir_T_mean','H_s']
+sensors_Water_level			>		[None,'WL']
+sensors_Wave_height			>		['dir_T_mean','H_max']
+	
 
 time_window_offset			>		0.5
 N_itter						>		1000			

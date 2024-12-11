@@ -16,7 +16,7 @@ Dynamic sea state resonance shall be analysed especially for low frequent wind t
 
 ?FIG
 
-A comparison of the derived sea state parameters of both approaches is shown in Table \ref{tab:Resonance_compare_page_1} and the results for every wind sea sector is shown in Figure \ref{fig:RWI_wind_page_1} and \ref{fig:RWI_wind_page_2}. 
+A comparison of the derived sea state parameters of both approaches is shown in Table \ref{tab:Resonance_compare_page_1}. 
 
 ?TABLE 
 

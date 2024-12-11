@@ -23,7 +23,6 @@ simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 pd.options.mode.chained_assignment = None  # default='warn'
 
-
 # %% Startup Block
 
 script_name = os.path.basename(__file__)
@@ -61,7 +60,6 @@ if not os.path.exists(path_out):
     os.makedirs(path_out)
 
 shutil.copy(path_in, path_out + 'Input.txt')
-
 
 # %% Programm specific
 
@@ -200,7 +198,7 @@ if (INPUT["Toggle_Modules"].get("plot_condensation_example", {})):
 
     # filter for nans and H_s over 0
     Calc.add_filter(mode='nans')
-    Calc.add_filter(mode='range', colnames=[SENSORS["Name"]["H_s_wind"]], ranges=[[0,None]])
+    Calc.add_filter(mode='range', colnames=[SENSORS["Name"]["H_s_wind"]], ranges=[[0, None]])
 
     indizes_in = Calc.apply_filters()
 
@@ -261,7 +259,7 @@ for sea_type, column_names in hstp_columns.items():
 
         # Set quantile bounds if applicable
         if Input.get("quantile_relative") is not None:
-            Input["quant_up"] = round(INPUT["Structure"]["f_0"] - INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100,3)
+            Input["quant_up"] = round(INPUT["Structure"]["f_0"] - INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100, 3)
             Input["quant_low"] = round(INPUT["Structure"]["f_0"] + INPUT["Structure"]["f_0"] * Input["quantile_relative"] / 100, 3)
 
         # Run calculations for omni and directional HSTP
@@ -395,7 +393,7 @@ for sea_type, column_names in column_names_dict.items():
                                           angle_grid_mod, INPUT["Structure"]["f_0"], gamma_mode=INPUT["RWI"]["gamma"])
 
         omni, _ = hc_calc.calc_RWI(df[column_names[0]], df[column_names[1]], df[column_names[2]], None,
-                                    INPUT["Structure"]["f_0"], gamma_mode=INPUT["RWI"]["gamma"])
+                                   INPUT["Structure"]["f_0"], gamma_mode=INPUT["RWI"]["gamma"])
 
         # Combine the results and save them
         Calc.result = omni + directional
@@ -404,8 +402,8 @@ for sea_type, column_names in column_names_dict.items():
 # WaveBreak steep
 toggle_modules = ["calc_WaveBreak_Steep"]
 column_names_dict = {
-    "wind": [SENSORS["Name"]["H_s_wind"],SENSORS["Name"]["T_p_wind"], SENSORS["Name"]["dir_v_m"]],
-    "total": [SENSORS["Name"]["H_s"],SENSORS["Name"]["T_p"], SENSORS["Name"]["dir_v_m"]]
+    "wind": [SENSORS["Name"]["H_s_wind"], SENSORS["Name"]["T_p_wind"], SENSORS["Name"]["dir_v_m"]],
+    "total": [SENSORS["Name"]["H_s"], SENSORS["Name"]["T_p"], SENSORS["Name"]["dir_v_m"]]
 }
 
 for sea_type, column_names in column_names_dict.items():
@@ -605,7 +603,8 @@ if len(INPUT["Toggle_Modules"].get("calc_ExtremeConture", {})) > 0:
 toggle_modules = ["calc_Validation"]
 validation_column_names_dict = {
     "wind": [SENSORS["Name"]["H_s_wind"], SENSORS["Name"]["T_p_wind"], SENSORS["Name"]["dir_v_m"], SENSORS["Name"]["v_m"]],
-    "swell": [SENSORS["Name"]["H_s_swell"], SENSORS["Name"]["T_p_swell"], SENSORS["Name"]["dir_T_mean_Swell"], SENSORS["Name"]["v_m"]]
+    "swell": [SENSORS["Name"]["H_s_swell"], SENSORS["Name"]["T_p_swell"], SENSORS["Name"]["dir_T_mean_Swell"], SENSORS["Name"]["v_m"]],
+    "total": [SENSORS["Name"]["H_s"], SENSORS["Name"]["T_p"], SENSORS["Name"]["dir_T_mean"], SENSORS["Name"]["v_m"]],
 }
 
 for sea_type, column_names in validation_column_names_dict.items():
@@ -617,6 +616,7 @@ for sea_type, column_names in validation_column_names_dict.items():
 
         Calc = hc_calc.Calculation()
         df_data = gl.export_df_from_sql(db_path, table_name, column_names=column_names, timeframe=timeframe)
+        N_ges = len(df_data)
         df_data['gamma'] = 3.3
         df_data = df_data.dropna(how='any')
 
@@ -636,6 +636,7 @@ for sea_type, column_names in validation_column_names_dict.items():
 
             colnames_DEL = gl.find_string_with_substrings(colnames_DEL, Input['nodes_to_load'])
             df = Calc.initilize_from_db(db_path, table_name_DEL, colnames_DEL, timeframe=timeframe, indizes=df_data.index)
+            Calc.basedata["N_rows"] = N_ges
 
         else:
             print(f"   loading from database: {db_path} in table {Input['table_name']} for current nodes and timeframe")
@@ -646,7 +647,7 @@ for sea_type, column_names in validation_column_names_dict.items():
                              "tablename": Input['table_name'],
                              "colnames_ini": df.keys,
                              "db_timeframe": [df.index[0], df.index[-1]],
-                             "N_rows": len(df),
+                             "N_rows": N_ges,
                              "sample_rate": gl.median_sample_rate(df.index),
                              "indizes": df.index}
 
@@ -720,7 +721,7 @@ if len(INPUT["Toggle_Modules"].get("calc_Weibull", {})) > 0:
 
 # %% Plot
 figsize_fullpage = [size * 0.39370079 for size in INPUT["Toggle_Modules"].get("writing_box", {})]
-figsize_fullpage_caption = [figsize_fullpage[0], figsize_fullpage[1]*0.9]
+figsize_fullpage_caption = [figsize_fullpage[0], figsize_fullpage[1] * 0.9]
 
 figsize_halfpage = [figsize_fullpage[0], figsize_fullpage[1] / 2.5]
 
@@ -972,10 +973,10 @@ if INPUT["Toggle_Modules"].get("plot_VMHS", {}) and (len(INPUT["Toggle_Modules"]
 
         # Save Plots
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f"VMHS_{sea_type}" , dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+            gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f"VMHS_{sea_type}", dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
         if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-            gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f"VMHS_{sea_type}" , dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+            gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f"VMHS_{sea_type}", dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
         # Generate Parameter Table
         Input = INPUT[f"VMHS_{sea_type}"]
@@ -1072,7 +1073,7 @@ if INPUT["Toggle_Modules"].get("plot_HSTP", {}) and (len(INPUT["Toggle_Modules"]
                 cmap_norm='sqrt'
             )
 
-            line_mean =hc_plt.Line(
+            line_mean = hc_plt.Line(
                 x=Seg.result["data"]["x"],
                 y=Seg.result["data"]["mean result plot"],
                 label='Selected correlation',
@@ -1147,13 +1148,13 @@ if INPUT["Toggle_Modules"].get("plot_HSTP", {}) and (len(INPUT["Toggle_Modules"]
         # Generate Parameter Table
         new_col = \
             [f"[{Input['percentiles'][0]}\\% ... {Input['percentiles'][1]}\\%]" if Input['quantile'] else "-",
-                   f"[{Input['quant_up']} Hz ... {Input['quant_low']} Hz]" if Input['quantile'] else "-",
-                   Input["N_grid"],
-                   Input["avrg_method"],
-                   f"{100 - Input['cut_reg']}" + " \\%",
-                   '-' if Input['cut_reg'] == 100 else f"{Input['deg_reg']}",
-                   '-' if Input['cut_reg'] == 100 else 'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
-                   '-' if Input['cut_reg'] == 100 else f"[{Input['zone_reg'][0]} ... {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
+             f"[{Input['quant_up']} Hz ... {Input['quant_low']} Hz]" if Input['quantile'] else "-",
+             Input["N_grid"],
+             Input["avrg_method"],
+             f"{100 - Input['cut_reg']}" + " \\%",
+             '-' if Input['cut_reg'] == 100 else f"{Input['deg_reg']}",
+             '-' if Input['cut_reg'] == 100 else 'x' if Input["model_reg"] == 'poly' else r'$\sqrt{x}$' if Input["model_reg"] == 'sqrt' else '',
+             '-' if Input['cut_reg'] == 100 else f"[{Input['zone_reg'][0]} ... {'max' if Input['zone_reg'][1] is None else Input['zone_reg'][1]}]"]
 
         columns_table.append(new_col)
         col_labels.append(f"{sea_type.capitalize()} sea")
@@ -1184,247 +1185,247 @@ if INPUT["Toggle_Modules"].get("plot_VMTP", {}) and (len(INPUT["Toggle_Modules"]
 
     # Loop over each plot type (wind, swell, total)
     for sea_type in INPUT["Toggle_Modules"]["plot_VMTP"]:
-            print(f"plotting VMTP {sea_type}...")
+        print(f"plotting VMTP {sea_type}...")
 
-            # Check if calculation is toggled
-            if sea_type not in INPUT["Toggle_Modules"].get("calc_VMPT", {}):
-                print("   please toggle calculation to plot")
-                continue
+        # Check if calculation is toggled
+        if sea_type not in INPUT["Toggle_Modules"].get("calc_VMTP", {}):
+            print("   please toggle calculation to plot")
+            continue
 
-            # Plot Data
-            Calc = DATA_OUT["VMTP"][sea_type]
-            Tiles = []
-            Tiles_omni = []
+        # Plot Data
+        Calc = DATA_OUT["VMTP"][sea_type]
+        Tiles = []
+        Tiles_omni = []
 
-            df = Calc.load_from_db(colnames_ini=True)
-            titles = gl.alias(Calc.create_segment_title(), INPUT["ColumNames"], INPUT["Aliase"])
+        df = Calc.load_from_db(colnames_ini=True)
+        titles = gl.alias(Calc.create_segment_title(), INPUT["ColumNames"], INPUT["Aliase"])
 
-            for i, Seg in enumerate(Calc.result):
-                Seg.indizes = pd.to_datetime(Seg.indizes)
-                point_data = df[df.index.isin(Seg.indizes)]
+        for i, Seg in enumerate(Calc.result):
+            Seg.indizes = pd.to_datetime(Seg.indizes)
+            point_data = df[df.index.isin(Seg.indizes)]
 
-                tile_curr = hc_plt.Tile(
-                    i,
-                    x_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Aliase"]),
-                    y_label=gl.alias(Seg.colnames['y'], INPUT["ColumNames"], INPUT["Aliase"]),
-                    title=titles[i],
-                )
-
-                tile_curr.add_scatter(hc_plt.Scatter(
-                    x=point_data[Seg.colnames["x"]],
-                    y=point_data[Seg.colnames["y"]],
-                    cmap='cool',
-                    size=2,
-                    cmap_norm='sqrt'
-                ))
-                tile_curr.add_line(hc_plt.Line(
-                    x=Seg.result["data"]["x"],
-                    y=Seg.result["data"]["mean result plot"],
-                    label='Extracted correlation',
-                    color='black'
-                ))
-
-                if Seg.angles is not None:
-                    Tiles.append(tile_curr)
-                else:
-                    Tiles_omni.append(tile_curr)
-
-            # Generate Plots
-            FIG_direc = hc_plt.plot_tiled(
-                Tiles, global_max=['auto', 'auto'], global_min=[0, 0],
-                grid=[3, 2], figsize=figsize_fullpage,
-                use_pgf=INPUT["Toggle_Modules"]["use_pgf"]
+            tile_curr = hc_plt.Tile(
+                i,
+                x_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Aliase"]),
+                y_label=gl.alias(Seg.colnames['y'], INPUT["ColumNames"], INPUT["Aliase"]),
+                title=titles[i],
             )
 
-            FIG_omni = hc_plt.plot_tiled(
-                Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0],
-                grid=[1, 1], figsize=figsize_halfpage,
-                use_pgf=INPUT["Toggle_Modules"]["use_pgf"]
-            )
+            tile_curr.add_scatter(hc_plt.Scatter(
+                x=point_data[Seg.colnames["x"]],
+                y=point_data[Seg.colnames["y"]],
+                cmap='cool',
+                size=2,
+                cmap_norm='sqrt'
+            ))
+            tile_curr.add_line(hc_plt.Line(
+                x=Seg.result["data"]["x"],
+                y=Seg.result["data"]["mean result plot"],
+                label='Extracted correlation',
+                color='black'
+            ))
 
-            # Save Plots
-            if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-                gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f"VMTP_{sea_type}", dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+            if Seg.angles is not None:
+                Tiles.append(tile_curr)
+            else:
+                Tiles_omni.append(tile_curr)
 
-            if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-                gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f"VMTP_{sea_type}", dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+        # Generate Plots
+        FIG_direc = hc_plt.plot_tiled(
+            Tiles, global_max=['auto', 'auto'], global_min=[0, 0],
+            grid=[3, 2], figsize=figsize_fullpage,
+            use_pgf=INPUT["Toggle_Modules"]["use_pgf"]
+        )
+
+        FIG_omni = hc_plt.plot_tiled(
+            Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0],
+            grid=[1, 1], figsize=figsize_halfpage,
+            use_pgf=INPUT["Toggle_Modules"]["use_pgf"]
+        )
+
+        # Save Plots
+        if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+            gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f"VMTP_{sea_type}", dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+        if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+            gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f"VMTP_{sea_type}", dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
 # RWI
 if INPUT["Toggle_Modules"].get("plot_RWI", {}) and (len(INPUT["Toggle_Modules"]["plot_RWI"]) > 0):
 
     # Loop over each RWI type (wind, total)
     for sea_type in INPUT["Toggle_Modules"]["plot_RWI"]:
-            print(f"plotting RWI {sea_type}...")
+        print(f"plotting RWI {sea_type}...")
 
-            # Check if calculation is toggled
-            if sea_type not in INPUT["Toggle_Modules"].get("calc_RWI", {}):
-                print("   please toggle calculation to plot")
-                continue
-            # Load the appropriate RWI data
-            Calc = DATA_OUT["RWI"][sea_type]
+        # Check if calculation is toggled
+        if sea_type not in INPUT["Toggle_Modules"].get("calc_RWI", {}):
+            print("   please toggle calculation to plot")
+            continue
+        # Load the appropriate RWI data
+        Calc = DATA_OUT["RWI"][sea_type]
 
-            Tiles = []
-            Tiles_omni = []
+        Tiles = []
+        Tiles_omni = []
 
-            df = Calc.load_from_db(colnames_ini=True)
+        df = Calc.load_from_db(colnames_ini=True)
 
-            titels = Calc.create_segment_title()
-            titels = gl.alias(titels, INPUT["ColumNames"], INPUT["Aliase"])
+        titels = Calc.create_segment_title()
+        titels = gl.alias(titels, INPUT["ColumNames"], INPUT["Aliase"])
 
-            # Process each segment
-            for i, Seg in enumerate(Calc.result):
-                Seg.indizes = pd.to_datetime(Seg.indizes)
-                point_data = df[df.index.isin(Seg.indizes)]
+        # Process each segment
+        for i, Seg in enumerate(Calc.result):
+            Seg.indizes = pd.to_datetime(Seg.indizes)
+            point_data = df[df.index.isin(Seg.indizes)]
 
-                tile_curr = hc_plt.Tile(i,
-                                        x_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Aliase"]),
-                                        y_label=gl.alias(Seg.colnames['y'], INPUT["ColumNames"], INPUT["Aliase"]),
-                                        title=titels[i])
+            tile_curr = hc_plt.Tile(i,
+                                    x_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Aliase"]),
+                                    y_label=gl.alias(Seg.colnames['y'], INPUT["ColumNames"], INPUT["Aliase"]),
+                                    title=titels[i])
 
-                scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]],
-                                         y=point_data[Seg.colnames["y"]],
-                                         cmap='cool',
-                                         cmap_mode='manual',
-                                         c=Seg.result.values,
-                                         size=2,
-                                         cbar=True,
-                                         cbar_label="RWI = $\\sqrt{S(f_0)}$ (Resonance Wave Intensity) $[\\sqrt{m^2/Hz}]$",
-                                         cbar_label_fontsize=6)
+            scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]],
+                                     y=point_data[Seg.colnames["y"]],
+                                     cmap='cool',
+                                     cmap_mode='manual',
+                                     c=Seg.result.values,
+                                     size=2,
+                                     cbar=True,
+                                     cbar_label="RWI = $\\sqrt{S(f_0)}$ (Resonance Wave Intensity) $[\\sqrt{m^2/Hz}]$",
+                                     cbar_label_fontsize=6)
 
-                Line_f0 = hc_plt.Line(x=None,
-                                      y=[1 / INPUT["Structure"]["f_0"]],
-                                      label=f'$f_0={INPUT["Structure"]["f_0"]}$ Hz',
-                                      color='green',
-                                      linestyle=':')
+            Line_f0 = hc_plt.Line(x=None,
+                                  y=[1 / INPUT["Structure"]["f_0"]],
+                                  label=f'$f_0={INPUT["Structure"]["f_0"]}$ Hz',
+                                  color='green',
+                                  linestyle=':')
 
-                tile_curr.add_scatter(scatter)
-                tile_curr.add_line(Line_f0)
+            tile_curr.add_scatter(scatter)
+            tile_curr.add_line(Line_f0)
 
-                if Seg.angles is not None:
-                    Tiles.append(tile_curr)
-                else:
-                    Tiles_omni.append(tile_curr)
+            if Seg.angles is not None:
+                Tiles.append(tile_curr)
+            else:
+                Tiles_omni.append(tile_curr)
 
-            # Generate Plots
-            FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], scatter_max='auto', figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+        # Generate Plots
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], scatter_max='auto', figsize=figsize_fullpage,
+                                      use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
-            FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
-            # Save Plots
-            if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-                gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f"RWI_{sea_type}", dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+        # Save Plots
+        if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+            gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f"RWI_{sea_type}", dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-            if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-                gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f"RWI_{sea_type}", dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+        if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+            gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f"RWI_{sea_type}", dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
 # WaveBreakSteep
 if INPUT["Toggle_Modules"].get("plot_BreakSteep", {}) and (len(INPUT["Toggle_Modules"]["plot_BreakSteep"]) > 0):
 
     # Loop over each RWI type (wind, total)
     for sea_type in INPUT["Toggle_Modules"]["plot_BreakSteep"]:
-            print(f"plotting WaveBreak_Steep {sea_type}...")
+        print(f"plotting WaveBreak_Steep {sea_type}...")
 
-            # Check if calculation is toggled
-            if sea_type not in INPUT["Toggle_Modules"].get("calc_AngleDeviation", {}):
-                print("   please toggle calculation to plot")
-                continue
+        # Check if calculation is toggled
+        if sea_type not in INPUT["Toggle_Modules"].get("calc_WaveBreak_Steep", {}):
+            print("   please toggle calculation to plot")
+            continue
 
-            # Load the appropriate WaveBreak_Steep data
-            Calc = DATA_OUT["WaveBreak_Steep"][sea_type]
+        # Load the appropriate WaveBreak_Steep data
+        Calc = DATA_OUT["WaveBreak_Steep"][sea_type]
 
-            Tiles = []
-            Tiles_omni = []
+        Tiles = []
+        Tiles_omni = []
 
-            df = Calc.load_from_db(colnames_ini=True)
+        df = Calc.load_from_db(colnames_ini=True)
 
-            titels = Calc.create_segment_title()
-            titels = gl.alias(titels, INPUT["ColumNames"], INPUT["Aliase"])
+        titels = Calc.create_segment_title()
+        titels = gl.alias(titels, INPUT["ColumNames"], INPUT["Aliase"])
 
-            # Process each segment
-            for i, Seg in enumerate(Calc.result):
-                Seg.indizes = pd.to_datetime(Seg.indizes)
-                point_data = df[df.index.isin(Seg.indizes)]
+        # Process each segment
+        for i, Seg in enumerate(Calc.result):
+            Seg.indizes = pd.to_datetime(Seg.indizes)
+            point_data = df[df.index.isin(Seg.indizes)]
 
-                tile_curr = hc_plt.Tile(i,
-                                        x_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Aliase"]),
-                                        y_label=gl.alias(Seg.colnames['y'], INPUT["ColumNames"], INPUT["Aliase"]),
-                                        title=titels[i])
+            tile_curr = hc_plt.Tile(i,
+                                    x_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Aliase"]),
+                                    y_label=gl.alias(Seg.colnames['y'], INPUT["ColumNames"], INPUT["Aliase"]),
+                                    title=titels[i])
 
-                c_krit = Seg.result["steepness"]
+            c_krit = Seg.result["steepness"]
 
-                # Set steepness values to NaN where break is False
-                c_krit.iloc[Seg.result["bool_break"] == False] = float('nan')
+            # Set steepness values to NaN where break is False
+            c_krit.iloc[Seg.result["bool_break"] == False] = float('nan')
 
-                scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]].values,
-                                         y=point_data[Seg.colnames["y"]].values,
-                                         cmap='cool',
-                                         cmap_mode='manual',
-                                         c=c_krit.values,
-                                         size=2,
-                                         cbar=True,
-                                         cbar_label="steepness [-]")
+            scatter = hc_plt.Scatter(x=point_data[Seg.colnames["x"]].values,
+                                     y=point_data[Seg.colnames["y"]].values,
+                                     cmap='cool',
+                                     cmap_mode='manual',
+                                     c=c_krit.values,
+                                     size=2,
+                                     cbar=True,
+                                     cbar_label="steepness [-]")
 
-                tile_curr.add_scatter(scatter)
+            tile_curr.add_scatter(scatter)
 
-                if Seg.angles is not None:
-                    Tiles.append(tile_curr)
-                else:
-                    Tiles_omni.append(tile_curr)
+            if Seg.angles is not None:
+                Tiles.append(tile_curr)
+            else:
+                Tiles_omni.append(tile_curr)
 
-            # Generate Plots
-            FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], scatter_max='auto', scatter_min=INPUT["Structure"]["steep_crit"],
-                                          figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+        # Generate Plots
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], scatter_max='auto', scatter_min=INPUT["Structure"]["steep_crit"],
+                                      figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
-            FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
-            # Save Plots
-            if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-                gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f"WaveBreak_{sea_type}", dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+        # Save Plots
+        if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+            gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f"WaveBreak_{sea_type}", dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-            if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-                gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f"WaveBreak_{sea_type}", dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+        if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+            gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f"WaveBreak_{sea_type}", dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
 # Tables
 if INPUT["Toggle_Modules"].get("plot_Tables", {}) and (len(INPUT["Toggle_Modules"]["plot_Tables"]) > 0):
 
     # Loop over each RWI type (wind, total)
     for sea_type in INPUT["Toggle_Modules"]["plot_Tables"]:
-            print(f"plotting Tables {sea_type}...")
+        print(f"plotting Tables {sea_type}...")
 
-            # Check if calculation is toggled
-            if sea_type not in INPUT["Toggle_Modules"].get("calc_Tables", {}):
-                print("   please toggle calculation to plot")
-                continue
+        # Check if calculation is toggled
+        if sea_type not in INPUT["Toggle_Modules"].get("calc_Tables", {}):
+            print("   please toggle calculation to plot")
+            continue
 
-            Calc = DATA_OUT["table_vmhs"][sea_type]
-            titel = f"'{gl.alias(Calc.result[0].colnames['y'], INPUT['ColumNames'], INPUT['Aliase'])}'" + "\n " + \
-                    f"in '{gl.alias(Calc.result[1].angle_name, INPUT['ColumNames'], INPUT['Aliase'])}' directional sections" + "\n" + \
-                    r"\small " + f"with v_m = '{gl.alias(Calc.result[0].colnames['x'], INPUT['ColumNames'], INPUT['Aliase'])}'"
+        Calc = DATA_OUT["table_vmhs"][sea_type]
+        titel = f"'{gl.alias(Calc.result[0].colnames['y'], INPUT['ColumNames'], INPUT['Aliase'])}'" + "\n " + \
+                f"in '{gl.alias(Calc.result[1].angle_name, INPUT['ColumNames'], INPUT['Aliase'])}' directional sections" + "\n" + \
+                r"\small " + f"with v_m = '{gl.alias(Calc.result[0].colnames['x'], INPUT['ColumNames'], INPUT['Aliase'])}'"
 
-            FIG = [hc_plt.plot_table_condesation(Calc, figsize=figsize_fullpage, titel=titel)]
+        FIG = [hc_plt.plot_table_condesation(Calc, figsize=figsize_fullpage, titel=titel)]
 
+        # Save plots
+        if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+            gl.save_figs_as_png(FIG, path_out + f'table_vmhs_{sea_type}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-            # Save plots
-            if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-                gl.save_figs_as_png(FIG, path_out + f'table_vmhs_{sea_type}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+        if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+            gl.save_figs_as_pdf(FIG, path_out + f'table_vmhs_{sea_type}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-            if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-                gl.save_figs_as_pdf(FIG, path_out + f'table_vmhs_{sea_type}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+        # VMTP
+        Calc = DATA_OUT["table_vmtp"][sea_type]
+        titel = f"'{gl.alias(Calc.result[0].colnames['y'], INPUT['ColumNames'], INPUT['Aliase'])}'" + "\n " + \
+                f"in '{gl.alias(Calc.result[1].angle_name, INPUT['ColumNames'], INPUT['Aliase'])}' directional sections" + "\n" + \
+                r"\small " + f"with v_m = '{gl.alias(Calc.result[0].colnames['x'], INPUT['ColumNames'], INPUT['Aliase'])}'"
 
-            # VMTP
-            Calc = DATA_OUT["table_vmtp"][sea_type]
-            titel = f"'{gl.alias(Calc.result[0].colnames['y'], INPUT['ColumNames'], INPUT['Aliase'])}'" + "\n " + \
-                    f"in '{gl.alias(Calc.result[1].angle_name, INPUT['ColumNames'], INPUT['Aliase'])}' directional sections" + "\n" + \
-                    r"\small " + f"with v_m = '{gl.alias(Calc.result[0].colnames['x'], INPUT['ColumNames'], INPUT['Aliase'])}'"
+        FIG = [hc_plt.plot_table_condesation(Calc, figsize=figsize_fullpage, titel=titel)]
 
-            FIG = [hc_plt.plot_table_condesation(Calc, figsize=figsize_fullpage, titel=titel)]
+        # Save plots
+        if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+            gl.save_figs_as_png(FIG, path_out + f'table_vmtp_{sea_type}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-            # Save plots
-            if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-                gl.save_figs_as_png(FIG, path_out + f'table_vmtp_{sea_type}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-            if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-                gl.save_figs_as_pdf(FIG, path_out + f'table_vmtp_{sea_type}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+        if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+            gl.save_figs_as_pdf(FIG, path_out + f'table_vmtp_{sea_type}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
 # AngleDeviation
 if INPUT["Toggle_Modules"].get("plot_AngleDeviation", {}):
@@ -1662,7 +1663,8 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and INPUT["Toggle_Modul
 
         FIG_direc = hc_plt.plot_tiled(Tiles, global_max=[None, None], global_min=[None, None], grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], grid=[1, 1], figsize=figsize_halfpage,
+                                     use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f'Extreme_qq_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -1772,7 +1774,8 @@ if INPUT["Toggle_Modules"].get("plot_ExtremeValues", {}) and INPUT["Toggle_Modul
 
         FIG_direc = hc_plt.plot_tiled(Tiles, global_max=[None, None], global_min=[None, None], grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], grid=[1, 1], figsize=figsize_halfpage,
+                                     use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f'Extreme_T_return_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -1820,181 +1823,182 @@ if INPUT["Toggle_Modules"].get("plot_Validation", {}) and (len(INPUT["Toggle_Mod
 
     # Loop over each RWI type (wind, total)
     for sea_type in INPUT["Toggle_Modules"]["plot_Validation"]:
-            print(f"plotting Validation {sea_type}...")
+        print(f"plotting Validation {sea_type}...")
 
-            # Check if calculation is toggled
-            if sea_type not in INPUT["Toggle_Modules"].get("calc_Validation", {}):
-                print("   please toggle calculation to plot")
-                continue
-            # lines
-            Calc = DATA_OUT["Validation"][sea_type]
+        # Check if calculation is toggled
+        if sea_type not in INPUT["Toggle_Modules"].get("calc_Validation", {}):
+            print("   please toggle calculation to plot")
+            continue
+        # lines
+        Calc = DATA_OUT["Validation"][sea_type]
 
+        Tiles = []
+        Tiles_omni = []
+        titels = Calc.create_segment_title()
+
+        titels = gl.alias(titels, INPUT["ColumNames"], INPUT["Aliase"])
+
+        for i, Seg in enumerate(Calc.result):
+
+            cmap_lines = LinearSegmentedColormap.from_list(
+                "custom_colormap", ['#ff0000', '#00ff00'])
+            range_colors = np.linspace(0, 1, len(Seg.result["condensed"]['vm_vise'].columns))
+
+            barcolor = [0.5, 0.5, 0.5]
+
+            Seg.indizes = pd.to_datetime(Seg.indizes)
+
+            Meta = Seg.result["meta"]
+
+            Legend = [{"color": 'grey', "label": "hindcast", "linestyle": '-'},
+                      {"color": 'grey', "label": "condensed", "linestyle": '--'}]
+
+            tile_curr = hc_plt.Tile(i,
+                                    x_label=gl.alias(Seg.colnames["Hindcast"]["v_m"], INPUT["ColumNames"], INPUT["Aliase"]),
+                                    y_label=f'Bending DEL [Nm]' + r" $\vert$ " + f'm={Meta["SN_slope"]}' + "\n" + f'N_ref={Meta["N_ref"]:.2e}' + r" $\vert$ " + f'lifetime={Meta["design_life"]}y',
+                                    y_label_right='number of data points',
+                                    title=titels[i],
+                                    spinecolor_right=barcolor,
+                                    legend=Legend)
+
+            configs = list(Seg.result["condensed"]['vm_vise'].columns)
+            configs = [config for config in configs if config != 'count']
+
+            textbox = []
+            colors = []
+
+            for j, config in enumerate(configs):
+                Line_condensed = hc_plt.Line(x=Seg.result["condensed"]['vm_vise'][config].index,
+                                             y=Seg.result["condensed"]['vm_vise'][config].values,
+                                             color=cmap_lines(range_colors[j]),
+                                             linestyle='--')
+
+                Line_hindcast = hc_plt.Line(x=Seg.result["hindcast"]['vm_vise'][config].index,
+                                            y=Seg.result["hindcast"]['vm_vise'][config].values,
+                                            color=cmap_lines(range_colors[j]),
+                                            linestyle='-')
+
+                tile_curr.add_line(Line_hindcast, zorder=10)
+                tile_curr.add_line(Line_condensed, zorder=10)
+
+                # textbox
+                textbox.append(str(config))
+                textbox.append(f"DEL Hindcast: {Seg.result['hindcast']['added'][config].values[0]:.3e}")
+                textbox.append(f"DEL Condensed: {Seg.result['condensed']['added'][config].values[0]:.3e}")
+                textbox.append(
+                    f"Condensed/Hindcast: {round(Seg.result['condensed']['added'][config].values[0] / Seg.result['hindcast']['added'][config].values[0] * 100, 1)}" + "$\\%$")
+                colors.append([cmap_lines(range_colors[j])])
+                colors.append(['black'])
+                colors.append(['black'])
+                colors.append(['black'])
+
+            Textbox_data = pd.DataFrame(data=textbox)
+            colors_data = pd.DataFrame(data=colors)
+
+            Bar_count = hc_plt.Bar(x=Seg.result["condensed"]['vm_vise'][configs[0]].index,
+                                   y=Seg.result["condensed"]['vm_vise']["count"],
+                                   width=1,
+                                   bottom=None,
+                                   align='center',
+                                   color=barcolor,
+                                   alpha=0.5,
+                                   spinecolor=barcolor,
+                                   yy_side='right')
+
+            tile_curr.add_bar(Bar_count)
+
+            if Seg.angles is not None:
+                Textbox_DEL = hc_plt.Textbox(Textbox_data,
+                                             fontsize=7,
+                                             corner1=[0.3, 1],
+                                             corner2=[1, 0.4],
+                                             colors=colors_data,
+                                             orientation_h='left',
+                                             orientation_v='center',
+                                             header=False)
+
+                tile_curr.add_textbox(Textbox_DEL)
+                Tiles.append(tile_curr)
+
+            else:
+                Textbox_DEL = hc_plt.Textbox(Textbox_data,
+                                             fontsize=8,
+                                             corner1=[0.6, 1],
+                                             corner2=[1, 0.4],
+                                             colors=colors_data,
+                                             orientation_h='left',
+                                             orientation_v='center',
+                                             header=False)
+
+                tile_curr.add_textbox(Textbox_DEL)
+                Tiles_omni.append(tile_curr)
+
+        FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+
+        if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+            gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f'Valid_line_{sea_type}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+        if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+            gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f'Valid_line_{sea_type}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+        # scatter
+        df_DEL = Calc.load_from_db()
+
+        for config in INPUT[f"Validation_{sea_type}"]["scatter_configs"]:
             Tiles = []
             Tiles_omni = []
             titels = Calc.create_segment_title()
 
+            titels = [f'{sea_type.capitalize()} Sea, config: {config} ' + "\n" + title + "\n" for title in titels]
+
             titels = gl.alias(titels, INPUT["ColumNames"], INPUT["Aliase"])
 
             for i, Seg in enumerate(Calc.result):
-
-                cmap_lines = LinearSegmentedColormap.from_list(
-                    "custom_colormap", ['#ff0000', '#00ff00'])
-                range_colors = np.linspace(0, 1, len(Seg.result["condensed"]['vm_vise'].columns))
-
-                barcolor = [0.5, 0.5, 0.5]
-
-                Seg.indizes = pd.to_datetime(Seg.indizes)
-
                 Meta = Seg.result["meta"]
 
-                Legend = [{"color": 'grey', "label": "hindcast", "linestyle": '-'},
-                          {"color": 'grey', "label": "condensed", "linestyle": '--'}]
+                df_data = gl.export_df_from_sql(Calc.basedata["dbname"],
+                                                "Hind_combined",
+                                                column_names=[Seg.colnames["Hindcast"]["H_s"], Seg.colnames["Hindcast"]["T_p"]],
+                                                indizes=Seg.indizes)
 
                 tile_curr = hc_plt.Tile(i,
-                                        x_label=gl.alias(Seg.colnames["Hindcast"]["v_m"], INPUT["ColumNames"], INPUT["Aliase"]),
-                                        y_label=f'Bending DEL [Nm]' + r" $\vert$ " + f'm={Meta["SN_slope"]}' + "\n" + f'N_ref={Meta["N_ref"]:.2e}' + r" $\vert$ " + f'lifetime={Meta["design_life"]}y',
-                                        y_label_right='number of data points',
-                                        title=titels[i],
-                                        spinecolor_right=barcolor,
-                                        legend=Legend)
+                                        x_label=gl.alias(Seg.colnames["Hindcast"]["H_s"], INPUT["ColumNames"], INPUT["Aliase"]),
+                                        y_label=gl.alias(Seg.colnames["Hindcast"]["T_p"], INPUT["ColumNames"], INPUT["Aliase"]),
+                                        title=titels[i])
 
-                configs = list(Seg.result["condensed"]['vm_vise'].columns)
-                configs = [config for config in configs if config != 'count']
+                scatter = hc_plt.Scatter(x=df_data[Seg.colnames["Hindcast"]["H_s"]],
+                                         y=df_data[Seg.colnames["Hindcast"]["T_p"]],
+                                         cmap='cool',
+                                         cmap_mode='manual',
+                                         c=df_DEL.loc[Seg.indizes, config].values,
+                                         size=2,
+                                         cbar=True,
+                                         cbar_label=f'Bending DEL [Nm]' + r" $\vert$ " + f'm={Meta["SN_slope"]}' + "\n" + f'N_ref={Meta["N_ref"]:.2e}' + r" $\vert$ " + f'lifetime={Meta["design_life"]}y')
 
-                textbox = []
-                colors = []
+                tile_curr.add_scatter(scatter)
 
-                for j, config in enumerate(configs):
-                    Line_condensed = hc_plt.Line(x=Seg.result["condensed"]['vm_vise'][config].index,
-                                                 y=Seg.result["condensed"]['vm_vise'][config].values,
-                                                 color=cmap_lines(range_colors[j]),
-                                                 linestyle='--')
-
-                    Line_hindcast = hc_plt.Line(x=Seg.result["hindcast"]['vm_vise'][config].index,
-                                                y=Seg.result["hindcast"]['vm_vise'][config].values,
-                                                color=cmap_lines(range_colors[j]),
-                                                linestyle='-')
-
-                    tile_curr.add_line(Line_hindcast, zorder=10)
-                    tile_curr.add_line(Line_condensed, zorder=10)
-
-                    # textbox
-                    textbox.append(str(config))
-                    textbox.append(f"DEL Hindcast: {Seg.result['hindcast']['added'][config].values[0]:.3e}")
-                    textbox.append(f"DEL Condensed: {Seg.result['condensed']['added'][config].values[0]:.3e}")
-                    textbox.append(
-                        f"Condensed/Hindcast: {round(Seg.result['condensed']['added'][config].values[0] / Seg.result['hindcast']['added'][config].values[0] * 100, 1)}" + "$\\%$")
-                    colors.append([cmap_lines(range_colors[j])])
-                    colors.append(['black'])
-                    colors.append(['black'])
-                    colors.append(['black'])
-
-                Textbox_data = pd.DataFrame(data=textbox)
-                colors_data = pd.DataFrame(data=colors)
-
-                Bar_count = hc_plt.Bar(x=Seg.result["condensed"]['vm_vise'][configs[0]].index,
-                                       y=Seg.result["condensed"]['vm_vise']["count"],
-                                       width=1,
-                                       bottom=None,
-                                       align='center',
-                                       color=barcolor,
-                                       alpha=0.5,
-                                       spinecolor=barcolor,
-                                       yy_side='right')
-
-                tile_curr.add_bar(Bar_count)
+                Line_f0 = hc_plt.Line(x=None,
+                                      y=[1 / INPUT["Structure"]["f_0"]],
+                                      label=f'$f_0={INPUT["Structure"]["f_0"]}$ Hz',
+                                      color='green',
+                                      linestyle=':')
+                tile_curr.add_line(Line_f0)
 
                 if Seg.angles is not None:
-                    Textbox_DEL = hc_plt.Textbox(Textbox_data,
-                                                 fontsize=7,
-                                                 corner1=[0.3, 1],
-                                                 corner2=[1, 0.4],
-                                                 colors=colors_data,
-                                                 orientation_h='left',
-                                                 orientation_v='center',
-                                                 header=False)
-
-                    tile_curr.add_textbox(Textbox_DEL)
                     Tiles.append(tile_curr)
-
                 else:
-                    Textbox_DEL = hc_plt.Textbox(Textbox_data,
-                                                 fontsize=8,
-                                                 corner1=[0.6, 1],
-                                                 corner2=[1, 0.4],
-                                                 colors=colors_data,
-                                                 orientation_h='left',
-                                                 orientation_v='center',
-                                                 header=False)
-
-                    tile_curr.add_textbox(Textbox_DEL)
                     Tiles_omni.append(tile_curr)
 
             FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
-            FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+            FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage,
+                                         use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
             if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-                gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f'Valid_line_{sea_type}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+                gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f'Valid_scatter_{sea_type}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
             if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-                gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f'Valid_line_{sea_type}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-            # scatter
-            df_DEL = Calc.load_from_db()
-
-            for config in INPUT[f"Validation_{sea_type}"]["scatter_configs"]:
-                Tiles = []
-                Tiles_omni = []
-                titels = Calc.create_segment_title()
-
-                titels = [f'{sea_type.capitalize()} Sea, config: {config} ' + "\n" + title + "\n" for title in titels]
-
-                titels = gl.alias(titels, INPUT["ColumNames"], INPUT["Aliase"])
-
-                for i, Seg in enumerate(Calc.result):
-                    Meta = Seg.result["meta"]
-
-                    df_data = gl.export_df_from_sql(Calc.basedata["dbname"],
-                                                    "Hind_combined",
-                                                    column_names=[Seg.colnames["Hindcast"]["H_s"], Seg.colnames["Hindcast"]["T_p"]],
-                                                    indizes=Seg.indizes)
-
-                    tile_curr = hc_plt.Tile(i,
-                                            x_label=gl.alias(Seg.colnames["Hindcast"]["H_s"], INPUT["ColumNames"], INPUT["Aliase"]),
-                                            y_label=gl.alias(Seg.colnames["Hindcast"]["T_p"], INPUT["ColumNames"], INPUT["Aliase"]),
-                                            title=titels[i])
-
-                    scatter = hc_plt.Scatter(x=df_data[Seg.colnames["Hindcast"]["H_s"]],
-                                             y=df_data[Seg.colnames["Hindcast"]["T_p"]],
-                                             cmap='cool',
-                                             cmap_mode='manual',
-                                             c=df_DEL.loc[Seg.indizes, config].values,
-                                             size=2,
-                                             cbar=True,
-                                             cbar_label=f'Bending DEL [Nm]' + r" $\vert$ " + f'm={Meta["SN_slope"]}' + "\n" + f'N_ref={Meta["N_ref"]:.2e}' + r" $\vert$ " + f'lifetime={Meta["design_life"]}y')
-
-                    tile_curr.add_scatter(scatter)
-
-                    Line_f0 = hc_plt.Line(x=None,
-                                          y=[1 / INPUT["Structure"]["f_0"]],
-                                          label=f'$f_0={INPUT["Structure"]["f_0"]}$ Hz',
-                                          color='green',
-                                          linestyle=':')
-                    tile_curr.add_line(Line_f0)
-
-                    if Seg.angles is not None:
-                        Tiles.append(tile_curr)
-                    else:
-                        Tiles_omni.append(tile_curr)
-
-                FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
-                FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=['auto', 'auto'], global_min=[0, 0], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
-
-                if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-                    gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f'Valid_scatter_{sea_type}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
-
-                if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-                    gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f'Valid_scatter_{sea_type}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+                gl.save_figs_as_pdf(FIG_direc + FIG_omni, path_out + f'Valid_scatter_{sea_type}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
 # SensorEval
 if INPUT["Toggle_Modules"].get("plot_SensorEval", {}):
@@ -2031,7 +2035,8 @@ if INPUT["Toggle_Modules"].get("plot_SensorEval", {}):
             # tile timeseries
             df = Calc.load_from_db(colnames_ini=True, indizes=Seg.indizes)
             x = df[Seg.colnames['x']].values
-            titel = f'Timeseries with min = {gl.round_to_significant_digit([min(x)], 3)[0]}' + r" $\vert$ " + f'max = {gl.round_to_significant_digit([max(x)], 3)[0]}' + r" $\vert$ " + f'standard deviation = {round(np.std(x), 4)}, ' + titels[i]
+            titel = f'Timeseries with min = {gl.round_to_significant_digit([min(x)], 3)[0]}' + r" $\vert$ " + f'max = {gl.round_to_significant_digit([max(x)], 3)[0]}' + r" $\vert$ " + f'standard deviation = {round(np.std(x), 4)}, ' + \
+                    titels[i]
 
             tile_time = hc_plt.Tile(i, x_label='date', y_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Aliase"]), title=titel)
 
@@ -2051,7 +2056,8 @@ if INPUT["Toggle_Modules"].get("plot_SensorEval", {}):
 
         # FIG_direc = hc_plt.plot_tiled(Tiles, global_max=['auto', 'auto'], global_min=[0, 0], grid=[3, 2])
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], max_margins=[0, 0], min_margins=[0, 0], grid=[2, 1], figsize=figsize_twothirdpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], max_margins=[0, 0], min_margins=[0, 0], grid=[2, 1],
+                                     figsize=figsize_twothirdpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_omni, path_out + f'SensorEval_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2103,7 +2109,7 @@ if INPUT["Toggle_Modules"].get("plot_Weibull", {}):
             tile_curr.add_textbox(textbox_params)
 
             # table
-            temp = gl.round_to_significant_digit(list(textbox_data.iloc[:, 1]) + [round(Seg.N/Calc.basedata['N_rows'] * 100, 1)], 3)
+            temp = gl.round_to_significant_digit(list(textbox_data.iloc[:, 1]) + [round(Seg.N / Calc.basedata['N_rows'] * 100, 1)], 3)
             weibull_table_data.append(temp)
 
             weibull_table_label = list(textbox_data.iloc[:, 0])
@@ -2118,7 +2124,8 @@ if INPUT["Toggle_Modules"].get("plot_Weibull", {}):
 
         FIG_direc = hc_plt.plot_tiled(Tiles, global_max=[None, None], global_min=[0, 0], grid=[3, 2], figsize=figsize_fullpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
-        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], grid=[1, 1], figsize=figsize_halfpage, use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+        FIG_omni = hc_plt.plot_tiled(Tiles_omni, global_max=[None, None], global_min=[None, None], grid=[1, 1], figsize=figsize_halfpage,
+                                     use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
         if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
             gl.save_figs_as_png(FIG_direc + FIG_omni, path_out + f'Weibull_{Calc_name}', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
@@ -2175,7 +2182,15 @@ if INPUT["Toggle_Modules"].get("plot_report_tables", {}):
                     meta_para.append(dataset_para)
                     meta_value.append(dataset_value)
 
-            data = np.array([meta_para, meta_value])
+            # order
+
+            para_order =['Point Name','Source', 'Water Depth', 'Time Step','Start Date','End Date', 'Date created',  'Longitude', 'Latitude', 'Projection', 'Cell size', 'Number of samples']
+
+            meta_dict = dict(zip(meta_para, meta_value))
+            sorted_meta_para = [param for param in para_order if param in meta_para]
+            sorted_meta_value = [meta_dict[param] for param in sorted_meta_para]
+
+            data = np.array([sorted_meta_para, sorted_meta_value])
             data = data.T
             col_labels = ["Parameter", "Value"]
             FIG = hc_plt.table(data,
@@ -2247,7 +2262,7 @@ if INPUT["Toggle_Modules"].get("plot_report_tables", {}):
                        figsize=figsize_fullpage,
                        cell_height=INPUT["Toggle_Modules"]["cell_height_tables"],
                        datatype='str',
-                       cell_width=[1, 3, 1, 1],
+                       cell_width=[1, 3, 2, 1],
                        use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
 
     if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
@@ -2273,26 +2288,48 @@ if INPUT["Toggle_Modules"].get("plot_report_tables", {}):
     if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
         gl.save_figs_as_pdf([FIG], path_out + 'Sensor_Original', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
-    # Revision Table
-    col_labels = ["Rev. JBO", "Rev. Employer", "Date", "Description"]
+    # plot resonance_compare
+    if 'wind' in DATA_OUT["RWI"] and 'wind' in DATA_OUT["Validation"]:
+        print("    Resonance Comparison")
 
-    Revisions = [INPUT["RevisionTable"][rev] for rev in INPUT["RevisionTable"].keys()]
+        RWI_data = DATA_OUT["RWI"]['wind'].result[0].result
+        RWI_max = RWI_data[0].max()
+        max_index = RWI_data[0].idxmax()
 
-    FIG = hc_plt.table(Revisions,
-                       collabels=col_labels,
-                       rowlabels=None,
-                       row_label_name='Parameters',
-                       figsize=figsize_fullpage,
-                       cell_height=0.7,
-                       cell_width=[1, 1, 2, 3],
-                       use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+        Seastate_RWI = DATA_OUT["RWI"]['wind'].load_from_db(indizes=[max_index], colnames_ini=True)
 
-    if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
-        gl.save_figs_as_png([FIG], path_out + f'Revision_Table', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+        df_DEL = DATA_OUT["Validation"]["wind"].load_from_db()
+        DEL_data = df_DEL[INPUT["Validation_wind"]["scatter_configs"][0]]
 
-    if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
-        gl.save_figs_as_pdf([FIG], path_out + f'Revision_Table', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+        DEL_max = DEL_data.max()
+        max_index = DEL_data.idxmax()
 
+        Seastate_DEL_max = DATA_OUT["RWI"]['wind'].load_from_db(indizes=[max_index], colnames_ini=True)
+
+        marg = 0.2
+        f_0 = INPUT["Structure"]["f_0"]
+        T_0_range = [(1 - marg) / f_0, (1 + marg) / f_0]
+
+        Table_Resonance = pd.DataFrame(columns=list(Seastate_DEL_max.columns) + ["Magnitude"])
+        Table_Resonance.loc['RWI', :] = list(Seastate_RWI.values[0]) + [RWI_max]
+        Table_Resonance.loc['DEL', :] = list(Seastate_DEL_max.values[0]) + [DEL_max]
+
+        FIG = hc_plt.table(Table_Resonance.loc[:, Table_Resonance.columns[[0, 1, 3]]],
+                           collabels=["$H_{s,wind}$ [m]", "$T_{p,wind}$ [s]", "Magnitude ($\\sqrt{m^2/Hz}$ or [Nm])"],
+                           rowlabels=Table_Resonance.index,
+                           row_label_name='Method',
+                           figsize=figsize_halfpage,
+                           datatype='str',
+                           cell_height=INPUT["Toggle_Modules"]["cell_height_tables"],
+                           formater='.3f',
+                           cell_width=[2, 1, 1, 2],
+                           use_pgf=INPUT["Toggle_Modules"]["use_pgf"])
+
+        if 'png' in INPUT["Toggle_Modules"]["plot_as"]:
+            gl.save_figs_as_png([FIG], path_out + 'Resonance_compare', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
+
+        if 'pdf' in INPUT["Toggle_Modules"]["plot_as"]:
+            gl.save_figs_as_pdf([FIG], path_out + 'Resonance_compare', dpi=INPUT["Toggle_Modules"]["dpi_figures"])
 
 # %% Data Out
 if INPUT["DataOut"]["CSV_out"]:
@@ -2582,7 +2619,7 @@ if INPUT["DataBase"].get("create_report", {}):
     png_files = [f for f in os.listdir(path_figs) if f.endswith('.png')]
     png_paths = [os.path.join(path_figs, f) for f in os.listdir(path_figs) if f.endswith('.png')]
     png_names = [name.removesuffix('.png') for name in png_files]
-    png_width = [0.5 if 'Roseplots' in png_name else 1 for png_name in png_names]
+    png_width = 1
 
     FIGURES = pd.DataFrame(columns=["filename", "path", "caption", "width"])
     FIGURES["filename"] = png_files
@@ -2597,15 +2634,13 @@ if INPUT["DataBase"].get("create_report", {}):
     for indx in FIGURES.index:
         if indx in INPUT["Captions"].keys():
             FIGURES.loc[indx, "caption"] = INPUT["Captions"][indx]
-    
+
     FIGURES.loc["DataSorce_global_page_1", "caption"] = "General databasis parameters"
 
-    # map
-    pic = "Map"
-    FIGURES.loc[pic, "filename"] = f"{pic}.jpg"
-    FIGURES.loc[pic, "path"] = INPUT["DataBase"]["map_path"]
-    FIGURES.loc[pic, "caption"] = "Overview map"
-    FIGURES.loc[pic, "width"] = 1
+    FIGURES.loc["Roseplots_swell_sea_page_1", "width"] = 0.5
+    FIGURES.loc["Roseplots_total_sea_page_1", "width"] = 0.5
+    FIGURES.loc["Roseplots_wind_page_1", "width"] = 0.5
+    FIGURES.loc["Roseplots_wind_sea_page_1", "width"] = 0.5
 
     # constant images (theory)
     pic = "VMTP_theory"
@@ -2657,7 +2692,7 @@ if INPUT["DataBase"].get("create_report", {}):
                                                                                 Biblografys,
                                                                                 INPUT["DataBase"]["acronym_path"],
                                                                                 path_report,
-                                                                                map=[INPUT["DataBase"]["map_path"], INPUT["Captions"]["Map"]],
+                                                                                map=[INPUT["DataBase"]["map_path"], INPUT["Captions"]["map"]],
                                                                                 introduction_text=introduction_text,
                                                                                 document_purpose_text=document_purpose_text)
     # Data Basis
@@ -2680,8 +2715,8 @@ if INPUT["DataBase"].get("create_report", {}):
         if row["used"]:
             key_fig = [indx for indx in FIGURES.index if FIGURES.loc[indx, "filename"] == f'DataSorce_{index}_page_1.png'][0]
             database = key_fig.replace("DataSorce_", "").replace("_page_1", "")
-
-            FIGURES.loc[key_fig, "caption"] = f'"{database}" Data Set ' + "\\cite{" + f"{database}" + "}"
+            database_name = database.replace("_", "\_")
+            FIGURES.loc[key_fig, "caption"] = f'"{database_name}" Data Set ' + "\\cite{" + f"{database}" + "}"
             TEX["DataBasis"] = ltx.include_TableFig(TEX["DataBasis"], FIGURES.loc[key_fig])
 
     TEX["DataBasis"] = ltx.include_TableFig(TEX["DataBasis"], FIGURES.loc["DataSorce_ResamplingTable_page_1"])
@@ -2792,35 +2827,56 @@ if INPUT["DataBase"].get("create_report", {}):
     for sensor, sensor_group_name in zip(sensors, sensor_group_names):
         sensor_name = SENSORS.loc[sensor[1], "Alias"]
         sensor_group_name_clean = sensor_group_name.replace('_', ' ')
-        template = "\\subsubsection{Data Evaluation: " + f"{sensor_name}" + "} \n" + "?FIG \n ?FIG  \n ?TABLE \n ?FIG \n ?TABLE \n ?MULTIFIG \n ?MULTIFIG \n ?MULTIFIG"
 
-        FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_3", "caption"] = f"Extreme Values of {sensor_group_name_clean}, omnidirectional"
-        FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_3", "caption"] = f"Comparison of real and theoretical extreme values of {sensor_group_name_clean}, omnidirectional"
-        FIGURES.loc[f"Extreme_Parameter_table_{sensor_group_name}_page_1", "caption"] = f"Parameters of extreme value extrapolation of {sensor_group_name_clean}"
-        FIGURES.loc[[f"Extreme_T_return_{sensor_group_name}_page_3"], "caption"] = f"Return periods of extreme values of {sensor_group_name_clean} with extrapolation, omnidirectional"
-        FIGURES.loc[f"T_return_table_{sensor_group_name}_page_1", "caption"] = f"Return periods of {sensor_group_name_clean}"
+        if sensor[0] is not None:
+            template = "\\subsubsection{Data Evaluation: " + f"{sensor_name}" + "} \n" + "?FIG \n ?FIG  \n ?TABLE \n ?FIG \n ?TABLE \n ?MULTIFIG \n ?MULTIFIG \n ?MULTIFIG"
 
-        FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_1", "caption"] = f"Extreme Values of {sensor_group_name_clean}, directional distribution part A"
-        FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_2", "caption"] = f"Extreme Values of {sensor_group_name_clean}, directional distribution part B"
+            FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_3", "caption"] = f"Extreme Values of {sensor_group_name_clean}, omnidirectional"
+            FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_3", "caption"] = f"Comparison of real and theoretical extreme values of {sensor_group_name_clean}, omnidirectional"
+            FIGURES.loc[f"Extreme_Parameter_table_{sensor_group_name}_page_1", "caption"] = f"Parameters of extreme value extrapolation of {sensor_group_name_clean}"
+            FIGURES.loc[
+                [f"Extreme_T_return_{sensor_group_name}_page_3"], "caption"] = f"Return periods of extreme values of {sensor_group_name_clean} with extrapolation, omnidirectional"
+            FIGURES.loc[f"T_return_table_{sensor_group_name}_page_1", "caption"] = f"Return periods of {sensor_group_name_clean}"
 
-        FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_1", "caption"] = f"Comparison of real and theoretical extreme values of {sensor_group_name_clean}, directional distribution A"
-        FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_2", "caption"] = f"Comparison of real and theoretical extreme values of {sensor_group_name_clean}, directional distribution B"
+            temp = ltx.include_Fig(template, FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_3"])
+            temp = ltx.include_Fig(temp, FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_3"])
+            temp = ltx.include_TableFig(temp, FIGURES.loc[f"Extreme_Parameter_table_{sensor_group_name}_page_1"])
+            temp = ltx.include_Fig(temp, FIGURES.loc[f"Extreme_T_return_{sensor_group_name}_page_3"])
+            temp = ltx.include_TableFig(temp, FIGURES.loc[f"T_return_table_{sensor_group_name}_page_1"])
 
-        FIGURES.loc[[
-            f"Extreme_T_return_{sensor_group_name}_page_1"], "caption"] = f"Return periods of extreme values of {sensor_group_name_clean} with extrapolation, directional distribution part A"
-        FIGURES.loc[[
-            f"Extreme_T_return_{sensor_group_name}_page_2"], "caption"] = f"Return periods of extreme values of {sensor_group_name_clean} with extrapolation, directional distribution part B"
+            FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_1", "caption"] = f"Extreme Values of {sensor_group_name_clean}, directional distribution part A"
+            FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_2", "caption"] = f"Extreme Values of {sensor_group_name_clean}, directional distribution part B"
+            FIGURES.loc[
+                f"Extreme_qq_{sensor_group_name}_page_1", "caption"] = f"Comparison of real and theoretical extreme values of {sensor_group_name_clean}, directional distribution A"
+            FIGURES.loc[
+                f"Extreme_qq_{sensor_group_name}_page_2", "caption"] = f"Comparison of real and theoretical extreme values of {sensor_group_name_clean}, directional distribution B"
+            FIGURES.loc[[
+                f"Extreme_T_return_{sensor_group_name}_page_1"], "caption"] = f"Return periods of extreme values of {sensor_group_name_clean} with extrapolation, directional distribution part A"
+            FIGURES.loc[[
+                f"Extreme_T_return_{sensor_group_name}_page_2"], "caption"] = f"Return periods of extreme values of {sensor_group_name_clean} with extrapolation, directional distribution part B"
 
-        temp = ltx.include_Fig(template, FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_3"])
-        temp = ltx.include_Fig(temp, FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_3"])
-        temp = ltx.include_TableFig(temp, FIGURES.loc[f"Extreme_Parameter_table_{sensor_group_name}_page_1"])
-        temp = ltx.include_Fig(temp, FIGURES.loc[f"Extreme_T_return_{sensor_group_name}_page_3"])
-        temp = ltx.include_TableFig(temp, FIGURES.loc[f"T_return_table_{sensor_group_name}_page_1"])
-        temp = ltx.include_MultiFig(temp, [FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_1"], FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_2"]])
-        temp = ltx.include_MultiFig(temp, [FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_1"], FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_2"]])
-        temp = ltx.include_MultiFig(temp, [FIGURES.loc[f"Extreme_T_return_{sensor_group_name}_page_1"], FIGURES.loc[f"Extreme_T_return_{sensor_group_name}_page_2"]])
+            temp = ltx.include_MultiFig(temp, [FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_1"], FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_2"]])
+            temp = ltx.include_MultiFig(temp, [FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_1"], FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_2"]])
+            temp = ltx.include_MultiFig(temp, [FIGURES.loc[f"Extreme_T_return_{sensor_group_name}_page_1"], FIGURES.loc[f"Extreme_T_return_{sensor_group_name}_page_2"]])
+
+        else:
+            template = "\\subsubsection{Data Evaluation: " + f"{sensor_name}" + "} \n" + "?FIG \n ?FIG  \n ?TABLE \n ?FIG \n ?TABLE"
+
+            FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_1", "caption"] = f"Extreme Values of {sensor_group_name_clean}, omnidirectional"
+            FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_1", "caption"] = f"Comparison of real and theoretical extreme values of {sensor_group_name_clean}, omnidirectional"
+            FIGURES.loc[f"Extreme_Parameter_table_{sensor_group_name}_page_1", "caption"] = f"Parameters of extreme value extrapolation of {sensor_group_name_clean}"
+            FIGURES.loc[
+                [f"Extreme_T_return_{sensor_group_name}_page_1"], "caption"] = f"Return periods of extreme values of {sensor_group_name_clean} with extrapolation, omnidirectional"
+            FIGURES.loc[f"T_return_table_{sensor_group_name}_page_1", "caption"] = f"Return periods of {sensor_group_name_clean}"
+
+            temp = ltx.include_Fig(template, FIGURES.loc[f"Extreme_Timeseries_{sensor_group_name}_page_1"])
+            temp = ltx.include_Fig(temp, FIGURES.loc[f"Extreme_qq_{sensor_group_name}_page_1"])
+            temp = ltx.include_TableFig(temp, FIGURES.loc[f"Extreme_Parameter_table_{sensor_group_name}_page_1"])
+            temp = ltx.include_Fig(temp, FIGURES.loc[f"Extreme_T_return_{sensor_group_name}_page_1"])
+            temp = ltx.include_TableFig(temp, FIGURES.loc[f"T_return_table_{sensor_group_name}_page_1"])
 
         temp_list.append(temp)
+
     temp_list = '\n'.join(temp_list)
     index = ltx.find_keyword(TEX[chapter], '?DATAEVALUATION')[0]
     TEX[chapter], _ = ltx.include_str(TEX[chapter], temp_list, line=index, replace=True)
@@ -2836,7 +2892,7 @@ if INPUT["DataBase"].get("create_report", {}):
 
     TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Resonance_compare_page_1"])
 
-#    TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc[f"RWI_wind_page_1"], FIGURES.loc[f"RWI_wind_page_2"]])
+    #    TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc[f"RWI_wind_page_1"], FIGURES.loc[f"RWI_wind_page_2"]])
 
     # BreakingWaves
     chapter = "BreakingWaves"
@@ -2848,18 +2904,17 @@ if INPUT["DataBase"].get("create_report", {}):
     TEX[chapter] = ltx.include_MultiFig(TEX[chapter], [FIGURES.loc[f"WaveBreak_wind_page_1"], FIGURES.loc[f"WaveBreak_wind_page_2"]])
 
     # list of figures
-    TEX["main"], last_idx = ltx.include_str(TEX["main"], '\\listoffigures', last_idx + 1)
-    TEX["main"], last_idx = ltx.include_str(TEX["main"], '\\listoftables \\newpage', last_idx + 1)
+    TEX["main"], _ = ltx.include_str(TEX["main"], '\\listoffigures \n \\listoftables \\newpage', last_idx + 1)
 
     # Appendix
     chapter = "Annex"
     TEX[chapter] = TEMPLATES[chapter]
-    TEX["main"], _ = ltx.include_include(TEX["main"], chapter)
+    TEX["main"], idx = ltx.include_include(TEX["main"], chapter)
     TEX[chapter] = ltx.include_Fig(TEX[chapter], FIGURES.loc["VMHS_example_page_1"])
     TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Report_table_VMHS_example_page_1"])
     TEX[chapter] = ltx.include_TableFig(TEX[chapter], FIGURES.loc["Sensor_Original_page_1"])
 
-    TEX[chapter] = ltx.include_MultiTab(TEX[chapter],[FIGURES.loc[f"angle_deviation_table_page_1"],
+    TEX[chapter] = ltx.include_MultiTab(TEX[chapter], [FIGURES.loc[f"angle_deviation_table_page_1"],
                                                        FIGURES.loc[f"angle_deviation_table_page_2"],
                                                        FIGURES.loc[f"angle_deviation_table_page_3"],
                                                        FIGURES.loc[f"angle_deviation_table_page_4"],
@@ -2872,6 +2927,13 @@ if INPUT["DataBase"].get("create_report", {}):
                                                        FIGURES.loc[f"angle_deviation_table_page_11"],
                                                        FIGURES.loc[f"angle_deviation_table_page_12"],
                                                        ])
+
+    # extern appendizes
+    for apendix_path in INPUT["DataBase"]["extern_appendenix"]:
+        tex_path, apendix_name = [(os.path.join(apendix_path, f), f) for f in os.listdir(apendix_path) if f.endswith('.tex')][0]
+        shutil.copy(tex_path, path_report + "\\" + apendix_name)
+
+        TEX["main"], _ = ltx.include_include(TEX["main"], apendix_name.replace(".tex", ''))
 
     # save TEX files
     for name, tex in TEX.items():
