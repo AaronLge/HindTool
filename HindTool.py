@@ -1084,7 +1084,7 @@ if INPUT["Toggle_Modules"].get("plot_HSTP", {}) and (len(INPUT["Toggle_Modules"]
             tile_curr.add_line(line_mean)
 
             if len(key_perc) > 0:
-                line_mean.label = '50th percentile'
+                line_mean.label = '50 percentile'
 
                 Line_perc_low = hc_plt.Line(x=Seg.result["data"]["x"],
                                             y=Seg.result["data"][key_perc[0]],
