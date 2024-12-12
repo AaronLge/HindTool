@@ -616,9 +616,9 @@ for sea_type, column_names in validation_column_names_dict.items():
 
         Calc = hc_calc.Calculation()
         df_data = gl.export_df_from_sql(db_path, table_name, column_names=column_names, timeframe=timeframe)
-        N_ges = len(df_data)
         df_data['gamma'] = 3.3
         df_data = df_data.dropna(how='any')
+        N_ges = len(df_data)
 
         JBOOST_proj_Path = INPUT['Structure']['JBOOST_proj']
         JBOOST_proj_input_path = INPUT['Structure']['JBOOST_input']
