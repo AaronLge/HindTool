@@ -659,7 +659,7 @@ for sea_type, column_names in validation_column_names_dict.items():
                                          DATA_OUT["table_vmtp"][sea_type].result,
                                          INPUT["Structure"]["JBOOST_proj"],
                                          INPUT["Structure"]["JBOOST_input"],
-                                         r".\\JBOOST\\")
+                                         ".\\JBOOST\\")
 
         Calc.result = result
 
