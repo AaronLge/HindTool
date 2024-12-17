@@ -62,8 +62,6 @@ if not os.path.exists(path_out):
 shutil.copy(path_in, path_out + 'Input.txt')
 
 # %% Programm specific
-
-
 DATA_OUT = {}
 
 Colors = {
@@ -175,7 +173,8 @@ for sea_type, column_names in vmhs_calculations.items():
             "bin_min": Input["bin_min"],
             "average_correction": Input["average_correction"],
             "avrg_method": Input["avrg_method"],
-            "make_monotone": Input["make_monotone"]
+            "make_monotone": Input["make_monotone"],
+            "N_segment_min": Input["N_segment_min"]
         }
         directional = hc_calc.calc_VMHS(df[column_names[0]], df[column_names[1]], df[column_names[2]], angle_grid_mod, **calc_params)
         omni = hc_calc.calc_VMHS(df[column_names[0]], df[column_names[1]], df[column_names[2]], None, **calc_params)
@@ -215,7 +214,10 @@ if (INPUT["Toggle_Modules"].get("plot_condensation_example", {})):
                                     bin_min=Input["bin_min"],
                                     average_correction=Input["average_correction"],
                                     avrg_method=Input["avrg_method"],
-                                    make_monotone=Input["make_monotone"])
+                                    make_monotone=Input["make_monotone"],
+                                    N_segment_min=Input["N_segment_min"])
+
+
 
     omni = hc_calc.calc_VMHS(df[SENSORS["Name"]["v_m"]], df[SENSORS["Name"]["H_s_wind"]], df[SENSORS["Name"]["dir_v_m"]], None,
                              N_grid=Input["N_grid"],
@@ -278,6 +280,7 @@ for sea_type, column_names in hstp_columns.items():
                                  percentiles=Input["percentiles"],
                                  avrg_method=Input["avrg_method"])
 
+
         directional = hc_calc.calc_HSTP(df[column_names[0]], df[column_names[1]], df[column_names[2]], angle_grid_mod,
                                         N_grid=Input["N_grid"],
                                         deg_reg=Input["deg_reg"],
@@ -291,7 +294,8 @@ for sea_type, column_names in hstp_columns.items():
                                         quant_up=Input["quant_up"],
                                         quant_low=Input["quant_low"],
                                         percentiles=Input["percentiles"],
-                                        avrg_method=Input["avrg_method"])
+                                        avrg_method=Input["avrg_method"],
+                                         N_segment_min=Input["N_segment_min"])
 
         # Store result in DATA_OUT
         Calc.result = omni + directional
@@ -390,7 +394,7 @@ for sea_type, column_names in column_names_dict.items():
 
         # Calculate directional and omni RWI
         directional, _ = hc_calc.calc_RWI(df[column_names[0]], df[column_names[1]], df[column_names[2]],
-                                          angle_grid_mod, INPUT["Structure"]["f_0"], gamma_mode=INPUT["RWI"]["gamma"])
+                                          angle_grid_mod, INPUT["Structure"]["f_0"], gamma_mode=INPUT["RWI"]["gamma"], N_segment_min=INPUT["RWI"]["N_segment_min"])
 
         omni, _ = hc_calc.calc_RWI(df[column_names[0]], df[column_names[1]], df[column_names[2]], None,
                                    INPUT["Structure"]["f_0"], gamma_mode=INPUT["RWI"]["gamma"])
@@ -424,7 +428,7 @@ for sea_type, column_names in column_names_dict.items():
 
         # Calculate directional and omni wave break steepness
         directional = hc_calc.calc_WaveBreak_Steep(df[column_names[0]], df[column_names[1]], df[column_names[2]],
-                                                   angle_grid_mod, Input["steep_crit"], Input["d"])
+                                                   angle_grid_mod, Input["steep_crit"], Input["d"], N_segment_min=INPUT["WaveBreak"]["N_segment_min"])
 
         omni = hc_calc.calc_WaveBreak_Steep(df[column_names[0]], df[column_names[1]], df[column_names[2]], None,
                                             Input["steep_crit"], Input["d"])
@@ -547,7 +551,8 @@ if INPUT["Toggle_Modules"].get("calc_ExtremeValues", {}):
                                                     freq_samp=Input["freq_samp"],
                                                     perc_up=Input["perc_up"],
                                                     perc_down=Input["perc_down"],
-                                                    time_window_offset=Input["time_window_offset"]
+                                                    time_window_offset=Input["time_window_offset"],
+                                                    N_segment_min = Input["N_segment_min"]
                                                     )
         else:
             directional = []

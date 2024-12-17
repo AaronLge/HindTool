@@ -2,7 +2,7 @@
 	#FOR FORMATNG RULES SEE: ./Tips_Readme/Input_template.txt
 
 *DataBase*
-path_DataBase				>		"C:/Users/aaron.lange/Desktop/Projekte/HindcastArchive/6_23.65257_120.00693_DHI/23.65257_120.00693_DHI.db"
+path_DataBase				>		"C:/Users/aaron.lange/Desktop/Projekte/HindcastArchive/5_23.65257_120.00693_DHI_old/23.65257_120.00693_DHI.db"
 colnames_preset				>		None
 db_info_txt					>		'auto'
 
@@ -11,28 +11,26 @@ db_info_txt					>		'auto'
 create_report				>		False
 path_latex_templates 		> 		".\latex_templates"	
 acronym_path				>		"C:/Users/aaron.lange/Desktop/Projekte/Report_Automation/Acronyms.txt"
-BIBDatasets                 >		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/yunlin/datasets.bib"
+BIBDatasets                 >		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/yunlin/yunlin_old/datasets.bib"
 BIBLiteratur				>		"C:/Users/aaron.lange/Desktop/Projekte/Report_Automation/Literature.bib"
 BIBGuidelines				>		"C:/Users/aaron.lange/Desktop/Projekte/Report_Automation/TechnicalGuidelines.bib"
-fig_path					>		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/yunlin/Data_Out_1/"
+fig_path					>		None
 
 map_path                    >       "C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/yunlin/map.png"
 
-extern_appendenix 			>		["C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/EnBW/Wind_swell_Seperation/report/report"]
-
 *Structure*
-JBOOST_proj					>		"I:/2024/A/24A526_Shell_Concept_Design/03_Lasten/00_Conceptual_Design/05_JBOOST/2024-11-19_EF_FLS/proj.lua"					
-JBOOST_input				>		"I:/2024/A/24A526_Shell_Concept_Design/03_Lasten/00_Conceptual_Design/05_JBOOST/2024-11-19_EF_FLS/Input JBOOST Shell_N9p2.lua"
+JBOOST_proj					>		"I:/2019/A/502_wpd_Yunlin_detailed_design/03_Lasten/01_ILA/ModeShapes/_ModalAnalysis_Final/C1_Update/proj.lua"					
+JBOOST_input				>		"I:/2019/A/502_wpd_Yunlin_detailed_design/03_Lasten/01_ILA/ModeShapes/_ModalAnalysis_Final/C1_Update/struc.lua"
 
 steep_crit					>		0.04									>	float:	Steepness limit (Hs/lamda(Tp)) for WaveBreaking 
-f_0							>		0.151									>	float:	first resonance-frequency (overrides value in ".\JBOOST\proj.lua")
+f_0							>		0.2433									>	float:	first resonance-frequency (overrides value in ".\JBOOST\proj.lua")
 
-d_from_proj					> 		True
-d							>		42.28
+d_from_proj					> 		False
+d							>		28
 
 *DataOut*
-path_out					>			"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/yunlin/">	str:	path for output-files, it is created if it doesent exist
-dir_name					>		'Data_Out'									>	str or none:	if str, name of the folder created in the path_out (Attention, can overwrite old foulders), if None, name is given, including a timestamp (recommended)
+path_out					>		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/yunlin/yunlin_old/">	str:	path for output-files, it is created if it doesent exist
+dir_name					>		'Data_Out_test'									>	str or none:	if str, name of the folder created in the path_out (Attention, can overwrite old foulders), if None, name is given, including a timestamp (recommended)
 CSV_out						>		True 									>	bool:	if True, export of all calculated data in "path_out/dirname/csv_data"
 CSV_deep					>		False											
 
@@ -48,20 +46,18 @@ datetime_start				>		'1979-01-01 07:00:00'					>	str:	startdatetime in the forma
 datetime_end				>		'1981-07-01 07:00:00'					>	str:	enddatetime in the format: "YYYY-MM-DD"
 
 *Toggle_Modules*
-#calc_VMHS					>		['wind', 'swell']									
-#calc_HSTP					>		['wind', 'swell']							
-#calc_VMTP					>		['swell']								
-#calc_RWI					>		['wind']								
-calc_Tables					>		['total']											
-#calc_WaveBreak_Steep		>		['wind']										
-#calc_AngleDeviation 		>		['dir_v_m', 'dir_T_mean_Wind', 'v_m']						>	angle_orig, angle_deviation, v_m
+calc_VMHS					>		['total']									
+#calc_HSTP					>		['total']							
+#calc_VMTP					>		['total']
+#calc_RWI					>		['total']
+#calc_Tables					>		['total']											
+#calc_WaveBreak_Steep		>		['total']	
 #calc_Roseplots				>		True									>	 [[angle, magnitude],[angle, magnitude]]
 #calc_ExtremeValues			>		True									
-#calc_Validation 			>		['wind','swell']											
+#calc_Validation 			>		['total']											
 #calc_SensorEval				>		True
 #calc_Weibull				>		[['dir_v_m', 'v_m']]
-##calc_ExtremeConture			>		[['H_s', 'T_p', 'dir_v_m']]
-#
+
 plot_VMHS					>		['wind', 'total', 'swell']
 plot_HSTP					>		['wind', 'swell', 'total']
 plot_VMTP					>		['wind', 'swell', 'total']
@@ -85,19 +81,28 @@ cell_height_tables			>		0.7
 
 
 *ColumNames*
-datetime					>		"datetime (ISO 8601) [UTC]"
-v_m 						>	 	"Wind Speed at 10m (WS_{10}) [m/s]"
-dir_v_m 					> 		"Wind Direction at 10m (WD_{10}) [\Deg.N-from]"
-T_p							>		"Peak Wave Period (T_{p}) [s]"
-T_p_wind					>		"Peak Wave Period - Wind-Sea (T_{p-Sea}) [s]"
-T_p_swell					>		"Peak Wave Period - Swell (T_{p-Swell}) [s]"
+datetime					>		"Time"
+v_m 						>	 	"WS [m/s], CFSR"
+dir_v_m 					> 		"WD [\circN], CFSR"
+T_p							>		"Tp [s], SW_{WT}"
 dir_T_p						>		"Peak Wave Direction (PWD) [\Deg.N-from]"
-H_s							>		"Sign. Wave Height (H_{m0}) [m]"
-H_s_wind					>		"Sign. Wave Height - Wind-Sea (H_{m0-Sea}) [m]"
-H_s_swell					>		"Sign. Wave Height - Swell (H_{m0-Swell}) [m]"
-dir_T_mean					>		"Mean Wave Direction (MWD) [\Deg.N-from]"
-dir_T_mean_Wind				>		"Mean Wave Direction - Wind-Sea (MWD_{Sea}) [\Deg.N-from]"
-dir_T_mean_Swell			>		"Mean Wave Direction - Swell (MWD_{Swell}) [\Deg.N-from]"
+H_s							>		"Hm0 [m], SW_{WT}"
+dir_T_mean					>		"MWD [\circN-from], SW_{WT}"
+WL							>		"WLtot [mMSL], HD_{WT}"
+v_curr_tot					>		"CStot [m/s], HD_{WT}"	
+dir_curr_tot				>		"CDtot [m/s], HD_{WT}"
+v_curr_tid					>		"CStid [m/s], HD_{WT}"
+dir_curr_tid				>		"CDtid [m/s], HD_{WT}"
+v_curr_res					>		"CSres [m/s], HD_{WT}"
+dir_curr_res				>		"CDres [m/s], HD_{WT}"
+
+		
+T_p_wind					>		"not supplied"			
+T_p_swell					>		"not supplied"	
+H_s_wind					>		"not supplied"
+H_s_swell					>		"not supplied"
+dir_T_mean_Wind				>		"not supplied"
+dir_T_mean_Swell			>		"not supplied"	
 
 *Aliase*
 datetime					>		"date [UTC]"
@@ -112,13 +117,21 @@ dir_T_mean					>		"Mean wave direction, total sea [deg]"
 T_p_wind					>		"Peak wave period, wind sea [s]"
 H_s_swell					>		"Significant wave height, swell sea [m]"
 T_p_swell					>		"Peak wave period, swell sea [s]"
-WL							>		"Water level [mMSL]"
+WL							>		"Water level total [mMSL]"
 dir_T_mean_Swell			>		"Mean wave direction, swell sea [deg]"
 dir_T_mean_Wind				>		"Mean wave direction, wind sea [deg]" 
 dir_curr					>		"Current firection [deg]"
 WL_tide						>		"Water level, tide [mMSL]"
 v_curr 						>		"Current speed [m/s]"
 v_curr_1m					>		"Current speed, 1m [m/s]"
+
+v_curr_tot					>		"Current speed total[m/s]"	
+dir_curr_tot				>		"Current direction total [deg]"
+v_curr_tid					>		"Current speed tidal [m/s]"
+dir_curr_tid				>		"Current direction tidal [deg]"
+v_curr_res					>		"Current speed residual [m/s]"
+dir_curr_res				>		"Current direction residual[deg]"
+
 
 *Units*
 datetime					>		r"[-]"
@@ -139,6 +152,13 @@ WL							>		r"[m]"
 dir_curr					>		r"[deg]"
 WL_tide						>		r"[m]"
 v_curr 						>		r"[m/s]"
+v_curr_tot					>		r"[m/s]"	
+dir_curr_tot				>		r"[deg]"
+v_curr_tid					>		r"[m/s]"
+dir_curr_tid				>		r"[deg]"
+v_curr_res					>		r"[m/s]"
+dir_curr_res				>		r"[deg]"
+
 
 *Symbols*
 datetime					>		r"datetime"
@@ -158,7 +178,15 @@ dir_T_mean_Wind				>		r"$\alpha_{T_{mean, wind}}$"
 WL							>		r"$WL$"
 dir_curr					>		r"$\alpha_{curr}$"
 WL_tide						>		r"$WL_{tide}$"
-v_curr 						>		r"$v_{curr}$"
+
+v_curr_tot					>		r"v_{curr,tota}"	
+v_curr_tid					>		r"v_{curr,tidal}"
+v_curr_res					>		r"v_{curr,residual}"
+
+dir_curr_tot				>		r"\alpha{curr,total}"
+dir_curr_tid				>		r"\alpha{curr,tidal}"
+dir_curr_res				>		r"\alpha{curr,residual}"
+
 
 *DocumentMeta*
 DocumentType 				>		r"Technical Note"
@@ -196,6 +224,7 @@ bin_min						>		0 										>	int:	mininmal number of Datapoints in one bin to i
 average_correction			>		1
 avrg_method					>		"weighted mean" 						>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
 make_monotone 				>		True                                    >   bool:   ensures a (non strict) monoton increasing function by setting every decreasing value to the value before
+N_segment_min				>		200
 
 *VMHS_swell*
 N_grid						>		15										>	int: 	number of bins in Vm-Axis
@@ -209,6 +238,7 @@ bin_min						>		0 										>	int:	mininmal number of Datapoints in one bin to i
 average_correction			>		1.05                                    >   float:  factor for all vm points 
 avrg_method					>		"weighted mean" 						>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
 make_monotone 				>		True                                    >   bool:   ensures a (non strict) monoton increasing function by setting every decreasing value to the value before
+N_segment_min				>		200
 
 *VMHS_docu*
 N_grid						>		20										>	int: 	number of bins in Vm-Axis
@@ -222,13 +252,14 @@ bin_min						>		0 										>	int:	mininmal number of Datapoints in one bin to i
 average_correction			>		1
 avrg_method					>		"weighted mean" 						>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
 make_monotone 				>		True                                    >   bool:   ensures a (non strict) monoton increasing function by setting every decreasing value to the value before (not applied in regression section)
+N_segment_min				>		200
 
 
 *VMHS_total*
 N_grid						>		60										>	int: 	number of bins in Vm-Axis
 deg_reg						>		3									    >	int: 	degree used for regression 
 model_reg					>		'poly'									>	str: 	method used for regression ('poly' : polynominal, 'sqrt' : squareroot), see documentation
-cut_reg						>		60									    >	float: 	percentage calculated with mean-values, the top (100 - cut_reg)% by regression
+cut_reg						>		0									    >	float: 	percentage calculated with mean-values, the top (100 - cut_reg)% by regression
 weighting_reg				>		0										>	float:	weighting of regression by number of data-points in bin, 1: full weighting 0: no weighting
 zone_reg 					>		[2, None]								>	list: 	range from which calculating the regression function is determined, if[.. , None], the upper limit is the maximal found value (from the current angle-section)
 zone_line					> 		[2, None] 								>	zone: 	zone, in which the regression (or mean) plot is shown (or displayed in the tables), if [.. , None]  the upper limit is the maximal found value, excuding values under n_bin (from the current angle-section)
@@ -236,6 +267,7 @@ bin_min						>		0 										>	int:	mininmal number of Datapoints in one bin to i
 average_correction			>		1                                       >   float:  factor for all vm points 
 avrg_method					>		"weighted mean" 						>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
 make_monotone 				>		True                                    >   bool:   ensures a (non strict) monoton increasing function by setting every decreasing value to the value before (not applied in regression section)
+N_segment_min				>		200
 
 *HSTP_wind*
 N_grid						>		100										>	int:	number of bins in Hs-Axis
@@ -253,6 +285,7 @@ quant_low					>		None									>	float:	lower (Period) limit (higher frequency va
 quant_up					>		None									>	float:	upper (Period) limit (lower frequency value) of resonance frequency band, if None: not plotted
 avrg_method					>		"median"							    >	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)avrg_method					>		"mean"							>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
 make_monotone 				>		False                                   >   bool:   ensures a (non strict) monoton increasing function by setting every decreasing value to the value before (not applied in regression section)
+N_segment_min				>		200
 
 
 *HSTP_swell*
@@ -271,6 +304,7 @@ quant_low					>		None									>	float:	lower (Period) limit (higher frequency va
 quant_up					>		None									>	float:	upper (Period) limit (lower frequency value) of resonance frequency band, if None: not plotted
 avrg_method					>		"median"								>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
 make_monotone 				>		False                                   >   bool:   ensures a (non strict) monoton increasing function by setting every decreasing value to the value before (not applied in regression section)
+N_segment_min				>		200
 
 *HSTP_total*
 N_grid						>		50										>	int:	number of bins in Hs-Axis
@@ -288,7 +322,7 @@ quant_low					>		None									>	float:	lower (Period) limit (higher frequency va
 quant_up					>		None									>	float:	upper (Period) limit (lower frequency value) of resonance frequency band, if None: not plotted
 avrg_method					>		"median"								>	bool: 	toogle weighting of Hs - Values ("squared mean" , "mean", "median", see documentation)
 make_monotone 				>		False                                   >   bool:   ensures a (non strict) monoton increasing function by setting every decreasing value to the value before (not applied in regression section)   
-
+N_segment_min				>		200
 
 *Tables*
 vm_zone 					>		[0.5, None]								>	list:	range in Vm-Axis, if [.. , None], the upper limit is the maximal found value (dependend on calculations from VMHS, HSTP, VMTP)
@@ -313,30 +347,20 @@ table_name					>		"DEL_config_2"
 nodes_to_load				>		['501']
 scatter_configs				>		['IDLING node 501']
 
-nodes_to_load				>		['501']							        >   list None: 'all'
-scatter_configs				>		['IDLING node 501']                     >
-
-
-*Validation_total*
-from_DB						> 		False
-table_name					>		"DEL_config_2"
-nodes_to_load				>		['501']
-scatter_configs				>		['IDLING node 501']
-
-
 *Roseplots*
 wind						>		[['dir_v_m', 'v_m']]
 total_sea					>		[['dir_T_mean', 'H_s']]
-swell_sea					>		[['dir_T_mean_Swell', 'H_s_swell']]	
-wind_sea					>		[['dir_v_m', 'H_s_wind']]
+swell_sea					>		[]	
+wind_sea					>		[]
 
-currents					>		[]
+currents					>		[['dir_curr_tot', 'v_curr_tot'],['dir_curr_tid', 'v_curr_tid'],['dir_curr_res', 'v_curr_res']]
 
 *RWI*
 gamma						>		'torset'
+N_segment_min				>		1
 
 *SensorEval*
-Sensors 					>		['v_m','H_s','T_p','H_s_wind','T_p_wind','H_s_swell','T_p_swell']
+Sensors 					>		['v_m','H_s','T_p','v_curr_tot', 'v_curr_tid', 'v_curr_res' ]
 
 
 *AngleDeviation*
@@ -348,7 +372,7 @@ margin						>		[[0, 100], [0, 100]]
 
 *ExtremeValues*
 sensors_Wind_speed			>		['dir_v_m','v_m']
-#sensors_Water_level			>		[None,'WL']
+sensors_Water_level			>		[None,'WL']
 sensors_Wave_height			>		['dir_T_mean','H_s']
 
 time_window_offset			>		0.5
@@ -359,8 +383,11 @@ conf_inter_mode				>		'percentile'							> percentile oder std
 conf_inter_algorithm		>		'2'										> 1 oder 2 
 T_return					>		[5,10,50]
 freq_samp					>		1
+N_segment_min				>		1
 
 
+*WaveBreak*
+N_segment_min 				>		100
 
 *Captions*
 FIGUDataSorce_global_page_1 				>  "General databasis parameters"
@@ -427,7 +454,7 @@ angle_deviation_table_page_8  				>  "Directional deviation wind sector [195°..
 angle_deviation_table_page_9  				>  "Directional deviation wind sector [225°...255°]"
 angle_deviation_table_page_10  				>  "Directional deviation wind sector [255°...285°]0"
 angle_deviation_table_page_11  				>  "Directional deviation wind sector [285°...315°]1"
-angle_deviation_table_page_12  				>  "Directional deviation wind sector [315°...345°]2"
+angle_deviation_table_page_12  				>  "Directional deviation wind sector [515°...345°]2"
 Revision_Table_page_1  						>  None
 Map											>	"Overview map (BSH)"
 DataSorce_global_page_1						>	"General databasis parameters (\cite{MetConditions})"
