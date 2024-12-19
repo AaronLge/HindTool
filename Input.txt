@@ -23,7 +23,7 @@ JBOOST_proj					>		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/yunli
 JBOOST_input				>		"C:/Users/aaron.lange/Desktop/Projekte/Hindcast_Reports/yunlin/Model/struc.lua"
 
 steep_crit					>		0.04									>	float:	Steepness limit (Hs/lamda(Tp)) for WaveBreaking 
-f_0							>		0.151									>	float:	first resonance-frequency (overrides value in ".\JBOOST\proj.lua")
+f_0							>											>	float:	first resonance-frequency (overrides value in ".\JBOOST\proj.lua")
 
 d_from_proj					> 		True
 d							>		42.28

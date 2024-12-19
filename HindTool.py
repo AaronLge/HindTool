@@ -685,10 +685,6 @@ if INPUT["Toggle_Modules"].get("calc_SensorEval", {}):
         Calc.add_filter(mode='nans')
         df = df.loc[Calc.apply_filters()]
 
-        #  directional = hc_calc.calc_histogram(df[column_names[0]],
-        #                                      df[column_names[1]],
-        #                                        angle_grid_mod)
-
         omni = hc_calc.calc_histogram(df[colname_data],
                                       None,
                                       None)
@@ -2042,7 +2038,7 @@ if INPUT["Toggle_Modules"].get("plot_SensorEval", {}):
             # tile timeseries
             df = Calc.load_from_db(colnames_ini=True, indizes=Seg.indizes)
             x = df[Seg.colnames['x']].values
-            titel = f'Timeseries with min = {gl.round_to_significant_digit([min(x)], 3)[0]}' + r" $\vert$ " + f'max = {gl.round_to_significant_digit([max(x)], 3)[0]}' + r" $\vert$ " + f'standard deviation = {round(np.std(x), 4)}, ' + \
+            titel = f'Timeseries with mean = {gl.round_to_significant_digit([np.mean(x)], 3)[0]}'+ r" $\vert$ " + f'min = {gl.round_to_significant_digit([min(x)], 3)[0]}' + r" $\vert$ " + f'max = {gl.round_to_significant_digit([max(x)], 3)[0]}' + r" $\vert$ " + f'std = {round(np.std(x), 4)}, ' + \
                     titels[i]
 
             tile_time = hc_plt.Tile(i, x_label='date', y_label=gl.alias(Seg.colnames['x'], INPUT["ColumNames"], INPUT["Aliase"]), title=titel)
